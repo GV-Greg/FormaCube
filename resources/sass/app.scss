@@ -1,0 +1,297 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootswatch/dist/spacelab/variables';
+@import '~bootstrap/scss/bootstrap';
+@import '~bootstrap-vue/src/index.scss';
+@import '~bootswatch/dist/spacelab/bootswatch';
+@import '~bootswatch/dist/spacelab/bootstrap';
+
+// Vuetify
+@import '~vuetify/dist/vuetify.min.css';
+
+// Material Design Icons pour Vuetify
+@import '~@mdi/font/css/materialdesignicons.min.css';
+@import '~@mdi/font/scss/materialdesignicons.scss';
+@import url('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css');
+@import '~material-design-icons-iconfont/dist/material-design-icons.css';
+
+// Font Awesome Icons
+$fa-font-path: "../webfonts";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "~@fortawesome/fontawesome-free/scss/solid.scss";
+@import "~@fortawesome/fontawesome-free/scss/brands.scss";
+
+body {
+    margin: 0;
+    padding: 0;
+    height: auto;
+    font-family: Gadugi, sans-serif;
+    background-color: #3B424A;
+}
+
+body {
+    color: #fff;
+}
+
+h1, h2 {
+    color: #fff;
+    padding-top: 5px;
+}
+
+table th, table td {
+    color: #3b424a;
+}
+
+.v-application a {
+    color: #fff !important;
+}
+
+.v-application a:hover {
+    color: #1976d2 !important;
+}
+
+.link-interface {
+    color: #254F5D !important;
+}
+
+.link-interface:hover {
+    color: #1976d2 !important;
+}
+
+a:link {
+    text-decoration:none;
+}
+
+.content-wrapper {
+    background-color: #3b424a;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.container.fill-height {
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.router-link-exact-active {
+    color: #fff !important;
+}
+
+.theme--light.v-data-table.v-data-table--fixed-header thead th{
+    background-color: #193340 !important;
+    color: #fff !important;
+    height: 35px !important;
+}
+
+.v-data-table th, .v-data-table td{
+    height: 40px !important;
+}
+
+.modal-header {
+    margin-right: -1px;
+    background-color: #317283;
+}
+
+.modal-header .modal-title, .modal-header .close {
+    color: #fff;
+}
+
+.main-footer {
+    margin: 0;
+    padding: 0;
+    height: 30px;
+    background-color: #254F5D;
+}
+
+.main-footer a:hover{
+    color: #317283;
+    text-decoration: none;
+}
+
+.elevation-4 {
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22) !important;
+}
+
+.elevation-5 {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23) !important;
+}
+
+.logo {
+    height: auto;
+    width: 30%;
+}
+
+.theme--light.v-footer {
+    background-color: #193340 !important;
+}
+
+// Custom SideBar
+.theme--light.v-navigation-drawer {
+    background-color: #193340;
+    max-height: 100% !important;
+}
+
+.theme--light.v-navigation-drawer > .v-navigation-drawer__append > .v-list > .v-list-item,
+.theme--light.v-navigation-drawer > .v-navigation-drawer__content > .v-list > .v-list-item {
+    color: #fff !important;
+}
+
+.theme--light.v-navigation-drawer > .v-navigation-drawer__append > .v-list > .v-list-item--active,
+.theme--light.v-navigation-drawer > .v-navigation-drawer__content > .v-list > .v-list-item--active {
+    color: #5cdffd !important;
+}
+
+.v-avatar {
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12) !important;
+}
+
+// Custom bouton
+.btn-wrapper{
+    text-align: left;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.btn-interface {
+    background-image: linear-gradient(#32909e, #2c6c7a 50%, #254F5D);
+    background-repeat: no-repeat;
+    -webkit-filter: none;
+    filter: none;
+    border: 1px solid $interface;
+}
+
+// Tabs
+.theme--dark.v-tabs > .v-tabs-bar {
+    background-color: #193340 !important;
+}
+
+// Custom Formulaire
+.error--text {
+    color: #e3342f !important;
+}
+
+.theme--light.v-icon {
+    color: #317283;
+}
+
+// Custom Formulaire Login
+.myFormEmail, .myFormPassword {
+    border-radius: 20px !important;
+}
+
+.myFormEmail > .v-input__control > .v-input__slot > .v-input__prepend-inner,
+.myFormPassword > .v-input__control > .v-input__slot > .v-input__prepend-inner{
+    margin-right: 10px !important;
+    padding-left: 3px;
+}
+
+.myFormEmail > .v-input__control > .v-input__slot > fieldset > legend {
+    margin-left: 20px !important;
+}
+
+.myFormPassword > .v-input__control > .v-input__slot > fieldset > legend {
+    margin-left: 24px !important;
+}
+
+.myFormEmail > .v-input__control > .v-input__slot > .v-text-field__slot > .v-label--active {
+    transform: translateX(-2px) translateY(-28px) scale(0.75) !important;
+}
+
+.myFormPassword > .v-input__control > .v-input__slot > .v-text-field__slot > .v-label--active {
+    transform: translateX(-5px) translateY(-28px) scale(0.75) !important;
+}
+
+.myFormPassword > .v-input__control > .v-input__slot > .v-input__append-inner {
+    padding-right: 5px;
+}
+
+.v-label {
+    margin-bottom: 0 !important;
+}
+
+// Custom Formulaires
+.myLabel> .v-input__control > .v-input__slot > .v-label {
+    margin-bottom: 0 !important;
+}
+
+.myLabel{
+    margin-top: 4px !important;
+}
+
+::placeholder {
+    color: #bdc5cf !important;
+}
+
+// Custom Search
+.v-menu-content > .v-list-select > .v-list-item > .v-list-item__content > .v-list-item__title {
+    color: #0a0a17 !important;
+}
+
+.mySearch > .v-input__control > .v-input__slot > .v-input__append-inner {
+    margin-top: 7px !important;
+}
+
+// Custom Stepper
+.v-stepper,
+.v-stepper__items,
+.theme--light.v-stepper .v-stepper__items .v-stepper__content .v-stepper__wrapper {
+    overflow: visible !important;
+}
+
+.v-stepper__header {
+    background-color: #317283;
+}
+
+.theme--light.v-stepper .v-stepper__label {
+    color: rgba(255, 255, 255, 0.38);
+}
+
+.theme--light.v-stepper .v-stepper__step--active .v-stepper__label {
+    color: rgba(255, 255, 255, 1);
+}
+
+.theme--light.v-stepper .v-stepper__step--active .v-stepper__step__step,
+.theme--light.v-stepper .v-stepper__step--complete .v-stepper__step__step, {
+    background-color: #5cdffd !important;
+    border-color: #5cdffd !important;
+    color: #193340 !important;
+    font-weight: bolder;
+}
+
+.theme--light.v-stepper .v-stepper__header .v-divider {
+    border-color: rgba(255, 255, 255, 0.38);
+}
+
+// Custom Pagination
+.page-link {
+    color: #193340;
+}
+
+// Custom Date Input Without Date Picker
+[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+// Custom Tabs Accueil
+.v-application a.v-tab--active {
+    color: #389fad !important;
+}
+
+// Custome tableau
+.no-information {
+    color: #8c9499;
+    font-weight: normal;
+    font-style: italic;
+    font-size: small;
+}
+
+// Custom MailoUI
+.mailtoui-button-icon {
+    top: -4px !important;
+}

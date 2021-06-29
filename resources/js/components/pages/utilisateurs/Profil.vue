@@ -10,7 +10,7 @@
                             </v-avatar>
                             <div>
                                 <span class="display-1 text--primary font-weight-bold">
-                                    {{ currentUser.firstname }} {{ currentUser.lastname | UpperCase }}SEB<br>
+                                    {{ currentUser.firstname }} {{ currentUser.lastname | UpperCase }} by Greg<br>
                                 </span>
                                 <p><i>créé depuis le {{ currentUser.created_at | newDate }}</i></p>
                             </div>

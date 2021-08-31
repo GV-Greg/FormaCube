@@ -119,7 +119,7 @@
         data() {
             return {
                 loading: false,
-                searchColonnes: ['nom'],
+                searchColonnes: ['nom', 'salle'],
                 colonne: 'nom',
                 search: '',
                 formations: [],

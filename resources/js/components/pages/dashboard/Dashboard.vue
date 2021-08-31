@@ -3,7 +3,7 @@
         <v-navigation-drawer app expand-on-hover class="elevation-4">
             <v-list>
                 <v-list-item class="px-2" link  href="https://www.interface3namur.be" target="_blank" rel="noopener noreferrer">
-                    <v-img aspect-ratio="1" src="./images/Interface3Namur-favicon.png" alt="Logo" class="v-responsive__content-logo"></v-img>
+                    <v-img aspect-ratio="1" src="/images/Interface3Namur-favicon.png" alt="Logo" class="v-responsive__content-logo"></v-img>
                     <v-list-item-content>
                         <v-list-item-title>Interface3.Namur</v-list-item-title>
                     </v-list-item-content>

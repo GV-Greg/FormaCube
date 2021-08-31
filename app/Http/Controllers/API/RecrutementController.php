@@ -34,7 +34,13 @@ class RecrutementController extends Controller
      */
     public function search($field, $search)
     {
-        return new RecrutementCollection(Recrutement::where($field,'LIKE',"%$search%")->latest()->paginate(10));
+        if($field === 'formation') {
+            return new RecrutementCollection(Recrutement::whereHas('formation', function($query) use ($search) {
+                $query->where('nom', 'LIKE', "%$search%");
+            })->latest()->paginate(10));
+        } else {
+            return new RecrutementCollection(Recrutement::where($field,'LIKE',"%$search%")->latest()->paginate(10));
+        }
     }
 
     /**

@@ -407,6 +407,7 @@
                                             <b-form-select-option value="Étranger sans équivalence">Dipl&ocirc;me &eacute;tranger (sans équivalence)</b-form-select-option>
                                             <b-form-select-option value="Étranger avec équivalence">Dipl&ocirc;me &eacute;tranger (avec équivalence)</b-form-select-option>
                                             <b-form-select-option value="autre">Autre</b-form-select-option>
+                                            <b-form-select-option v-show="verifListDiplomes" :value="listDiplomes">{{ listDiplomes }}</b-form-select-option>
                                         </b-form-select>
                                         <b-form-input v-model="formInscrit.diplome" type="text" v-show="listDiplomes === 'autre'"
                                                       class="form-control col-7" :class="{ 'is-invalid': formInscrit.errors.has('diplome') }"
@@ -451,6 +452,7 @@
                                             <b-form-select-option value="Proximag">Proximag</b-form-select-option>
                                             <b-form-select-option value="Vlan">Vlan</b-form-select-option>
                                             <b-form-select-option value="autre">Autre</b-form-select-option>
+                                            <b-form-select-option v-show="verifListSources" :value="listSources">{{ listSources }}</b-form-select-option>
                                         </b-form-select>
                                         <b-form-input v-model="formInscrit.source_info" type="text" maxlength="190"  v-show="listSources === 'autre'"
                                                       class="form-control col-7" :class="{ 'is-invalid': formInscrit.errors.has('source_info') }"
@@ -481,6 +483,7 @@
 <script>
     import { Form } from "vform";
     import moment from 'moment';
+    const now = moment();
 
     export default {
         name: "Edit-Inscrit",
@@ -540,6 +543,19 @@
                 this.newTags.push(newTag);
                 this.choix_tag = null;
             },
+            listDiplomes: function(oldDiplome) {
+                if(oldDiplome === 'autre') {
+                    this.formInscrit.diplome = '';
+                }
+            },
+            listSources: function(oldSource) {
+                if(oldSource === 'autre') {
+                    this.formInscrit.source_info = '';
+                }
+            },
+            // formInscrit.date_naissance: function() {
+            //
+            // }
         },
         mounted() {
             console.log('EditInscrit component mounted');
@@ -568,8 +584,13 @@
                     return this.formInscrit.date_naissance !== '';
                 }
             },
-            formattedDateNaissance () {
+            formattedDateNaissance() {
                 return this.formInscrit.date_naissance ? moment(this.formInscrit.date_naissance).format('L') : ''
+            },
+            validDateNaissance() {
+                if(this.formInscrit.date_naissance.length > 0) {
+                    return moment(this.formInscrit.date_naissance) > moment();
+                }
             },
             validationMaxRue() {
                 return this.formInscrit.rue.length < 190;
@@ -633,6 +654,24 @@
             },
             validationAge() {
                 return Number(this.formInscrit.age) > 0 && Number(this.formInscrit.age) < 1000;
+            },
+            verifListDiplomes() {
+                return this.listDiplomes !== 'Aucun' && this.listDiplomes !== 'CEB' &&
+                    this.listDiplomes !== 'CESI' && this.listDiplomes !== 'CESS' &&
+                    this.listDiplomes !== 'Non Universitaire Type Court' &&
+                    this.listDiplomes !== 'Non Universitaire Type Long' && this.listDiplomes !== 'Universitaire' &&
+                    this.listDiplomes !== 'Étranger sans équivalence' && this.listDiplomes !== 'Étranger avec équivalence';
+            },
+            verifListSources() {
+                return this.listSources !== 'Facebook' && this.listSources !== 'Forem/Adressage forem' &&
+                    this.listSources !== 'Site internet' && this.listSources !== 'Affiches/flyes' &&
+                    this.listSources !== 'Ancien stagiaire' && this.listSources !== 'Autre formation' &&
+                    this.listSources !== 'Bouche à oreille' && this.listSources !== 'CEFO' &&
+                    this.listSources !== 'CPAS/Synergie emploi' && this.listSources !== 'Croix rouge' &&
+                    this.listSources !== 'Instagram' && this.listSources !== 'La Charnière' &&
+                    this.listSources !== 'Mailing' && this.listSources !== 'Maison de l\'emploi' &&
+                    this.listSources !== 'Mirena' && this.listSources !== 'Partenaires' &&
+                    this.listSources !== 'Proximag' && this.listSources !== 'Vlan';
             }
         },
         methods: {
@@ -652,7 +691,6 @@
                 }
                 return false;
             },
-
             getDatas() {
                 this.getInscrit();
                 this.getVilles();
@@ -687,6 +725,12 @@
                         }
                         if(response.data.pouvsubInfos != null) {
                             this.pouvsubInfos = response.data.pouvsubInfos;
+                        }
+                        if(response.data.inscrit.diplome != null) {
+                            this.listDiplomes = response.data.inscrit.diplome;
+                        }
+                        if(response.data.inscrit.source_info != null) {
+                            this.listSources = response.data.inscrit.source_info;
                         }
                         this.getFormInscrit(this.inscrit);
                         this.verifInscrit();
@@ -771,6 +815,7 @@
                 } else if(this.validation(this.formInscrit.prenom !== '' && !this.validationMaxPrenom, "Le champ prénom ne peut contenir plus de 190 caractères !")) {
                 } else if(this.validation(this.formInscrit.genre == null && this.champsObligatoires.genre === false, "Vous n'avez pas rempli le genre ou cochez la case 'non disponible' (ND) correspondante !")) {
                 } else if(this.validation(this.formInscrit.date_naissance === '' && this.champsObligatoires.date_naissance === false, "Vous n'avez pas rempli la date de naissance ou cochez la case 'non disponible' (ND) correspondante !")) {
+                } else if(this.validation(this.formInscrit.date_naissance !== '' && this.validDateNaissance, "La date de naissance ne peut être une date future !")) {
                 } else if(this.validation(this.formInscrit.rue !== '' && !this.validationMaxRue, "Le champ rue ne peut contenir plus de 190 caractères !")) {
                 } else if(this.validation(this.formInscrit.numero !== '' && Number(this.formInscrit.numero) <= 0, 'Le numéro doit être positif et non nul !')) {
                 } else if(this.validation(this.formInscrit.numero !== '' && Number(this.formInscrit.numero) > 9999, 'Le numéro doit être inférieur à 10000 !')) {

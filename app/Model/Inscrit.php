@@ -15,6 +15,8 @@ class Inscrit extends Model implements Searchable
         'nom', 'prenom', 'genre', 'date_naissance', 'rue', 'numero', 'boite', 'email', 'tel', 'gsm', 'commentaire_inscrit', 'prospect', 'age', 'num_national', 'statut_legal', 'diplome', 'duree_chomage', 'moyen_recrutement', 'groupe_social', 'newsletter'
     ];
 
+    protected $dates = ['date_naissance'];
+
     public function ville()
     {
         return $this->belongsTo(Villes::class);

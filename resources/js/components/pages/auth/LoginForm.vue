@@ -4,7 +4,7 @@
             <div class="col-lg-6 bg-light mt-5" style="border-radius: 40px;">
                 <div id="app" class="p-3">
                     <div class="d-flex justify-content-center p-5">
-                        <v-img src="./images/interface3-logo.png" id="logo" alt="Logo" style="width:80%"></v-img>
+                        <v-img src="/images/interface3-logo.png" id="logo" alt="Logo" style="width:80%"></v-img>
                     </div>
                     <div class="field px-5 pb-3">
                         <v-container class="text-center">

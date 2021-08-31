@@ -107,354 +107,364 @@
                         </v-row>
                     </v-card-text>
                 </v-card>
-                <v-row class="mb-n5 mt-0" v-show="loading === true">
-                    <v-col>
-                        <v-tabs class="elevation-2" dark>
-                            <v-tabs-slider></v-tabs-slider>
-                            <v-tab href="#listStagiaires">Liste des stagiaires</v-tab>
-                            <v-tab href="#ajoutStagiaires">Ajout de stagiaires</v-tab>
-                            <v-tab href="#recrutements">Recrutement(s)</v-tab>
-                            <v-tab href="#documents">Documents</v-tab>
-                            <v-tab-item value="listStagiaires">
-                                <v-card flat tile>
-                                    <v-card-text>
-                                        <div class="row d-flex justify-content-center mt-2" v-if="loadingDatas === true && lower_nom_formation  === 'pmtic' && stagiaires.length > 0">
-                                            <v-simple-table fixed-header>
-                                                <template v-slot:default>
-                                                    <thead>
-                                                    <tr>
-                                                        <th class="text-left">N°</th>
-                                                        <th class="text-center">Pr&eacute;nom</th>
-                                                        <th class="text-center">Nom</th>
-                                                        <th class="text-center">Infos</th>
-                                                        <th class="text-center">Modules</th>
-                                                        <th class="text-center">RDV</th>
-                                                        <th class="text-center">Rappel</th>
-                                                        <th class="text-left">Actions</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr class="myTr" v-for="(stagiaire, index) in stagiaires" :key="stagiaire.id">
-                                                        <td class="text-left"><strong>{{ index + 1 }}</strong></td>
-                                                        <td class="text-center"><strong>{{ stagiaire.prenom }}</strong></td>
-                                                        <td class="text-center"><strong>{{ stagiaire.nom | upperCase }}</strong></td>
-                                                        <td class="text-center">
-                                                            <span v-if="stagiaire.tel !== null || stagiaire.gsm !== null || stagiaire.email !== null">
-                                                                 <button @click="afficherInfos(stagiaire.prenom, stagiaire.nom, stagiaire.tel, stagiaire.gsm, stagiaire.email)">
-                                                                     <i class="fas fa-user-graduate fa-lg mr-1"></i>
-                                                                     <span class="font-weight-bold" v-show="stagiaire.tel !== null">T&eacute;l. </span>
-                                                                     <span class="font-weight-bold" v-show="stagiaire.gsm !== null">GSM </span>
-                                                                     <span class="font-weight-bold"v-show="stagiaire.Email !== null">Email </span>
-                                                                 </button>
-                                                            </span>
-                                                            <span v-else class="no-information">Non renseigné</span>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span class="font-weight-bold mr-1">1</span>
-                                                            <i v-if="stagiaire.pmtic_module_1 === true"class="fas fa-check fa-lg text-green mr-1"></i>
-                                                            <i v-else class="fas fa-times fa-lg text-red mr-1"></i>
-                                                            <span class="font-weight-bold mx-1">2</span>
-                                                            <i v-if="stagiaire.pmtic_module_2 === true" class="fas fa-check fa-lg text-green mr-1"></i>
-                                                            <i v-else class="fas fa-times fa-lg text-red mr-1"></i>
-                                                            <span class="font-weight-bold mx-1">3</span>
-                                                            <i v-if="stagiaire.pmtic_module_3 === true" class="fas fa-check fa-lg text-green mr-1"></i>
-                                                            <i v-else class="fas fa-times fa-lg text-red mr-1"></i>
-                                                        </td>
-                                                        <td class="text-center" v-if="stagiaire.date_rdv === null">
-                                                            <button @click="fixerRdv(stagiaire.id)">
-                                                                <i class="fas fa-calendar-check fa-lg text-pink mr-1"></i><i class="fas fa-times fa-lg text-red ml-1"></i>
-                                                            </button>
-                                                        </td>
-                                                        <td v-if="stagiaire.date_rdv != null && stagiaire.validation_rdv === 0" class="text-center">
-                                                            <button id="bouton_rdv_pmtic" @click="fixerRdv(stagiaire.id)" class="d-flex flex-row">
-                                                                <div class="mt-2"><i class="fas fa-calendar-check fa-lg text-orange mr-1"></i></div>
-                                                                <div class="d-flex flex-column text-left">
-                                                                    <span>{{ stagiaire.date_rdv | newDate }}</span>
-                                                                    <span class="mt-n1">{{ stagiaire.rdv_user_prenom }} {{ stagiaire.rdv_user_nom }}</span>
-                                                                </div>
-                                                            </button>
-                                                        </td>
-                                                        <td v-if="stagiaire.date_rdv != null && stagiaire.validation_rdv === 1" class="text-left" >
-                                                            <div class="d-flex flex-row">
-                                                                <div class="align-self-center mr-1"><i class="fas fa-calendar-check fa-lg text-green"></i></div>
-                                                                <div class="d-flex flex-column text-left">
-                                                                    <span>{{ stagiaire.date_rdv | newDate }}</span>
-                                                                    <span class="mt-n1">{{ stagiaire.rdv_user_prenom }} {{ stagiaire.rdv_user_nom }}</span>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-left" v-if="stagiaire.date_rappel === null">
-                                                            <button @click="faireRappel(stagiaire.id)">
-                                                                <i class="fas fa-phone fa-lg text-pink mr-1"></i><i class="fas fa-times fa-lg text-red ml-1"></i>
-                                                            </button>
-                                                        </td>
-                                                        <td class="text-left" v-else>
-                                                            <div class="d-flex flex-row">
-                                                                <div class="align-self-center mr-1"><i class="fas fa-phone fa-lg text-green"></i></div>
-                                                                <div class="d-flex flex-column text-left">
-                                                                    <span>{{ stagiaire.date_rappel | newDate }}</span>
-                                                                    <span class="mt-n1">{{ stagiaire.rappel_user_prenom }} {{ stagiaire.rappel_user_nom }}</span>
-                                                                    <span>{{ stagiaire.rappel_resultat }}</span>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <router-link :to="{ name: 'showInscrit', params: { id: stagiaire.id }}">
-                                                                <i class="fas fa-eye fa-lg text-blue mr-1"></i>
-                                                            </router-link>
-                                                            <span>|</span>
-                                                            <button type="button" @click="reportStagiaire(stagiaire.id)">
-                                                                <i class="fas fa-paper-plane fa-lg text-orange mx-1"></i>
-                                                            </button>
-                                                            <span>|</span>
-                                                            <button type="button" class="ml-1" @click="editStagiaire(stagiaire.id)">
-                                                                <i class="fas fa-edit fa-lg text-green mx-1"></i>
-                                                            </button>
-                                                            <span>|</span>
-                                                            <button type="button" class="ml-1" @click="startDeleteStagiaire(stagiaire.id, stagiaire.prenom, stagiaire.nom)">
-                                                                <i class="fas fa-trash-alt fa-lg text-red"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </template>
-                                            </v-simple-table>
-                                        </div>
-                                        <div v-show="loadingDatas === false">
-                                            <v-row class="text-center text-interface mt-1">
-                                                <v-col class="d-flex flex-column justify-center align-center">
-                                                    <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
-                                                    <span class="mt-5">Chargement...</span>
-                                                </v-col>
-                                            </v-row>
-                                        </div>
-                                        <div class="row d-flex justify-content-center mt-2" v-if="loadingDatas === true && lower_nom_formation  !== 'pmtic' && stagiaires.length > 0">
-                                            <v-simple-table fixed-header>
-                                                <template v-slot:default>
-                                                    <thead class>
-                                                    <tr>
-                                                        <th class="text-left">N°</th>
-                                                        <th class="text-center">Pr&eacute;nom & Nom</th>
-                                                        <th class="text-center">Infos</th>
-                                                        <th class="text-center">RDV</th>
-                                                        <th class="text-center">Rappel</th>
-                                                        <th class="text-left">Actions</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr class="myTr" v-for="(stagiaire, index) in stagiaires" :key="stagiaire.id">
-                                                        <td class="text-left"><strong>{{ index + 1 }}</strong></td>
-                                                        <td class="text-left"><strong>{{ stagiaire.prenom }} {{ stagiaire.nom | upperCase }}</strong></td>
-                                                        <td class="text-center">
-                                                            <span v-if="stagiaire.tel !== null || stagiaire.gsm !== null || stagiaire.email !== null">
-                                                                 <button @click="afficherInfos(stagiaire.prenom, stagiaire.nom, stagiaire.tel, stagiaire.gsm, stagiaire.email)">
-                                                                     <i class="fas fa-user-graduate fa-lg mr-1"></i>
-                                                                     <span class="font-weight-bold" v-show="stagiaire.tel !== null">T&eacute;l. </span>
-                                                                     <span class="font-weight-bold" v-show="stagiaire.gsm !== null">GSM </span>
-                                                                     <span class="font-weight-bold"v-show="stagiaire.Email !== null">Email </span>
-                                                                 </button>
-                                                            </span>
-                                                            <span v-else class="no-information">Non renseigné</span>
-                                                        </td>
-                                                        <td class="text-center" v-if="stagiaire.date_rdv === null">
-                                                            <button @click="fixerRdv(stagiaire.id)">
-                                                                <i class="fas fa-calendar-check fa-lg text-pink mr-1"></i><i class="fas fa-times fa-lg text-red ml-1"></i>
-                                                            </button>
-                                                        </td>
-                                                        <td v-if="stagiaire.date_rdv != null && stagiaire.validation_rdv === 0" class="text-center">
-                                                            <button id="bouton_rdv_general" @click="fixerRdv(stagiaire.id)" class="d-flex flex-row">
-                                                                <div class="mt-2"><i class="fas fa-calendar-check fa-lg text-orange mr-1"></i></div>
-                                                                <div class="d-flex flex-column text-left">
-                                                                    <span>{{ stagiaire.date_rdv | newDate }}</span>
-                                                                    <span class="mt-n1">{{ stagiaire.rdv_user_prenom }} {{ stagiaire.rdv_user_nom }}</span>
-                                                                </div>
-                                                            </button>
-                                                        </td>
-                                                        <td v-if="stagiaire.date_rdv != null && stagiaire.validation_rdv === 1" class="text-left" >
-                                                            <div class="d-flex flex-row">
-                                                                <div class="align-self-center mr-1"><i class="fas fa-calendar-check fa-lg text-green"></i></div>
-                                                                <div class="d-flex flex-column text-left">
-                                                                    <span>{{ stagiaire.date_rdv | newDate }}</span>
-                                                                    <span class="mt-n1">{{ stagiaire.rdv_user_prenom }} {{ stagiaire.rdv_user_nom }}</span>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td v-if="stagiaire.date_rappel === null" class="text-center" >
-                                                            <button @click="faireRappel(stagiaire.id)">
-                                                                <i class="fas fa-phone fa-lg text-pink mr-1"></i><i class="fas fa-times fa-lg text-red ml-1"></i>
-                                                            </button>
-                                                        </td>
-                                                        <td class="text-left" v-else>
-                                                            <div class="d-flex flex-row">
-                                                                <div class="align-self-center mr-1"><i class="fas fa-phone fa-lg text-green"></i></div>
-                                                                <div class="d-flex flex-column text-left">
-                                                                    <span>{{ stagiaire.date_rappel | newDate }}</span>
-                                                                    <span class="mt-n1">{{ stagiaire.rappel_user_prenom }} {{ stagiaire.rappel_user_nom }}</span>
-                                                                    <span>{{ stagiaire.rappel_resultat }}</span>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <router-link :to="{ name: 'showInscrit', params: { id: stagiaire.id }}">
-                                                                <i class="fas fa-eye fa-lg text-blue mr-1"></i>
-                                                            </router-link>
-                                                            <span>|</span>
-                                                            <button type="button" @click="reportStagiaire(stagiaire.id)">
-                                                                <i class="fas fa-paper-plane fa-lg text-orange mx-1"></i>
-                                                            </button>
-                                                            <span>|</span>
-                                                            <button type="button" class="ml-1" @click="startDeleteStagiaire(stagiaire.id, stagiaire.prenom, stagiaire.nom)">
-                                                                <i class="fas fa-trash-alt fa-lg text-red mx-1"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    </tbody>
-                                                </template>
-                                            </v-simple-table>
-                                        </div>
-                                        <div class="row d-flex justify-content-center" v-if="loadingDatas === true && stagiaires.length === 0">
-                                            <div class="col text-center">
-                                                Aucun stagiaire inscrit à la formation
-                                            </div>
-                                        </div>
-                                    </v-card-text>
-                                </v-card>
-                            </v-tab-item>
-                            <v-tab-item value="ajoutStagiaires">
-                                <v-card flat tile>
-                                    <v-card-text >
-                                        <div class="row row-cols-4">
-                                            <div class="col col-3 mb-5">
-                                                <b-form-input type="text" placeholder="Rechercher un·e inscrit·e" v-model="query"></b-form-input>
-                                                <div v-if="results.length > 0 && query" class="list_inscrits elevation-4">
-                                                    <ul>
-                                                        <li v-for="result in results.slice(0,10)" :key="result.id">
-                                                            <div class="d-inline-flex">
-                                                                <span class="inscrit" v-on:click="ajoutStagiaire(result.searchable.id, result.searchable.nom, result.searchable.prenom)">
-                                                                    <i class="fas fa-user-plus fa-lg myIcon"></i>
-                                                                    <span v-text="result.title" class="span_inscrit"></span>
-                                                                </span>
-                                                            </div>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div class="col col-3">
-                                                <h6>Liste des stagiaires à ajouter :</h6>
-                                                <div v-if="listStagiaires.length > 0" class="list_stagiaires">
-                                                    <ul>
-                                                        <li v-for="(personne, index) in listStagiaires" :key="personne.id">
-                                                            <div class="d-inline-flex stagiaire">
-                                                                <i class="fas fa-user fa-lg myIconStagiaire"></i>
-                                                                {{ personne.nom | upperCase }} {{ personne.prenom }}
-                                                                <i class="fas fa-times fa-lg myIconDelete" v-on:click="deleteListStagiaires(index)"></i>
-                                                            </div>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div v-else>
-                                                    Aucun
-                                                </div>
-                                            </div>
-                                            <div class="col col-3 text-right">
-                                                <button v-if="nbreStagiaires === formation.max_stagiaires" class="btn btn-success text-light" disabled>Inscrire les stagiaires</button>
-                                                <button v-else class="btn btn-success text-light" @click="storeInscriptionStagiaires()">Inscrire les stagiaires</button>
-                                            </div>
-                                            <div class="col col-3 text-left" v-if="nbreStagiaires < formation.max_stagiaires">
-                                                <router-link :to="{ name: 'createInscritWithFormation', params: { formation_id: formation.id }}"
-                                                             class="link default">
-                                                    <button class="btn btn-interface text-light">
-                                                        <b-img v-bind="images" center src="../images/BoutonAjoutPerso.png" alt="Center image"></b-img>
-                                                        Faire une inscription
-                                                    </button>
-                                                </router-link>
-                                            </div>
-                                        </div>
-                                    </v-card-text>
-                                </v-card>
-                            </v-tab-item>
-                            <v-tab-item value="recrutements">
-                                <v-card flat tile>
-                                    <v-card-text style="height: auto;">
-                                        <v-row v-if="recrutements.length > 0">
-                                            <v-col class="col-3 default bloc text-center mb-5 elevation-2 ml-4 mr-2 mt-2" v-for="item in recrutements" :key="item.id">
-                                                <router-link :to="{ name: 'showRecrutement', params: { id: item.id }}"
-                                                             class="link default">
-                                                        <i class="fas fa-calendar-plus fa-lg myIcon"></i>
-                                                        <strong>Recrutement du {{ item.date | newDate }}</strong><br/>
-                                                </router-link>
-                                                <i class="fas fa-times fa-lg myIconDeleteStagiaire"
-                                                   v-show="currentUser.role === 'admin' || currentUser.role === 'master'"
-                                                   v-on:click="verifRecrutement(item.id)">
-                                                </i>
-                                            </v-col>
-                                        </v-row>
-                                        <v-row v-else>
-                                            <v-col>
-                                                Aucun recrutement prévu
-                                            </v-col>
-                                        </v-row>
-                                        <v-row v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
-                                            <v-col cols="12" sm="6" class="d-flex justify-content-center">
-                                                <v-date-picker
-                                                    v-model="listNewDatesRecrutements"
-                                                    multiple no-title
-                                                    :min="min"
-                                                    :max="max"
-                                                    :allowed-dates="allowedDaysRecrutement(listDatesRecrutements)"
-                                                    locale="fr"
-                                                    :first-day-of-week="weekday"
-                                                    color="green lighten-1"
-                                                >
-                                                </v-date-picker>
-                                            </v-col>
-                                            <v-col cols="12" sm="6">
-                                                <v-menu :close-on-content-click="false"
-                                                        :return-value.sync="listNewDatesRecrutements"
-                                                        transition="scale-transition"
-                                                        offset-y
-                                                        min-width="290px" >
-                                                    <template v-slot:activator="{ on, attrs }">
-                                                        <v-combobox
-                                                            v-model="listNewDatesRecrutements"
-                                                            multiple
-                                                            chips
-                                                            small-chips
-                                                            label="Date(s) de recrutement"
-                                                            prepend-icon="mdi-calendar"
-                                                            readonly
-                                                            v-bind="attrs" v-on="on" >
-                                                        </v-combobox>
-                                                    </template>
-                                                </v-menu>
-                                            </v-col>
-                                        </v-row>
-                                        <v-row v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
-                                            <v-col class="d-flex justify-content-center">
-                                                <button class="btn btn-success" @click.prevent="startTraitementRecrutements()" :disabled="listNewDatesRecrutements.length === 0">
-                                                    Sauvegarder les dates
-                                                </button>
-                                            </v-col>
-                                        </v-row>
-                                    </v-card-text>
-                                </v-card>
-                            </v-tab-item>
-                            <v-tab-item value="documents">
-                                <v-card flat tile>
-                                    <v-card-text>
-                                        <button class="btn btn-interface button-link" @click="uploadListePresence()">Liste des présences</button>
-                                    </v-card-text>
-                                </v-card>
-                            </v-tab-item>
-                        </v-tabs>
-                    </v-col>
-                </v-row>
             </v-col>
         </v-row>
-        <v-row v-else class="text-center text-interface mt-10">
+        <v-row v-else class="text-center text-light mt-10">
             <v-col class="d-flex flex-column justify-center align-center">
                 <v-progress-circular :size="70" :width="10" color="white" indeterminate></v-progress-circular>
-                <span class="mt-5 text-white">Chargement...</span>
+                <span class="mt-5">Chargement...</span>
+            </v-col>
+        </v-row>
+        <v-row class="mb-n5" v-show="loading === true">
+            <v-col>
+                <v-tabs class="elevation-2" dark>
+                    <v-tabs-slider></v-tabs-slider>
+                    <v-tab href="#listStagiaires">Liste des stagiaires</v-tab>
+                    <v-tab href="#ajoutStagiaires">Ajout de stagiaires</v-tab>
+                    <v-tab href="#recrutements">Recrutement(s)</v-tab>
+                    <v-tab href="#documents">Documents</v-tab>
+                    <v-tab-item value="listStagiaires">
+                        <v-card flat tile>
+                            <v-card-text>
+                                <div class="row d-flex justify-content-center mt-2" v-if="loadingDatas === true && lower_nom_formation  === 'pmtic' && stagiaires.length > 0">
+                                    <v-simple-table fixed-header>
+                                        <template v-slot:default>
+                                            <thead>
+                                            <tr>
+                                                <th class="text-left">N°</th>
+                                                <th class="text-center">Pr&eacute;nom</th>
+                                                <th class="text-center">Nom</th>
+                                                <th class="text-center">Infos</th>
+                                                <th class="text-center">Modules</th>
+                                                <th class="text-center">RDV</th>
+                                                <th class="text-center">Rappel</th>
+                                                <th class="text-left">Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr class="myTr" v-for="(stagiaire, index) in stagiaires" :key="stagiaire.id">
+                                                <td class="text-left"><strong>{{ index + 1 }}</strong></td>
+                                                <td class="text-center"><strong>{{ stagiaire.prenom }}</strong></td>
+                                                <td class="text-center"><strong>{{ stagiaire.nom | upperCase }}</strong></td>
+                                                <td class="text-center">
+                                                    <span v-if="stagiaire.tel !== null || stagiaire.gsm !== null || stagiaire.email !== null">
+                                                         <button @click="afficherInfos(stagiaire.prenom, stagiaire.nom, stagiaire.tel, stagiaire.gsm, stagiaire.email)">
+                                                             <i class="fas fa-user-graduate fa-lg mr-1"></i>
+                                                             <span class="font-weight-bold" v-show="stagiaire.tel !== null">T&eacute;l. </span>
+                                                             <span class="font-weight-bold" v-show="stagiaire.gsm !== null">GSM </span>
+                                                             <span class="font-weight-bold"v-show="stagiaire.Email !== null">Email </span>
+                                                         </button>
+                                                    </span>
+                                                    <span v-else class="no-information">Non renseigné</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="font-weight-bold mr-1">1</span>
+                                                    <i v-if="stagiaire.pmtic_module_1 === true"class="fas fa-check fa-lg text-green mr-1"></i>
+                                                    <i v-else class="fas fa-times fa-lg text-red mr-1"></i>
+                                                    <span class="font-weight-bold mx-1">2</span>
+                                                    <i v-if="stagiaire.pmtic_module_2 === true" class="fas fa-check fa-lg text-green mr-1"></i>
+                                                    <i v-else class="fas fa-times fa-lg text-red mr-1"></i>
+                                                    <span class="font-weight-bold mx-1">3</span>
+                                                    <i v-if="stagiaire.pmtic_module_3 === true" class="fas fa-check fa-lg text-green mr-1"></i>
+                                                    <i v-else class="fas fa-times fa-lg text-red mr-1"></i>
+                                                </td>
+                                                <td class="text-center" v-if="stagiaire.date_rdv === null">
+                                                    <button @click="fixerRdv(stagiaire.id)">
+                                                        <i class="fas fa-calendar-check fa-lg text-pink mr-1"></i><i class="fas fa-times fa-lg text-red ml-1"></i>
+                                                    </button>
+                                                </td>
+                                                <td v-if="stagiaire.date_rdv != null && stagiaire.validation_rdv === 0" class="text-center">
+                                                    <button id="bouton_rdv_pmtic" @click="fixerRdv(stagiaire.id)" class="d-flex flex-row">
+                                                        <div class="mt-2"><i class="fas fa-calendar-check fa-lg text-orange mr-1"></i></div>
+                                                        <div class="d-flex flex-column text-left">
+                                                            <span>{{ stagiaire.date_rdv | newDate }}</span>
+                                                            <span class="mt-n1">{{ stagiaire.rdv_user_prenom }} {{ stagiaire.rdv_user_nom }}</span>
+                                                        </div>
+                                                    </button>
+                                                </td>
+                                                <td v-if="stagiaire.date_rdv != null && stagiaire.validation_rdv === 1" class="text-left" >
+                                                    <div class="d-flex flex-row">
+                                                        <div class="align-self-center mr-1"><i class="fas fa-calendar-check fa-lg text-green"></i></div>
+                                                        <div class="d-flex flex-column text-left">
+                                                            <span>{{ stagiaire.date_rdv | newDate }}</span>
+                                                            <span class="mt-n1">{{ stagiaire.rdv_user_prenom }} {{ stagiaire.rdv_user_nom }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-left" v-if="stagiaire.date_rappel === null">
+                                                    <button @click="faireRappel(stagiaire.id)">
+                                                        <i class="fas fa-phone fa-lg text-pink mr-1"></i><i class="fas fa-times fa-lg text-red ml-1"></i>
+                                                    </button>
+                                                </td>
+                                                <td class="text-left" v-else>
+                                                    <div class="d-flex flex-row">
+                                                        <div class="align-self-center mr-1"><i class="fas fa-phone fa-lg text-green"></i></div>
+                                                        <div class="d-flex flex-column text-left">
+                                                            <span>{{ stagiaire.date_rappel | newDate }}</span>
+                                                            <span class="mt-n1">{{ stagiaire.rappel_user_prenom }} {{ stagiaire.rappel_user_nom }}</span>
+                                                            <span>{{ stagiaire.rappel_resultat }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <router-link :to="{ name: 'showInscrit', params: { id: stagiaire.id }}">
+                                                        <i class="fas fa-eye fa-lg text-blue mr-1"></i>
+                                                    </router-link>
+                                                    <span>|</span>
+                                                    <button type="button" @click="reportStagiaire(stagiaire.id)">
+                                                        <i class="fas fa-paper-plane fa-lg text-orange mx-1"></i>
+                                                    </button>
+                                                    <span>|</span>
+                                                    <button type="button" class="ml-1" @click="editStagiaire(stagiaire.id)">
+                                                        <i class="fas fa-edit fa-lg text-green mx-1"></i>
+                                                    </button>
+                                                    <span>|</span>
+                                                    <button type="button" class="ml-1" @click="startDeleteStagiaire(stagiaire.id, stagiaire.prenom, stagiaire.nom)">
+                                                        <i class="fas fa-trash-alt fa-lg text-red"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </template>
+                                    </v-simple-table>
+                                </div>
+                                <div v-show="loadingDatas === false">
+                                    <v-row class="text-center text-interface mt-1">
+                                        <v-col class="d-flex flex-column justify-center align-center">
+                                            <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
+                                            <span class="mt-5">Chargement...</span>
+                                        </v-col>
+                                    </v-row>
+                                </div>
+                                <div class="row d-flex justify-content-center mt-2" v-if="loadingDatas === true && lower_nom_formation  !== 'pmtic' && stagiaires.length > 0">
+                                    <v-simple-table fixed-header>
+                                        <template v-slot:default>
+                                            <thead class>
+                                            <tr>
+                                                <th class="text-left">N°</th>
+                                                <th class="text-center">Pr&eacute;nom & Nom</th>
+                                                <th class="text-center">Infos</th>
+                                                <th class="text-center">RDV</th>
+                                                <th class="text-center">Rappel</th>
+                                                <th class="text-left">Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr class="myTr" v-for="(stagiaire, index) in stagiaires" :key="stagiaire.id">
+                                                <td class="text-left"><strong>{{ index + 1 }}</strong></td>
+                                                <td class="text-left"><strong>{{ stagiaire.prenom }} {{ stagiaire.nom | upperCase }}</strong></td>
+                                                <td class="text-center">
+                                                    <span v-if="stagiaire.tel !== null || stagiaire.gsm !== null || stagiaire.email !== null">
+                                                         <button @click="afficherInfos(stagiaire.prenom, stagiaire.nom, stagiaire.tel, stagiaire.gsm, stagiaire.email)">
+                                                             <i class="fas fa-user-graduate fa-lg mr-1"></i>
+                                                             <span class="font-weight-bold" v-show="stagiaire.tel !== null">T&eacute;l. </span>
+                                                             <span class="font-weight-bold" v-show="stagiaire.gsm !== null">GSM </span>
+                                                             <span class="font-weight-bold"v-show="stagiaire.Email !== null">Email </span>
+                                                         </button>
+                                                    </span>
+                                                    <span v-else class="no-information">Non renseigné</span>
+                                                </td>
+                                                <td class="text-center" v-if="stagiaire.date_rdv === null">
+                                                    <button @click="fixerRdv(stagiaire.id)">
+                                                        <i class="fas fa-calendar-check fa-lg text-pink mr-1"></i><i class="fas fa-times fa-lg text-red ml-1"></i>
+                                                    </button>
+                                                </td>
+                                                <td v-if="stagiaire.date_rdv != null && stagiaire.validation_rdv === 0" class="text-center">
+                                                    <button id="bouton_rdv_general" @click="fixerRdv(stagiaire.id)" class="d-flex flex-row">
+                                                        <div class="mt-2"><i class="fas fa-calendar-check fa-lg text-orange mr-1"></i></div>
+                                                        <div class="d-flex flex-column text-left">
+                                                            <span>{{ stagiaire.date_rdv | newDate }}</span>
+                                                            <span class="mt-n1">{{ stagiaire.rdv_user_prenom }} {{ stagiaire.rdv_user_nom }}</span>
+                                                        </div>
+                                                    </button>
+                                                </td>
+                                                <td v-if="stagiaire.date_rdv != null && stagiaire.validation_rdv === 1" class="text-left" >
+                                                    <div class="d-flex flex-row">
+                                                        <div class="align-self-center mr-1"><i class="fas fa-calendar-check fa-lg text-green"></i></div>
+                                                        <div class="d-flex flex-column text-left">
+                                                            <span>{{ stagiaire.date_rdv | newDate }}</span>
+                                                            <span class="mt-n1">{{ stagiaire.rdv_user_prenom }} {{ stagiaire.rdv_user_nom }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td v-if="stagiaire.date_rappel === null" class="text-center" >
+                                                    <button @click="faireRappel(stagiaire.id)">
+                                                        <i class="fas fa-phone fa-lg text-pink mr-1"></i><i class="fas fa-times fa-lg text-red ml-1"></i>
+                                                    </button>
+                                                </td>
+                                                <td class="text-left" v-else>
+                                                    <div class="d-flex flex-row">
+                                                        <div class="align-self-center mr-1"><i class="fas fa-phone fa-lg text-green"></i></div>
+                                                        <div class="d-flex flex-column text-left">
+                                                            <span>{{ stagiaire.date_rappel | newDate }}</span>
+                                                            <span class="mt-n1">{{ stagiaire.rappel_user_prenom }} {{ stagiaire.rappel_user_nom }}</span>
+                                                            <span>{{ stagiaire.rappel_resultat }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <router-link :to="{ name: 'showInscrit', params: { id: stagiaire.id }}">
+                                                        <i class="fas fa-eye fa-lg text-blue mr-1"></i>
+                                                    </router-link>
+                                                    <span>|</span>
+                                                    <button type="button" @click="reportStagiaire(stagiaire.id)">
+                                                        <i class="fas fa-paper-plane fa-lg text-orange mx-1"></i>
+                                                    </button>
+                                                    <span>|</span>
+                                                    <button type="button" class="ml-1" @click="startDeleteStagiaire(stagiaire.id, stagiaire.prenom, stagiaire.nom)">
+                                                        <i class="fas fa-trash-alt fa-lg text-red mx-1"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </template>
+                                    </v-simple-table>
+                                </div>
+                                <div class="row d-flex justify-content-center" v-if="loadingDatas === true && stagiaires.length === 0">
+                                    <div class="col text-center">
+                                        Aucun stagiaire inscrit à la formation
+                                    </div>
+                                </div>
+                            </v-card-text>
+                        </v-card>
+                    </v-tab-item>
+                    <v-tab-item value="ajoutStagiaires">
+                        <v-card flat tile>
+                            <v-card-text >
+                                <v-row>
+                                    <v-col cols="12">
+                                        <h5 class="text-center font-weight-bold text-red">Il reste {{ stagiairesRestants }} places.</h5>
+                                    </v-col>
+                                </v-row>
+                                <div class="row row-cols-4" v-if="recrutements.length === 0 || (recrutements.length > 0 && date_today >= first_recrutement)">
+                                    <div class="col col-3 mb-5">
+                                        <b-form-input type="text" placeholder="Rechercher un·e inscrit·e" v-model="query"></b-form-input>
+                                        <div v-if="results.length > 0 && query" class="list_inscrits elevation-4">
+                                            <ul>
+                                                <li v-for="result in results.slice(0,10)" :key="result.id">
+                                                    <div class="d-inline-flex">
+                                                        <span class="inscrit" v-on:click="ajoutStagiaire(result.searchable.id, result.searchable.nom, result.searchable.prenom)">
+                                                            <i class="fas fa-user-plus fa-lg myIcon"></i>
+                                                            <span v-text="result.title" class="span_inscrit"></span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col col-3">
+                                        <h6>Liste des stagiaires à ajouter :</h6>
+                                        <div v-if="listStagiaires.length > 0" class="list_stagiaires">
+                                            <ul>
+                                                <li v-for="(personne, index) in listStagiaires" :key="personne.id">
+                                                    <div class="d-inline-flex stagiaire">
+                                                        <i class="fas fa-user fa-lg myIconStagiaire"></i>
+                                                        {{ personne.nom | upperCase }} {{ personne.prenom }}
+                                                        <i class="fas fa-times fa-lg myIconDelete" v-on:click="deleteListStagiaires(index)"></i>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div v-else>
+                                            Aucun
+                                        </div>
+                                    </div>
+                                    <div class="col col-3 text-right">
+                                        <button v-if="nbreStagiaires === formation.max_stagiaires" class="btn btn-success text-light" disabled>Inscrire les stagiaires</button>
+                                        <button v-else class="btn btn-success text-light" @click="startStoreInscriptionStagiaires()">Inscrire les stagiaires</button>
+                                    </div>
+                                    <div class="col col-3 text-left" v-if="nbreStagiaires < formation.max_stagiaires">
+                                        <router-link :to="{ name: 'createInscritWithFormation', params: { formation_id: formation.id }}"
+                                                     class="link default">
+                                            <button class="btn btn-interface text-light">
+                                                <b-img v-bind="images" center src="../images/BoutonAjoutPerso.png" alt="Center image"></b-img>
+                                                Faire une inscription
+                                            </button>
+                                        </router-link>
+                                    </div>
+                                </div>
+                                <div class="row d-flex justify-content-center" v-else>
+                                    <div class="col text-center">
+                                        L'ajout de stagiaires se fait via les recrutements
+                                    </div>
+                                </div>
+                            </v-card-text>
+                        </v-card>
+                    </v-tab-item>
+                    <v-tab-item value="recrutements">
+                        <v-card flat tile>
+                            <v-card-text style="height: auto;">
+                                <v-row v-if="recrutements.length > 0">
+                                    <v-col class="col-3 default bloc text-center mb-5 elevation-2 ml-4 mr-2 mt-2" v-for="item in recrutements" :key="item.id">
+                                        <router-link :to="{ name: 'showRecrutement', params: { id: item.id }}"
+                                                     class="link default">
+                                                <i class="fas fa-calendar-plus fa-lg myIcon"></i>
+                                                <strong>Recrutement du {{ item.date | newDate }}</strong><br/>
+                                        </router-link>
+                                        <i class="fas fa-times fa-lg myIconDeleteStagiaire"
+                                           v-show="currentUser.role === 'admin' || currentUser.role === 'master'"
+                                           v-on:click="verifRecrutement(item.id)">
+                                        </i>
+                                    </v-col>
+                                </v-row>
+                                <v-row v-else>
+                                    <v-col>
+                                        Aucun recrutement prévu
+                                    </v-col>
+                                </v-row>
+                                <v-row v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
+                                    <v-col cols="12" sm="6" class="d-flex justify-content-center">
+                                        <v-date-picker
+                                            v-model="listNewDatesRecrutements"
+                                            multiple no-title
+                                            :min="min"
+                                            :max="max"
+                                            :allowed-dates="allowedDaysRecrutement(listDatesRecrutements)"
+                                            locale="fr"
+                                            :first-day-of-week="weekday"
+                                            color="green lighten-1"
+                                        >
+                                        </v-date-picker>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-menu :close-on-content-click="false"
+                                                :return-value.sync="listNewDatesRecrutements"
+                                                transition="scale-transition"
+                                                offset-y
+                                                min-width="290px" >
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-combobox
+                                                    v-model="listNewDatesRecrutements"
+                                                    multiple
+                                                    chips
+                                                    small-chips
+                                                    label="Date(s) de recrutement"
+                                                    prepend-icon="mdi-calendar"
+                                                    readonly
+                                                    v-bind="attrs" v-on="on" >
+                                                </v-combobox>
+                                            </template>
+                                        </v-menu>
+                                    </v-col>
+                                </v-row>
+                                <v-row v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
+                                    <v-col class="d-flex justify-content-center">
+                                        <button class="btn btn-success" @click.prevent="startTraitementRecrutements()" :disabled="listNewDatesRecrutements.length === 0">
+                                            Sauvegarder les dates
+                                        </button>
+                                    </v-col>
+                                </v-row>
+                            </v-card-text>
+                        </v-card>
+                    </v-tab-item>
+                    <v-tab-item value="documents">
+                        <v-card flat tile>
+                            <v-card-text>
+                                <button class="btn btn-interface button-link" @click="uploadListePresence()">Liste des présences</button>
+                            </v-card-text>
+                        </v-card>
+                    </v-tab-item>
+                </v-tabs>
             </v-col>
         </v-row>
         <!-- Modal d'édition des modules PMTIC-->
@@ -757,9 +767,9 @@
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn color="warning" @click="interruptionDeleteStagiaire()">Fermer</v-btn>
+                    <v-btn color="warning" @click="interruptionDeleteStagiaire()" class="mb-2">Fermer</v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn color="error" @click="storeTags()">Sauvegarder & supprimer</v-btn>
+                    <v-btn color="error" @click="storeTags()" class="mb-2">Sauvegarder & supprimer</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -927,10 +937,13 @@
         name: "ShowFormation",
         data() {
             const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
             const minDate = new Date(now).toISOString().substr(0, 10);
             return {
                 loading: false,
                 loadingDatas: false,
+                date_today: today,
+                first_recrutement: null,
                 green: 'green',
                 default: 'default',
                 menu: false,
@@ -1039,6 +1052,13 @@
             query(after, before) {
                 this.searchInscrits();
             },
+            selected(newValue, oldValue) {
+                if(newValue > oldValue) {
+                    this.nbrePlaces--;
+                } else {
+                    this.nbrePlaces++;
+                }
+            }
         },
         mounted() {
             console.log('Show Formation component mounted');
@@ -1122,7 +1142,7 @@
                         this.stagiaires = response.data.stagiaires;
                         this.transformStagiaires();
                         this.nbreStagiaires = this.stagiaires.length;
-                        this.stagiairesRestants = response.data.formation.max_stagiaires - response.data.nbreStagiaires;
+                        this.stagiairesRestants = response.data.formation.max_stagiaires - this.nbreStagiaires;
                         this.getStagiairesEmails();
                         this.$Progress.finish();
                     })
@@ -1180,6 +1200,10 @@
                             this.listDatesRecrutements.push(this.recrutements[i].date);
                         }
                         this.loading = true;
+                        if(this.recrutements.length > 0) {
+                            this.first_recrutement = new Date(this.recrutements[0].date)
+                            this.first_recrutement.setHours(0);
+                        }
                     })
                     .catch(error => {
                         this.$Progress.fail();
@@ -1396,9 +1420,11 @@
                 }
             },
             searchInscrits() {
-                axios.get('api/inscrits/search', { params: { query: this.query } })
-                    .then(response => this.results = response.data)
-                    .catch(error => { console.log(error.response) } );
+                if(this.query != null) {
+                    axios.get('api/inscrits/search', { params: { query: this.query } })
+                        .then(response => this.results = response.data)
+                        .catch(error => { console.log(error.response) } );
+                }
             },
             ajoutStagiaire: function(id, nom, prenom) {
                 this.stagiaire['id'] = id;
@@ -1417,28 +1443,41 @@
             },
             deleteListStagiaires: function (index) {
                 this.listStagiaires.splice(index, 1);
+                this.stagiairesRestants++;
             },
-            storeInscriptionStagiaires() {
+
+            startStoreInscriptionStagiaires() {
+                this.traitements = [];
+                this.dialog_recrutements_traitement = true;
+                setTimeout(() => this.storeInscriptionStagiaires(this.listStagiaires[0].id, this.listStagiaires[0].prenom + ' ' + this.listStagiaires[0].nom, 0), this.vitesse);
+            },
+
+            storeInscriptionStagiaires(id, stagiaire, compteur) {
                 this.$Progress.start();
-                for(let $i=0; $i < this.listStagiaires.length; $i++) {
-                    axios.post('api/formations/addInscrit/' + this.formation.id +'/'+ this.listStagiaires[$i].id)
-                        .then(response => {
-                            this.$Progress.finish();
-                            if(response.data.message != null) {
-                                Toast.fire('Inscription effectuée');
-                            } else if (response.data.error != null) {
-                                Snackbar.fire('Déjà inscrit à cette formation !');
-                            }
-                        })
-                        .catch(error => {
-                            console.log(error.response);
-                            this.$Progress.fail();
-                            Snackbar.fire('Inscription non effectuée !');
-                        })
+                axios.post('api/formations/addInscrit/' + this.formation.id +'/'+ id)
+                    .then(response => {
+                        this.$Progress.finish();
+                        if(response.data.message != null) {
+                            this.traitements.push(stagiaire + ' inscrit·e.');
+                        } else if (response.data.error != null) {
+                            this.traitements.push(stagiaire + ' déjà inscrit·e.');
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                        this.traitements.push(stagiaire + ' non inscrit·e.');
+                    })
+                compteur += 1;
+                if(compteur < this.listStagiaires.length) {
+                    setTimeout(() => this.storeInscriptionStagiaires(this.listStagiaires[compteur].id, this.listStagiaires[compteur].prenom + ' ' + this.listStagiaires[compteur].nom, compteur), this.vitesse);
+                } else {
+                    this.listStagiaires = [];
+                    Toast.fire('Inscriptions effectuées !');
+                    this.$Progress.finish();
+                    this.dialog_recrutements_traitement = false;
+                    this.query = null;
+                    this.getFormation();
                 }
-                this.$Progress.finish();
-                this.getFormation();
-                window.location.reload();
             },
 
             getTags() {

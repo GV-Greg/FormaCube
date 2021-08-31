@@ -335,12 +335,12 @@
     }
 
     .blocFormation {
-        height: 150px;
+        min-height: 150px;
         width: 150px;
     }
 
     .blocRecrutement {
-        height: 103px;
+        min-height: 103px;
         width: 150px;
     }
 

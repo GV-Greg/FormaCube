@@ -58,7 +58,7 @@
                             <th class="text-left" v-show="recherche === true">EMAIL</th>
                             <th class="text-left" v-show="recherche === true">T&Egrave;L.</th>
                             <th class="text-left" v-show="recherche === true">GSM</th>
-                            <th class="text-center">CENTRES D'INT&Eacute;R&Ecirc;TS</th>
+                            <th class="text-center">CENTRES D'INT&Eacute;R&Ecirc;T</th>
                             <th class="text-center">ACTIONS</th>
                         </tr>
                         </thead>

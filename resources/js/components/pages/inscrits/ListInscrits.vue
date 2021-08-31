@@ -20,13 +20,16 @@
                 <v-text-field v-model="search" label="Recherche" color="blue-grey darken-4" class="mySearch bg-light" outlined dense hide-details="auto" append-icon="fas fa-search"></v-text-field>
             </div>
         </div>
+        <div v-show="colonne === 'date_naissance'" class="text-red text-right -mt-5 mb-1">
+            Le format de date doit &ecirc;tre : YYYY-MM-JJ
+        </div>
         <v-simple-table fixed-header>
             <thead class>
             <tr>
                 <th>N°</th>
                 <th>NOM</th>
                 <th>PRÉNOM</th>
-                <th>NÉ·E</th>
+                <th>NÉ·E LE</th>
                 <th>ADRESSE</th>
                 <th>TÉL/GSM</th>
                 <th>ACTIONS</th>

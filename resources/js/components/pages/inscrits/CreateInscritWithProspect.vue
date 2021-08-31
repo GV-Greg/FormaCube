@@ -498,10 +498,10 @@
         methods: {
             retour() {
                 Suppression.fire({
-                    text: "Si vous continuez, vous retournez à la liste des inscrits!",
+                    text: "Si vous continuez, vous retournez à la liste des prospects!",
                 }).then((result) => {
                     if (result.value) {
-                        this.$router.push('/inscrits')
+                        this.$router.push('/prospects')
                     }
                 });
             },

@@ -701,7 +701,7 @@
                         if(this.formInfosPouvsub.successful) {
                             this.$Progress.finish();
                             Toast.fire('Infos du pouvoir subsidiant édités');
-                            this.$router.push('/formations')
+                            this.$router.push('/formations/show/' + this.formation.id)
                         }
                     })
                     .catch(error => {

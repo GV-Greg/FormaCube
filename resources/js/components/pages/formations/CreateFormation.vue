@@ -67,7 +67,7 @@
                                             L'abréviation de la formation doit &ecirc;tre compos&eacute; d'au moins 3 caract&egrave;res.
                                         </b-form-invalid-feedback>
                                         <b-form-invalid-feedback id="abreviation-max-feedback" class="pl-5" v-show="validationMaxAbreviation === false">
-                                            L'abréviation de la formation doit &ecirc;tre compos&eacute; de moins 20 caract&egrave;res.
+                                            L'abréviation de la formation doit &ecirc;tre compos&eacute; de moins 21 caract&egrave;res.
                                         </b-form-invalid-feedback>
                                         <has-error :form="formFormation" field="abreviation" class="pl-5"></has-error>
                                     </b-input-group>

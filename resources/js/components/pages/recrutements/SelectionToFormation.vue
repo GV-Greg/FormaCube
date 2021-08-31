@@ -33,7 +33,7 @@
                 <v-tabs class="elevation-2" dark>
                     <v-tabs-slider></v-tabs-slider>
                     <v-tab href="#listCandidats">Liste des candidat·e·s</v-tab>
-                    <v-tab-item value="listCandidats">
+                    <v-tab-item value="listCandidats" v-if="date_today >= date_recrutement">
                         <h4 v-if="recrutement.selection === 0" class="text-light-interface text-center mt-3">Sélection des candidats repris pour la formation</h4>
                         <h4 v-if="recrutement.selection === 1 && recrutement.prospection === 0" class="text-light-interface text-center mt-3 mb-3">Liste des candidats non repris</h4>
                         <v-card flat tile>
@@ -147,6 +147,9 @@
                             </v-card-text>
                         </v-card>
                     </v-tab-item>
+                    <v-tab-item value="listCandidats" v-else>
+                        <h4 class="text-red font-weight-bold text-center mt-3">Impossible de sélectionner les candidats si le jour du recrutement n'a pas eu lieu</h4>
+                    </v-tab-item>
                 </v-tabs>
             </v-col>
         </v-row>
@@ -244,10 +247,14 @@
     export default {
         name: "SelectionToFormation",
         data() {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
             return {
                 loading: false,
                 loadingDatas: false,
+                date_today: today,
                 recrutement: [],
+                date_recrutement: null,
                 formation: [],
                 candidats: [],
                 nbrePlaces: null,
@@ -299,7 +306,7 @@
         },
         methods: {
             goBack() {
-                return this.$router.go(-1);
+                return this.$router.push('/recrutements/show/' + this.recrutement.id);
             },
             getRecrutement() {
                 this.$Progress.start();
@@ -316,6 +323,8 @@
                         if(this.recrutement.selection === 1 && this.recrutement.prospection === 0) {
                             this.getCandidatsNonSelected();
                         } else {
+                            this.date_recrutement = new Date(this.recrutement.date)
+                            this.date_recrutement.setHours(0);
                             this.$Progress.finish();
                             this.loading= true;
                         }

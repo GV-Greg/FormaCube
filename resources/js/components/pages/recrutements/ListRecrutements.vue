@@ -9,8 +9,11 @@
                 <v-select :items="searchColonnes" v-model="colonne" color="blue-grey darken-4" class="mySelect bg-light text-dark" outlined dense hide-details="auto"></v-select>
             </div>
             <div class="col-lg-5">
-                <v-text-field v-model="search" label="Recherche format date : yyyy-mm-dd" color="blue-grey darken-4" class="mySearch bg-light" outlined dense hide-details="auto" append-icon="fas fa-search"></v-text-field>
+                <v-text-field v-model="search" label="Recherche" color="blue-grey darken-4" class="mySearch bg-light" outlined dense hide-details="auto" append-icon="fas fa-search"></v-text-field>
             </div>
+        </div>
+        <div v-show="colonne === 'date'" class="text-red text-center -mt-5 mb-1">
+            Le format de date doit &ecirc;tre : YYYY-MM-JJ
         </div>
         <v-simple-table fixed-header class="mt-3">
             <thead class>
@@ -120,7 +123,7 @@
                                     :allowed-dates="allowedDays(listDatesOthersRecrutements)"
                                     :min="min"
                                     :max="max"
-                                    locale="be-fr"
+                                    locale="fr-BE"
                                     :first-day-of-week="1"
                                     @change="save"
                                 >
@@ -231,8 +234,8 @@
             const minDate = new Date(today).toISOString().substr(0, 10);
             return {
                 loading: false,
-                searchColonnes: ['date'],
-                colonne: 'date',
+                searchColonnes: ['formation', 'date', ],
+                colonne: 'formation',
                 search: '',
                 recrutements: [],
                 pagination: {

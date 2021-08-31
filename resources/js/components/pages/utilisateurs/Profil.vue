@@ -12,7 +12,7 @@
                                 <span class="display-1 text--primary font-weight-bold">
                                     {{ currentUser.firstname }} {{ currentUser.lastname | UpperCase }}<br>
                                 </span>
-                                <p><i>créé depuis le {{ currentUser.created_at | newDate }}</i></p>
+                                <p><i>Fiche créée depuis le {{ currentUser.created_at | newDate }}.</i></p>
                             </div>
                         </div>
                         <v-row>

@@ -56713,11 +56713,11 @@ li[data-v-1379ff90]:hover {
     background-color: #fff;
 }
 .blocFormation[data-v-1379ff90] {
-    height: 150px;
+    min-height: 150px;
     width: 150px;
 }
 .blocRecrutement[data-v-1379ff90] {
-    height: 103px;
+    min-height: 103px;
     width: 150px;
 }
 .blocFormation[data-v-1379ff90]:hover, .blocRecrutement[data-v-1379ff90]:hover{

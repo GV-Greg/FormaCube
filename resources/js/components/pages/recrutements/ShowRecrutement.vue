@@ -63,9 +63,9 @@
                                 <span v-show="recrutement.tuteur_genre === 'user.png'">Tuteur·rice : </span>
                                 <span class="font-weight-bolder text-interface">{{ recrutement.tuteur_prenom }}</span>
                             </v-col>
-                            <v-col >
-                                <router-link :to="{ name: 'selectionToFormation', params: { id: recrutement.id }}" class="myLink">
-                                    <button class="btn btn-interface button-link mt-n2" :disabled="date_today < date_recrutement">
+                            <v-col>
+                                <router-link :to="{ name: 'selectionToFormation', params: { id: recrutement.id }}" class="myLink" v-show="date_today >= date_recrutement">
+                                    <button class="btn btn-interface button-link mt-n2">
                                         Sélection des candidats
                                     </button>
                                 </router-link>
@@ -117,7 +117,7 @@
                     <v-tab-item value="listCandidats">
                         <v-card flat tile>
                             <v-card-text>
-                                <div class="row d-flex justify-content-center mt-2" v-if="candidats.length > 0">
+                                <div class="row d-flex justify-content-center mt-2" v-if="loadingDatas === true && candidats.length > 0">
                                     <v-simple-table fixed-header>
                                         <template v-slot:default>
                                             <thead class>
@@ -162,7 +162,15 @@
                                         </template>
                                     </v-simple-table>
                                 </div>
-                                <div v-else class="row">
+                                <div v-show="loadingDatas === false">
+                                    <v-row class="text-center text-interface mt-1">
+                                        <v-col class="d-flex flex-column justify-center align-center">
+                                            <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
+                                            <span class="mt-5">Chargement...</span>
+                                        </v-col>
+                                    </v-row>
+                                </div>
+                                <div class="row" v-if="loadingDatas === true && candidats.length === 0">
                                     <div class="col">
                                         Aucun·e candidat·e inscrit·e au recrutement
                                     </div>
@@ -207,7 +215,7 @@
                                         </div>
                                     </div>
                                     <div class="col col-3 text-right">
-                                        <button class="btn btn-success text-light" @click="storeInscriptionCandidats()">Inscrire les candidat·e·s</button>
+                                        <button class="btn btn-success text-light" @click="startStoreInscriptionCandidats()">Inscrire les candidat·e·s</button>
                                     </div>
                                     <div class="col col-3 text-left">
                                         <router-link :to="{ name: 'createInscritWithRecrutement', params: { recrutement_id: recrutement.id }}"
@@ -260,8 +268,11 @@
                                 <v-date-picker
                                     v-model="formRecrutement.date"
                                     :allowed-dates="allowedDays(listDatesOthersRecrutements)"
-                                    :min="min" :max="max" locale="be-fr" :first-day-of-week="1"
+                                    :min="min"
+                                    :max="max"
+                                    :first-day-of-week="1"
                                     @change="save"
+                                    locale="fr-BE"
                                 >
                                     <v-spacer></v-spacer>
                                     <v-btn text color="primary" @click="menu_date_recrutement = false" class="mt-n12">
@@ -374,6 +385,24 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <!-- Modal de traitement -->
+        <v-dialog v-model="dialog_recrutements_traitement" persistent width="400">
+            <v-card color="bg-light-interface" dark class="pt-4">
+                <v-card-text>
+                    Traitement...
+                    <v-progress-linear
+                        indeterminate
+                        color="white"
+                        class="mb-0"
+                    ></v-progress-linear>
+                    <div v-show="traitements.length > 0" class="mt-5 d-flex flex-column">
+                        <span v-for="(traitement, index) in traitements" :key="index">
+                            {{ traitement }}
+                        </span>
+                    </div>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -390,6 +419,7 @@
             const minDate = new Date(today).toISOString().substr(0, 10);
             return {
                 loading: false,
+                loadingDatas: false,
                 date_today: today,
                 date_recrutement: null,
                 menu_date_recrutement: false,
@@ -433,6 +463,9 @@
                 results: [],
                 dialog_report_candidat: false,
                 images: { blank: false, width: 80, height: 55, class: 'mb-1 ombre' },
+                dialog_recrutements_traitement: false,
+                traitements: [],
+                vitesse: 1000,
             }
         },
         watch: {
@@ -479,12 +512,14 @@
             getRecrutement() {
                 this.$Progress.start();
                 this.loading = false;
+                this.loadingDatas = false;
                 axios.get(`/api/recrutements/show/${this.$route.params.id}`)
                     .then((response) => {
                         this.recrutement = response.data.recrutement;
                         this.formation_date = response.data.formation.date_debut;
                         this.candidats = response.data.candidats;
                         this.getOthersRecrutements();
+                        this.loading= true;
                         this.getListCandidatsAllRecrutements();
                         this.dayBeforeFormation = new Date(response.data.formation.date_debut);
                         this.dayBeforeFormation = this.dayBeforeFormation.setDate(this.dayBeforeFormation.getDate() -1);
@@ -493,7 +528,6 @@
                         this.date_recrutement.setHours(0);
                         this.getCandidatsEmails();
                         this.$Progress.finish();
-                        this.loading= true;
                     })
                     .catch(error => {
                         this.$Progress.fail();
@@ -539,6 +573,7 @@
                         }
                     }
                 }
+                this.loadingDatas = true;
             },
             deleteCandidat(id) {
                 this.$Progress.start();
@@ -563,9 +598,11 @@
 
             },
             searchInscrits() {
-                axios.get('api/inscrits/search', { params: { query: this.query } })
-                    .then(response => this.results = response.data)
-                    .catch(error => { console.log(error.response) } );
+                if(this.query != null) {
+                    axios.get('api/inscrits/search', { params: { query: this.query } })
+                        .then(response => this.results = response.data)
+                        .catch(error => { console.log(error.response) } );
+                }
             },
             ajoutCandidat: function(id, nom, prenom) {
                 this.candidat['id'] = id;
@@ -580,29 +617,42 @@
             deleteListCandidats: function (index) {
                 this.listCandidats.splice(index, 1);
             },
-            storeInscriptionCandidats() {
-                this.$Progress.start();
-                for(let $i=0; $i < this.listCandidats.length; $i++) {
-                    axios.post('api/recrutements/addInscrit/' + this.recrutement.id +'/'+ this.listCandidats[$i].id)
-                        .then(response => {
-                            if(response.data.message != null) {
-                                Toast.fire("Inscription effectuée");
-                            } else if (response.data.error != null) {
-                                Snackbar.fire('Déjà inscrit à ce recrutement !');
-                            }
-                            this.$Progress.finish();
-                        })
-                        .catch(error => {
-                            console.log(error.response);
-                            this.$Progress.fail();
-                            Snackbar.fire('Inscription non effectuée !');
-                        })
-                }
-                this.$Progress.finish();
-                this.candidats = [];
-                this.getRecrutement();
-                window.location.reload();
+
+            startStoreInscriptionCandidats() {
+                this.traitements = [];
+                this.dialog_recrutements_traitement = true;
+                setTimeout(() => this.storeInscriptionCandidats(this.listCandidats[0].id, this.listCandidats[0].prenom + ' ' + this.listCandidats[0].nom, 0), this.vitesse);
             },
+
+            storeInscriptionCandidats(id, candidat, compteur) {
+                this.$Progress.start();
+                axios.post('api/recrutements/addInscrit/' + this.recrutement.id +'/'+ id)
+                    .then(response => {
+                        this.$Progress.finish();
+                        if(response.data.message != null) {
+                            this.traitements.push(candidat + ' inscrit·e.');
+                        } else if (response.data.error != null) {
+                            this.traitements.push(candidat + ' déjà inscrit·e.');
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                        this.traitements.push(candidat + ' non inscrit·e.');
+                    })
+                compteur += 1;
+                if(compteur < this.listCandidats.length) {
+                    setTimeout(() => this.storeInscriptionCandidats(this.listCandidats[compteur].id, this.listCandidats[compteur].prenom + ' ' + this.listCandidats[compteur].nom, compteur), this.vitesse);
+                } else {
+                    this.listCandidats = [];
+                    Toast.fire('Inscriptions effectuées !');
+                    this.$Progress.finish();
+                    this.dialog_recrutements_traitement = false;
+                    this.query = null;
+                    this.getRecrutement();
+                    window.reload();
+                }
+            },
+
             forceFileDownload(response) {
                 let headers = response.headers;
                 let date = this.recrutement.date;

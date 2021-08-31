@@ -14,6 +14,7 @@ use App\Model\PouvsubInfos;
 use App\Model\Recrutement;
 use App\Model\RecrutementInscrit;
 use ArrayObject;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +40,13 @@ class FormationController extends Controller
      */
     public function search($field, $search)
     {
-        return new FormationCollection(Formation::where($field,'LIKE',"%$search%")->latest()->paginate(10));
+        if($field === 'salle') {
+            return new FormationCollection(Formation::whereHas('salle', function($query) use ($search) {
+                $query->where('nom', 'LIKE', "%$search%");
+            })->latest()->paginate(10));
+        } else {
+            return new FormationCollection(Formation::where($field,'LIKE',"%$search%")->latest()->paginate(10));
+        }
     }
 
     /**

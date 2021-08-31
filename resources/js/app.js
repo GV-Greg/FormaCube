@@ -91,7 +91,7 @@ const Snackbar = Swal.mixin({
 // Notification de demande de suppression
 const Suppression = Swal.mixin({
     title: 'Êtes-vous sûr?',
-    text: "Si vous continuez, se sera supprimé à vie!",
+    text: "Si vous continuez, la suppression sera définitive!",
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#3085d6',

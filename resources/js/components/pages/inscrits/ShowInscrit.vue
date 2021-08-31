@@ -23,7 +23,7 @@
                                     <span class="display-1 text--primary font-weight-bold">
                                         {{ inscrit.prenom }} {{ inscrit.nom | upperCase }}<br>
                                     </span>
-                                    <p><i>créé<span v-show="inscrit.genre === 'femme'">e</span> depuis le {{ inscrit.created_at | newDate }}</i></p>
+                                    <p><i>Fiche créée depuis le {{ inscrit.created_at | newDate }}.</i></p>
                                 </div>
                             </div>
                             <v-speed-dial class="ml-3 mt-2 mb-6"
@@ -118,7 +118,7 @@
                                 </div>
                             </v-col>
                             <v-col cols="4">
-                                <h6>Centre(s) d'int&eacute;r&ecirc;ts :</h6>
+                                <h6>Centre(s) d'int&eacute;r&ecirc;t :</h6>
                                 <div v-if="tags.length === 0" class="ml-2 mt-n2 no-information">Aucun</div>
                                 <div v-else class="mt-n2 ml-n4">
                                     <v-chip v-for="item in tags" :key="item.id" class="ma-1" color="success" text-color="white"
@@ -228,7 +228,7 @@
                         <div class="container p-4">
                             <div class="row">
                                 <div class="col">
-                                    <b-form-group label="Sélectionner les centres d'intérêts dans la liste déroulante">
+                                    <b-form-group label="Sélectionnez les centres d'intérêt dans la liste déroulante">
                                         <b-form-tags input-id="tags" v-model="inscritTags" size="lg" add-on-change no-outer-focus>
                                             <template v-slot="{ tags, inputAttrs, inputHandlers, disabled, removeTag }">
                                                 <ul v-if="tags.length > 0" class="list-inline d-inline-block">
@@ -268,7 +268,7 @@
                                         ></b-form-tags>
                                         <template #description>
                                             <div id="tags-validation-help">
-                                                Un nouveau tag doit être compris entre 3 et 50 caractères.<br>Séparer les nouveaux tags par une virgule ou un point ou appuyer sur Add.
+                                                Un nouveau tag doit être compris entre 3 et 50 caractères.<br>Séparez les nouveaux tags par une virgule ou un point ou appuyez sur Add.
                                             </div>
                                         </template>
                                     </b-form-group>

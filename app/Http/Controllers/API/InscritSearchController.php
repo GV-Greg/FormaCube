@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\InscritResource;
 use App\Model\Inscrit;
 use Illuminate\Http\Request;
 use Spatie\Searchable\Search;

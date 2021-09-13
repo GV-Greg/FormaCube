@@ -24,4 +24,9 @@ class FormationInscrit extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function formation()
+    {
+        return $this->belongsTo(Formation::class);
+    }
 }

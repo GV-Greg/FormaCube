@@ -168,8 +168,8 @@
                                         <b-input-group-prepend is-text>
                                             <span class="text-light-interface font-weight-bold">Email*</span>
                                         </b-input-group-prepend>
-                                        <b-form-input v-model="formInscrit.email" :state="validationEmail && checkEmail && validationMaxEmail" type="email"
-                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('email') }"
+                                        <b-form-input v-model="formInscrit.email" :state="(validationEmail && checkEmail && validationMaxEmail) && (checkNewsletter && checkEmail && validationMaxEmail)" type="email"
+                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('email'), 'rounded-r': formInscrit.newsletter === true }"
                                                       name="email" id="email" placeholder="Email">
                                         </b-form-input>
                                         <b-input-group-append is-text v-show="pouvsubInfos.email === 1">
@@ -178,17 +178,26 @@
                                             <i v-else
                                                class="fas fa-check fa-lg text-green font-weight-bold"></i>
                                         </b-input-group-append>
-                                        <b-input-group-append is-text>
+                                        <b-input-group-append is-text v-show="formInscrit.newsletter !== true">
                                             <b-form-checkbox v-model="champsObligatoires.email" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
                                         </b-input-group-append>
                                         <has-error :form="formInscrit" field="email"></has-error>
                                     </b-input-group>
                                     <p v-show="champsObligatoires.email !== true && checkEmail === false" class="text-danger small mt-1 mb-n1">L'adresse mail n'est pas valide.</p>
                                     <p v-show="champsObligatoires.email !== true && validationMaxEmail === false" class="text-danger small mt-1 mb-n1">L'email ne peut contenir plus de 190 caract&egrave;res.</p>
+                                    <p v-show="checkNewsletter === false" class="text-danger small mt-1 mb-n1">L'email est requis pour la newsletter.</p>
                                 </div>
                                 <div class="col col-lg-4">
                                     <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-form-checkbox v-model="formInscrit.newsletter" class="mb-2 mr-sm-2 mb-sm-0">Newsletter</b-form-checkbox>
+                                        <b-input-group-prepend is-text>
+                                            <span class="text-light-interface font-weight-bold">Newsletter</span>
+                                        </b-input-group-prepend>
+                                        <b-form-select v-model="formInscrit.newsletter"
+                                                       class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('newsletter') }"
+                                                       name="newsletter" id="newsletter">
+                                            <b-form-select-option :value="false">Non</b-form-select-option>
+                                            <b-form-select-option :value="true">Oui</b-form-select-option>
+                                        </b-form-select>
                                         <has-error :form="formInscrit" field="newsletter"></has-error>
                                     </b-input-group>
                                 </div>
@@ -543,6 +552,11 @@
                 this.newTags.push(newTag);
                 this.choix_tag = null;
             },
+            checkNewsletter: function(newValue) {
+                if(this.champsObligatoires.email === true) {
+                    this.champsObligatoires.email = newValue;
+                }
+            },
             listDiplomes: function(oldDiplome) {
                 if(oldDiplome === 'autre') {
                     this.formInscrit.diplome = '';
@@ -553,9 +567,6 @@
                     this.formInscrit.source_info = '';
                 }
             },
-            // formInscrit.date_naissance: function() {
-            //
-            // }
         },
         mounted() {
             console.log('EditInscrit component mounted');
@@ -588,7 +599,7 @@
                 return this.formInscrit.date_naissance ? moment(this.formInscrit.date_naissance).format('L') : ''
             },
             validDateNaissance() {
-                if(this.formInscrit.date_naissance.length > 0) {
+                if(this.formInscrit.date_naissance !== null && this.formInscrit.date_naissance.length > 0) {
                     return moment(this.formInscrit.date_naissance) > moment();
                 }
             },
@@ -618,6 +629,11 @@
             },
             validationMaxEmail() {
                 return this.formInscrit.email.length < 190;
+            },
+            checkNewsletter() {
+                if(this.formInscrit.email.length === 0) {
+                    return this.formInscrit.newsletter !== true;
+                }
             },
             validationTel_national() {
                 if(this.champsObligatoires.tel === false && this.formInscrit.tel_national !== null) {
@@ -716,7 +732,7 @@
             getInscrit() {
                 this.loading = false;
                 this.$Progress.start();
-                axios.get(`/api/inscrits/show/${this.$route.params.id}`)
+                axios.get(`/api/inscrits/edit/${this.$route.params.id}`)
                     .then((response) => {
                         this.inscrit = response.data.inscrit;
                         if(response.data.formationInscrit != null) {
@@ -821,9 +837,10 @@
                 } else if(this.validation(this.formInscrit.numero !== '' && Number(this.formInscrit.numero) > 9999, 'Le numéro doit être inférieur à 10000 !')) {
                 } else if(this.validation(this.formInscrit.boite !== '' && !this.validationMaxBoite, "Le champ boite ne peut contenir plus de 10 caractères !")) {
                 } else if(this.validation(this.formInscrit.ville_id == null && this.champsObligatoires.ville_id === false, "Vous n'avez pas rempli la ville ou cochez la case 'non disponible' (ND) correspondante !")) {
-                } else if(this.validation(this.formInscrit.email === '' && this.champsObligatoires.email === false, "Vous n'avez pas rempli l'email ou cochez la case 'non disponible' (ND) correspondante !")) {
+                } else if(this.validation(this.formInscrit.email === '' && this.champsObligatoires.email === false && this.checkNewsletter === true, "Vous n'avez pas rempli l'email ou cochez la case 'non disponible' (ND) correspondante !")) {
                 } else if(this.validation(this.formInscrit.email !== '' && this.validEmail(this.formInscrit.email) === false, "Vous n'avez pas renseigné un email valide !")) {
                 } else if(this.validation(this.formInscrit.email !== '' && !this.validationMaxEmail, "Le champ email ne peut contenir plus de 190 caractères !")) {
+                } else if(this.validation(this.checkNewsletter === false, "L'email est requis pour la newsletter !")) {
                 } else if(this.validation(this.champsObligatoires.gsm === false && (this.gsm_national === '' || this.formInscrit.gsm === '' || this.gsm_national === null || this.formInscrit.gsm === null), "Vous n'avez pas rempli tous les champs du n° de gsm ou cochez la case 'non disponible' (ND) correspondante !")) {
                 } else if(this.validation(this.champsObligatoires.gsm === false && (this.gsm_national.length < 3 || this.formInscrit.gsm.length < 9 ), "Il n'y pas le minimum de caractères requis dans un des champs du n° de gsm !")) {
                 } else if(this.validation(this.champsObligatoires.tel === false && (this.tel_national === '' || this.formInscrit.tel === '' || this.tel_national === null || this.formInscrit.tel === null), "Vous n'avez pas rempli le tél. fix ou cochez la case 'non disponible' (ND) correspondante !")) {
@@ -881,7 +898,7 @@
                     this.formInscrit.source_info = this.listSources
                 }
                 this.formInscrit
-                    .put(`/api/inscrits/edit/${this.$route.params.id}`)
+                    .put(`/api/inscrits/update/${this.$route.params.id}`)
                     .then(response => {
                         if(this.formInscrit.successful) {
                             this.$Progress.finish();

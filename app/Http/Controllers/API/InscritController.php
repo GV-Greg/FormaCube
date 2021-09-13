@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Actions\CreateContactNewsletterAction;
+use App\Actions\DeleteContactNewsletterAction;
+use App\Actions\UpdateContactNewsletterAction;
 use App\Exports\ProspectsExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\InscritCollection;
@@ -59,9 +62,10 @@ class InscritController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     * @throws \SendinBlue\Client\ApiException
      */
-    public function store(Request $request)
+    public function store(Request $request, CreateContactNewsletterAction $action)
     {
         $this->validate($request, [
             'nom' => 'required',
@@ -97,7 +101,6 @@ class InscritController extends Controller
             $inscrit->duree_chomage = $request->duree_chomage;
             $inscrit->source_info = $request->source_info;
             $inscrit->groupe_social = $request->groupe_social;
-            $inscrit->newsletter = $request->newsletter;
             $inscrit->save();
         } else {
             $inscrit = Inscrit::where('email', $request->email)->get()->first();
@@ -144,6 +147,13 @@ class InscritController extends Controller
                     $inscrit->formations()->attach($formation, ['date_ajout' => $date_ajout, 'pmtic_module_1' => $request->pmtic_module_1, 'pmtic_module_2' => $request->pmtic_module_2, 'pmtic_module_3' => $request->pmtic_module_3]);
                 }
             }
+        }
+
+        // Mise à jour de la liste de newsletter de Send in blue
+        if($request->newsletter === true) {
+            $inscrit->newsletter = true;
+            $inscrit->save();
+            $action->execute($request);
         }
 
         if($search === false) {
@@ -195,13 +205,49 @@ class InscritController extends Controller
     }
 
     /**
+     * @param int $id
+     */
+    public function edit(int $id) {
+        $inscrit = new InscritResource(Inscrit::where('id', '=', $id)->with('tags')->with('recrutements')->with('formations')->get()->first());
+
+        $listFormations = Formation::all();
+
+        for($i=0; $i < count($inscrit->recrutements); $i++) {
+            for($x=0; $x < count($listFormations); $x++) {
+                if($inscrit->recrutements[$i]['formation_id'] === $listFormations[$x]['id']) {
+                    $inscrit->recrutements[$i]['formation_nom'] = $listFormations[$x]['nom'];
+                }
+            }
+        }
+
+        $pouvsubInfos = null;
+        $latestFormation = FormationInscrit::where('inscrit_id', $id)->select('formation_id', 'inscrit_id')->orderBy('date_ajout', 'desc')->get()->first();
+
+        for($y=0; $y < count($inscrit->formations); $y++) {
+            if($inscrit->formations[$y]->id === $latestFormation->formation_id) {
+                if(strtotime($inscrit->formations[$y]->date_fin) > strtotime(date("Y-m-d"))) {
+                    $pouvsubInfos = PouvsubInfos::where('formation_id', $latestFormation->formation_id)->get()->first();
+                }
+            }
+        }
+
+        return response()->json([
+            'inscrit' => $inscrit,
+            'tags' => $inscrit->tags,
+            'recrutements' => $inscrit->recrutements,
+            'formations' => $inscrit->formations,
+            'pouvsubInfos' => $pouvsubInfos,
+        ]);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return InscritResource
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id, UpdateContactNewsletterAction $action)
     {
         $this->validate($request, [
             'nom' => 'required',
@@ -209,6 +255,9 @@ class InscritController extends Controller
         ]);
 
         $inscrit = Inscrit::findOrFail($id);
+
+        // Mise à jour de la liste de newsletter de Send in blue
+        $action->execute($inscrit, $request);
 
         $modifications = '';
         $modif_compteur = 0;
@@ -400,9 +449,13 @@ class InscritController extends Controller
      * @param  int  $id
      * @return InscritResource
      */
-    public function destroy($id)
+    public function destroy($id, DeleteContactNewsletterAction $action)
     {
         $inscrit = Inscrit::find($id);
+        // suppresion de l'inscrit dans la liste de diffusion de la newsletter de Sendinblue
+        if($inscrit->newsletter === 1) {
+            $action->execute($inscrit->email);
+        }
 
         $inscrit->delete();
 

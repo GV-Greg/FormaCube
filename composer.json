@@ -22,6 +22,7 @@
         "maatwebsite/excel": "^3.1",
         "php-parallel-lint/php-console-color": "^0.3.0",
         "php-parallel-lint/php-console-highlighter": "^0.4.0",
+        "sendinblue/api-v3-sdk": "7.x.x",
         "spatie/laravel-searchable": "^1.6",
         "tymon/jwt-auth": "^1.0"
     },

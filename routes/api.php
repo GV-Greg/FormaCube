@@ -76,7 +76,8 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
         Route::get('/latest', 'API\InscritController@latest')->name('inscrits.latest');
         Route::post('/create', 'API\InscritController@store')->name('inscrit.store');
         Route::put('/statut/{id}', 'API\InscritController@modifStatut')->name('statut-inscrit.update');
-        Route::put('/edit/{id}', 'API\InscritController@update')->name('inscrit.update');
+        Route::get('/edit/{id}', 'API\InscritController@edit')->name('inscrit.edit');
+        Route::put('/update/{id}', 'API\InscritController@update')->name('inscrit.update');
         Route::get('/show/{id}', 'API\InscritController@show')->name('inscrit.show');
         Route::get('search', 'API\InscritSearchController@index');
         Route::delete('/{id}', 'API\InscritController@destroy')->name('inscrit.destroy');
@@ -121,4 +122,6 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
     Route::prefix('logs')->group( function() {
         Route::get('/show/{id}', 'API\LogController@show')->name('logs.show');
     });
+
+    Route::get('contacts', 'SendInBlueController@contacts');
 });

@@ -1,12 +1,20 @@
 <template>
     <div>
         <h1>Liste des Utilisateurs</h1>
-        <div class="row align-items-center mt-2">
-            <div class="col-lg-4">
+        <div class="row mt-2">
+            <div class="col-lg-6">
                 <div class="btn-wrapper">
                     <router-link to="/users/create" class="btn btn-success px-3">
                         <i class="fas fa-users-cog"></i>
                         Nouveau
+                    </router-link>
+                </div>
+            </div>
+            <div class="col-lg-6 d-flex align-items-end flex-column">
+                <div class="btn-wrapper">
+                    <router-link to="/users/archives" class="btn btn-info px-3">
+                        <i class="fas fa-archive"></i>
+                        Archives
                     </router-link>
                 </div>
             </div>
@@ -103,19 +111,22 @@
             },
             destroy(user) {
                 this.$Progress.start();
-                Suppression.fire().then((result) => {
+                Suppression.fire({
+                    text: "Si vous continuez, l'utilisateur sera archivé!",
+                    confirmButtonText: 'Oui, archivez!'
+                }).then((result) => {
                     if (result.value) {
                         axios.delete('api/users/' + user.id)
                             .then(response => {
                                 this.$Progress.finish();
                                 this.$store.dispatch('getUsers');
-                                Confirm.fire('Utilisateur supprimé!');
+                                Confirm.fire(response.data.message);
                                 Fire.$emit('RefreshPage'); // Rafraichit la page
                             })
                             .catch(error => {
                                 this.$Progress.fail();
                                 console.log(error.response);
-                                Snackbar.fire('Problème avec la suppression de l\'utilisateur !');
+                                Snackbar.fire('Problème avec l\'archivage de l\'utilisateur !');
                             })
                     }
                 });

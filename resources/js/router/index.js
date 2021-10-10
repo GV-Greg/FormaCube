@@ -13,6 +13,7 @@ import UtilisateursList from "../components/pages/utilisateurs/ListUtilisateurs.
 import NewUtilisateur from "../components/pages/utilisateurs/CreateUtilisateur.vue";
 import UpdateUtilisateur from "../components/pages/utilisateurs/UpdateUtilisateur.vue";
 import ShowUtilisateur from "../components/pages/utilisateurs/ShowUtilisateur.vue";
+import ArchivesUtilisateurs from "../components/pages/utilisateurs/ArchivesUtilisateurs.vue";
 
 import MainProfil from "../components/pages/utilisateurs/MainProfil.vue";
 import Profil from "../components/pages/utilisateurs/Profil.vue";
@@ -88,6 +89,11 @@ const routes = [
                         path: 'edit/:id',
                         name: 'updateUtilisateur',
                         component: UpdateUtilisateur,
+                    },
+                    {
+                        path: 'archives',
+                        name: 'archivesUtilisateur',
+                        component: ArchivesUtilisateurs,
                     },
                     {
                         path: ':id',

@@ -9,6 +9,7 @@ export default {
         loading: false,
         auth_error: null,
         users: [],
+        archives: [],
     },
     getters: {
         isLoading(state) {
@@ -25,6 +26,9 @@ export default {
         },
         users(state) {
             return state.users;
+        },
+        archives(state) {
+            return state.archives;
         },
     },
     mutations: {
@@ -54,7 +58,10 @@ export default {
         },
         updateUser(state, payload) {
             state.currentUser = payload;
-        }
+        },
+        updateArchives(state, payload) {
+            state.archives = payload;
+        },
     },
     actions: {
         login(context) {
@@ -62,12 +69,21 @@ export default {
         },
         getUsers(context) {
             axios.get('api/users')
-            .then((response) => {
-                context.commit('updateUsers', response.data.users)
-            })
-            .catch((error) => {
+                .then((response) => {
+                    context.commit('updateUsers', response.data.users)
+                })
+                .catch((error) => {
 
-            })
+                })
         },
+        getArchives(context) {
+            axios.get('api/users/archives')
+                .then((response) => {
+                    context.commit('updateArchives', response.data.archives)
+                })
+                .catch((error) => {
+
+                })
+        }
     },
 };

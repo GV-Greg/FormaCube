@@ -103,7 +103,25 @@ class UsersController extends Controller
         $user->delete();
 
         return response()->json([
-            'message' => 'L\'utilisateur est supprimé'
+            'message' => 'Utilisateur archivé!'
+        ]);
+    }
+
+    public function archives()
+    {
+        $archives = User::onlyTrashed()->get();
+
+        return response()->json([
+            'archives' => $archives
+        ], 200);
+    }
+
+    public function restore(int $id)
+    {
+        $user = User::withTrashed()->where('id', $id)->restore();
+
+        return response()->json([
+            'message' => 'Utilisateur restauré!'
         ]);
     }
 }

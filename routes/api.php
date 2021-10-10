@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 
 Route::group(['prefix' => 'auth'], function ($router) {
 
@@ -19,9 +17,11 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
 
     Route::prefix('users')->group( function() {
         Route::get('', 'UsersController@all');
+        Route::get('/archives', 'UsersController@archives');
         Route::post('/create', 'UsersController@new');
         Route::get('/edit/{id}', 'UsersController@edit');
         Route::put('/edit/{id}', 'UsersController@update');
+        Route::get('/restore/{id}', 'UsersController@restore');
         Route::get('/{id}', 'UsersController@show');
         Route::delete('/{id}', 'UsersController@destroy');
     });

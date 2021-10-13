@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+/*  Gestion de l'authentification */
 Route::group(['prefix' => 'auth'], function ($router) {
-
     Route::post('login', 'AuthController@login');
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
@@ -11,10 +11,12 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::get('getme', 'AuthController@me');
 });
 
+/*  Si authentifié ! */
 Route::group(['middelware' => 'jwt.auth'], function ($router) {
-
+    /*  Gestion de la modification d'un profil utilisateur par un administrateur */
     Route::put('profil/edit/{id}', 'API\UserController@updateProfile');
 
+    /*  Gestion des utilisateurs  */
     Route::prefix('users')->group( function() {
         Route::get('', 'UsersController@all');
         Route::get('/archives', 'UsersController@archives');
@@ -26,6 +28,7 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
         Route::delete('/{id}', 'UsersController@destroy');
     });
 
+    /*  Gestion des salles  */
     Route::prefix('salles')->group( function() {
         Route::get('', 'API\SalleController@index')->name('salles.index');
         Route::get('/all', 'API\SalleController@all')->name('salles.all');
@@ -33,8 +36,10 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
         Route::put('/edit/{id}', 'API\SalleController@update')->name('salles.update');
         Route::delete('/{id}', 'API\SalleController@destroy')->name('salles.destroy');
     });
+    /*  Recherche pour les salles  */
     Route::get('search/salles/{colonne}/{search}', 'API\SalleController@search');
 
+    /*  Gestion des formations  */
     Route::prefix('formations')->group( function() {
         Route::get('', 'API\FormationController@index')->name('formations.index');
         Route::get('/all', 'API\FormationController@all')->name('formations.all');
@@ -51,8 +56,10 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
         Route::delete('/deleteInscrit/{formation}/{inscrit}', 'API\FormationController@deleteInscrit')->name('formations.deleteInscrit');
         Route::post('/candidatToStagiaire/{recrutement}/{formation}/{inscrit}', 'API\FormationController@candidatToStagiaire')->name('formations.candidatToStagiaire');
     });
+    /*  Recherche pour les formations  */
     Route::get('search/formations/{colonne}/{search}', 'API\FormationController@search');
 
+    /*  Gestion des recrutements  */
     Route::prefix('recrutements')->group( function() {
         Route::get('', 'API\RecrutementController@index')->name('recrutements.index');
         Route::get('/all', 'API\RecrutementController@all')->name('recrutements.all');
@@ -69,8 +76,10 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
         Route::put('/selection/{id}', 'API\RecrutementController@updateSelection')->name('recrutements.updateSelection');
         Route::put('/prospection/{id}', 'API\RecrutementController@updateProspection')->name('recrutements.updateProspection');
     });
+    /*  Recherche pour les recrutements  */
     Route::get('search/recrutements/{colonne}/{search}', 'API\RecrutementController@search');
 
+    /*  Gestion des inscrits  */
     Route::prefix('inscrits')->group( function() {
         Route::get('', 'API\InscritController@index')->name('inscrits.index');
         Route::get('/latest', 'API\InscritController@latest')->name('inscrits.latest');
@@ -93,13 +102,16 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
         Route::put('/candidatToProspect/{id}/{traitement}/{prospect}', 'API\InscritController@candidatToProspect')->name('inscrits.candidatToProspect');
         Route::get('/prospects', 'API\InscritController@prospects')->name('prospects.index');
     });
+    /*  Recherche pour les inscrits ou les prospects  */
     Route::get('search/inscrits/{colonne}/{search}', 'API\InscritController@search');
     Route::get('search/inscrits/prospects/tags/{search}', 'API\InscritController@searchProspects');
 
+    /*  Liste des villes  */
     Route::prefix('villes')->group( function() {
         Route::get('', 'API\VilleController@index')->name('villes.index');
     });
 
+    /*  Gestion des tags  */
     Route::prefix('tags')->group( function() {
         Route::get('', 'API\TagController@index')->name('tags.index');
         Route::get('/all', 'API\TagController@all')->name('tags.all');
@@ -107,8 +119,14 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
         Route::put('/edit/{id}', 'API\TagController@update')->name('tags.update');
         Route::delete('/{id}', 'API\TagController@destroy')->name('tags.destroy');
     });
+    /*  Recherche pour les tags  */
     Route::get('search/tags/{colonne}/{search}', 'API\TagController@search');
 
+    /*  Gestion des pouvoirs subsidiants  */
+    Route::apiResource('pouvsubs', 'API\PouvsubController');
+    Route::get('search/pouvsubs/{colonne}/{search}', 'API\PouvsubController@search');
+
+    /*  Gestion des tags des infos pour les pouvoirs subsidiants  */
     Route::prefix('pouvsub-infos')->group( function() {
         Route::get('/infos/{id}', 'API\PouvsubInfosController@getInfos')->name('pouvsub-infos.infos');
         Route::post('/create', 'API\PouvsubInfosController@store')->name('pouvsub-infos.store');
@@ -116,12 +134,11 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
         Route::delete('/{id}', 'API\PouvsubInfosController@destroy')->name('pouvsub-infos.destroy');
     });
 
-    Route::apiResource('pouvsubs', 'API\PouvsubController');
-    Route::get('search/pouvsubs/{colonne}/{search}', 'API\PouvsubController@search');
-
+    /*  Gestion des logs  */
     Route::prefix('logs')->group( function() {
         Route::get('/show/{id}', 'API\LogController@show')->name('logs.show');
     });
 
+    /*  Gestion des inscriptions à la newsletter via l'API de Send in blue  */
     Route::get('contacts', 'SendInBlueController@contacts');
 });

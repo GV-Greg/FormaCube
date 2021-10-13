@@ -118,7 +118,7 @@
             </v-container>
         </v-main>
         <v-footer app class="d-flex justify-content-center">
-            <span class="white--text">Version 4.5.3 &bull; <strong>Copyright &copy; 2019-{{ this.currentYear }} <a href="http://www.creacube.be" target="_blank" rel="noopener noreferrer" class="text-orange myLink">CreaCube</a>.</strong> All rights reserved.</span>
+            <span class="white--text">Version 4.5.3 &bull; <strong>Copyright &copy; 2019-{{ this.currentYear }} <a href="http://www.creacube.be" target="_blank" rel="noopener noreferrer" class="myLink">CreaCube</a>.</strong> All rights reserved. <strong><a :href="bugsLink" target="_blank" rel="noopener noreferrer" class="myLink ml-1">D&eacute;clarer un bug</a>.</strong></span>
         </v-footer>
     </v-app>
 
@@ -127,7 +127,15 @@
 <script>
     import moment from 'moment';
 
+
+
     export default {
+        data() {
+            return {
+                bugsLink: 'https://docs.google.com/spreadsheets/d/1XS8YiWqcgHokWDhwznSKFyYC5F9oPuH3/edit?usp=sharing&ouid=113711131617140508701&rtpof=true&sd=true'
+            }
+        },
+
         methods: {
             logout() {
                 this.$store.commit('logout');
@@ -181,5 +189,9 @@
         margin-top: 0.25rem;
         margin-bottom: 0.25rem;
         border-color: #254F5D !important;
+    }
+
+    .myLink {
+        color: #f6993f !important;
     }
 </style>

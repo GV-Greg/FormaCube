@@ -141,4 +141,9 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
 
     /*  Gestion des inscriptions à la newsletter via l'API de Send in blue  */
     Route::get('contacts', 'SendInBlueController@contacts');
+
+    /* Exports de fichiers excel */
+    Route::prefix('excel')->group( function() {
+        Route::get('/formation-participants/{id}', 'API\ExportsExcelController@formationListeParticipants')->name('excel.formation.participants');
+    });
 });

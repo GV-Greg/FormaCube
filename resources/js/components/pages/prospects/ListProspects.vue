@@ -43,7 +43,7 @@
                     <a class="mailtoui btn interface text-light" :href="'mailto:?bcc=' + emails" :class="recherche === false || prospects === null ? 'disabled' : ''">MAILTO</a>
                     <v-btn color="interface text-light" :disabled="recherche === false || prospects === null">
                         <download-excel :data="json_data" :fields="json_fields" worksheet="Prospects"
-                                        name="prospects.xls">Excel</download-excel>
+                                        name="prospects.xlsx">Excel</download-excel>
                     </v-btn>
                 </v-col>
             </v-row>

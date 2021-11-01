@@ -59,15 +59,15 @@ return [
         |
         */
         'properties'             => [
-            'creator'        => '',
+            'creator'        => 'Interface3.Namur',
             'lastModifiedBy' => '',
             'title'          => '',
             'description'    => '',
             'subject'        => '',
-            'keywords'       => '',
+            'keywords'       => 'erp,excel,export,spreadsheet',
             'category'       => '',
             'manager'        => '',
-            'company'        => '',
+            'company'        => 'Interface3.Namur',
         ],
     ],
 

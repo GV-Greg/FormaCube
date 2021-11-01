@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 
 class FormationListePresenceController extends Controller
 {
-    public function index($id) {
+    public function index(int $id) {
         $formation = Formation::find($id);
         $pouvsub = Pouvsub::where('id', $formation->pouvsub_id)->get()->first();
         $listStagiaires = FormationInscrit::where('formation_id', $formation->id)->get()->all();

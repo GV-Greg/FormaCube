@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Model\Inscrit;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class FormationCollection extends ResourceCollection

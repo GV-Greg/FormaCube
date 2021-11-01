@@ -95,7 +95,8 @@
                                         <b-form-input
                                             id="date_naissance" type="date"
                                             v-model="formInscrit.date_naissance"
-                                            :state="validationNaissance"
+                                            min="1950-01-01" :max="new Date().toISOString().substr(0, 10)"
+                                            :state="validationNaissance && !validDateNaissance"
                                             placeholder="YYYY-MM-DD"
                                             autocomplete="off"
                                         ></b-form-input>
@@ -104,6 +105,7 @@
                                             <b-form-checkbox v-model="champsObligatoires.date_naissance" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
                                         </b-input-group-append>
                                     </b-input-group>
+                                    <p v-show="!validDateNaissance === false" class="text-danger small mt-1 mb-n1">La date de naissance ne peut être une date future ou datant après {{ yearsAgo }}.</p>
                                 </div>
                             </div>
                             <div class="row row-cols-2 mt-n4">
@@ -356,6 +358,7 @@
                     'tel' : true,
                     'gsm' : false,
                 },
+                yearsAgo: moment().subtract(15, 'years').format('YYYY'),
                 villes: [],
                 recrutement: [],
                 calculAge: null,
@@ -397,6 +400,11 @@
             },
             formattedDateNaissance () {
                 return this.formInscrit.date_naissance ? moment(this.formInscrit.date_naissance).format('L') : ''
+            },
+            validDateNaissance() {
+                if(this.formInscrit.date_naissance !== null && this.formInscrit.date_naissance.length > 0) {
+                    return moment().diff(moment(this.formInscrit.date_naissance), 'years', true) < 15;
+                }
             },
             validationMaxRue() {
                 return this.formInscrit.rue.length < 251;
@@ -545,6 +553,7 @@
                 } else if(this.validation(this.formInscrit.prenom !== '' && !this.validationMaxPrenom, "Le champ prénom ne peut contenir plus de 190 caractères !")) {
                 } else if(this.validation(this.formInscrit.genre == null && this.champsObligatoires.genre === false, "Vous n'avez pas rempli le genre ou cochez la case 'non disponible' (ND) correspondante !")) {
                 } else if(this.validation(this.formInscrit.date_naissance === '' && this.champsObligatoires.date_naissance === false, "Vous n'avez pas rempli la date de naissance ou cochez la case 'non disponible' (ND) correspondante !")) {
+                } else if(this.validation(this.formInscrit.date_naissance !== '' && this.validDateNaissance, "La date de naissance ne peut être une date future ou datant après " + this.yearsAgo + " !")) {
                 } else if(this.validation(this.formInscrit.rue !== '' && !this.validationMaxRue, "Le champ rue ne peut contenir plus de 190 caractères !")) {
                 } else if(this.validation(this.formInscrit.numero !== '' && Number(this.formInscrit.numero) <= 0, 'Le numéro doit être positif et non nul !')) {
                 } else if(this.validation(this.formInscrit.numero !== '' && Number(this.formInscrit.numero) > 9999, 'Le numéro doit être inférieur à 10000 !')) {

@@ -1,8 +1,11 @@
 <style type="text/css">
     body{
-        font-family: Gadugi, sans-serif;
+        font-family: 'gadugi', sans-serif !important;
+        font-weight: normal;
         width: 100vw;
         height: 100vh;
+        margin: 0;
+        padding: 0;
     }
 
     #entete {
@@ -10,29 +13,38 @@
     }
 
     .logo {
-        width: 18%;
+        width: 30%;
     }
 
     #logo-interface {
         position: relative;
         float: left;
-        top: 20px;
     }
 
     #logo-pouvsub {
         position: relative;
         float: right;
-    }
-
-    #infos-formation {
-        margin-top: -100px;
+        margin-top: -35px;
+        margin-right: -50px;
     }
 
     h3 {
         width: 100vw;
         height: 50px;
-        margin-top: -50px;
-        margin-bottom: -10px;
+        margin: -20px 0 -40px 0;
+        padding: 0;
+        font-family: 'blogger', sans-serif !important;
+        font-weight: bold;
+        color: #00768C;
+        font-size: 35px;
+    }
+
+    #infos-formation {
+        margin: 0 0 20px 0;
+        padding: 0;
+        font-size: 25px;
+        font-weight: bold;
+        height: 50px;
     }
 
     h4 {
@@ -41,8 +53,24 @@
     }
 
     table {
-        border-collapse: collapse;
+        margin: 0;
+        padding: 0;
         width: 100%;
+        border-collapse: collapse;
+        border: 0.1em solid black;
+    }
+
+    table th {
+        font-weight: bold;
+        font-size: 12pt;
+        line-height: 10pt;
+        border: 0.1em solid black;
+    }
+
+    td {
+        border: 1px solid black;
+        height: 45px;
+        padding: 0.37em;
     }
 
     #table-stagiaires {
@@ -51,15 +79,6 @@
 
     #table-formateur {
         margin-top: -5px;
-    }
-
-    table, th, td {
-        border: 1px solid black;
-    }
-
-    td {
-        height: 50px;
-        padding: 10px;
     }
 
     #nomprenom {
@@ -117,7 +136,6 @@
 </style>
 
 <body>
-<div id="container">
     <div id="entete">
         <div id="logo-interface">
             <img src="./images/Interface3-logo.png" alt="logo-interface3namur" class="logo" >
@@ -127,9 +145,8 @@
         </div>
     </div>
     <h3>Présences "{{ $formation->nom }}"</h3>
-    <span class="infos" id="infos-formation">Du {{ $formation->date_debut }} au {{ $formation->date_fin }} - Horaire : 8h45-12h15 & 13h-16h30</span><br>
+    <span class="infos" id="infos-formation">Du {{ date('d/m/Y', strtotime($formation->date_debut)) }} au {{ date('d/m/Y', strtotime($formation->date_fin)) }}</span><br>
     <div class="infos" id="date"><label for="date">Date : </label><input id="points" type="text"></div>
-
     <table id="table-stagiaires">
         <thead>
         <tr>
@@ -187,5 +204,4 @@
             </tr>
         </tbody>
     </table>
-</div>
 </body>

@@ -460,7 +460,9 @@
                     <v-tab-item value="documents">
                         <v-card flat tile>
                             <v-card-text>
-                                <button class="btn btn-interface button-link" @click="uploadListePresence()">Liste des présences</button>
+                                <a :href="'api/excel/formation-participants/' + formation.id" class="btn btn-interface button-link">Liste des participants</a>
+                                <button class="btn btn-interface button-link" @click="uploadListePresence()">Liste des pr&eacute;sences</button>
+                                <button class="btn btn-interface button-link" @click="uploadAbsences()">Doc. Absences justifi&eacute;es</button>
                             </v-card-text>
                         </v-card>
                     </v-tab-item>
@@ -1805,15 +1807,22 @@
                     });
                 }
             },
-            forceFileDownload(response) {
+            forceFileDownload(response, fichier) {
                 let headers = response.headers;
-                let nom = this.formation.abreviation;
                 let blob = new Blob([response.data], {type: headers['content-type']});
                 let link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
-                link.download = `${nom}_liste-presence.pdf`;
+                link.download = fichier;
                 link.click();
                 link.remove();
+            },
+            uploadListeParticipants() {
+                axios.get('api/excel/formation-participants/' + this.formation.id)
+                    .catch(error => {
+                        console.log(error.response);
+                        this.$Progress.fail();
+                        this.traitements.push('Excel non exporté.');
+                    })
             },
             uploadListePresence() {
                 axios({
@@ -1822,7 +1831,20 @@
                     responseType: 'blob',
                 })
                     .then(response => {
-                        this.forceFileDownload(response);
+                        this.forceFileDownload(response, `${this.formation.abreviation}_liste-presence.pdf`);
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                    })
+            },
+            uploadAbsences() {
+                axios({
+                    url: '/PDF/formation/absences/' + this.formation.id,
+                    method: 'GET',
+                    responseType: 'blob',
+                })
+                    .then(response => {
+                        this.forceFileDownload(response, `${this.formation.abreviation}_absences.pdf`);
                     })
                     .catch(error => {
                         console.log(error.response);

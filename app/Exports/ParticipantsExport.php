@@ -111,7 +111,7 @@ class ParticipantsExport implements fromCollection,
             $drawingLogoPouvSub = new Drawing();
             $drawingLogoPouvSub->setName('logo-pouvoir-subsidiant');
             $drawingLogoPouvSub->setDescription('logo Pouvoir Subsidiant');
-            $drawingLogoPouvSub->setPath(public_path("images\logos\\" . $formation->logo));
+            $drawingLogoPouvSub->setPath(public_path("images/logos/" . $formation->logo));
             $drawingLogoPouvSub->setHeight(60);
             $drawingLogoPouvSub->setCoordinates('F2');
             array_push($drawings, $drawingLogoPouvSub);

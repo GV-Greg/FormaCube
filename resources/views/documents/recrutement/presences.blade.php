@@ -9,7 +9,7 @@
     }
 
     #entete {
-        height: 150px;
+        height: 125px;
     }
 
     .logo {
@@ -19,19 +19,20 @@
     #logo-interface {
         position: relative;
         float: left;
+        margin-top: -25px;
     }
 
     #logo-pouvsub {
         position: relative;
         float: right;
-        margin-top: -35px;
+        margin-top: -25px;
         margin-right: -50px;
     }
 
     h3 {
         width: 100vw;
         height: 50px;
-        margin: -20px 0 -40px 0;
+        margin: 5px 0 -40px 0;
         padding: 0;
         font-family: 'blogger', sans-serif !important;
         font-weight: bold;

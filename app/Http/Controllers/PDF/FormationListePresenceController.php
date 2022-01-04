@@ -8,7 +8,6 @@ use App\Model\FormationInscrit;
 use App\Model\Inscrit;
 use App\Model\Pouvsub;
 use Barryvdh\DomPDF\Facade as PDF;
-use Illuminate\Http\Request;
 
 class FormationListePresenceController extends Controller
 {

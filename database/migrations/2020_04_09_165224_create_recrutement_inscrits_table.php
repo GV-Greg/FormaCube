@@ -13,7 +13,7 @@ class CreateRecrutementInscritsTable extends Migration
      */
     public function up()
     {
-        Schema::create('recrutement_inscrits', function (Blueprint $table) {
+        Schema::create('inscrit_recrutement', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('recrutement_id')->unsigned();
             $table->bigInteger('inscrit_id')->unsigned();
@@ -31,6 +31,6 @@ class CreateRecrutementInscritsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('recrutement_inscrits');
+        Schema::dropIfExists('inscrit_recrutement');
     }
 }

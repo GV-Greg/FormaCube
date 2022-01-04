@@ -26,7 +26,7 @@ class CreateFormationsForeignKeys extends Migration
     public function down()
     {
         Schema::table('formations', function (Blueprint $table) {
-            Schema::dropForeign(['pouvsub_id']);
+            $table->dropForeign(['pouvsub_id']);
         });
     }
 }

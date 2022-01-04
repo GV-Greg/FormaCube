@@ -25,6 +25,8 @@ class CreateInscritsForeignKeys extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('inscrits_foreign_keys');
+        Schema::table('inscrits', function (Blueprint $table) {
+            $table->dropForeign(['ville_id']);
+        });
     }
 }

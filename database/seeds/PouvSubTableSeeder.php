@@ -14,7 +14,33 @@ class PouvSubTableSeeder extends Seeder
      */
     public function run()
     {
-        $pouvsub = [
+        $pouvsubs = [
+            [
+                'nom'=>'Interface3',
+                'adresse'=> false,
+                'date_naissance'=> false,
+                'age'=> false,
+                'email'=> true,
+                'num_national'=> false,
+                'statut_legal'=> false,
+                'diplome'=> false,
+                'duree_chomage'=> false,
+                'source_info'=> false,
+                'groupe_social'=> false,
+            ],
+            [
+                'nom'=>'SPW',
+                'adresse'=> true,
+                'date_naissance'=> true,
+                'age'=> false,
+                'email'=> false,
+                'num_national'=> true,
+                'statut_legal'=> true,
+                'diplome'=> true,
+                'duree_chomage'=> true,
+                'source_info'=> false,
+                'groupe_social'=> false,
+            ],
             [
                 'nom'=>'Cefora',
                 'adresse'=> true,
@@ -69,7 +95,8 @@ class PouvSubTableSeeder extends Seeder
             ],
         ];
 
-        foreach ($pouvsub as $key => $value) {
+        foreach ($pouvsubs as $key => $value) {
             PouvSub::create($value);
-        }    }
+        }
+    }
 }

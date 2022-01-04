@@ -13,7 +13,7 @@ class CreateFormationInscritsTable extends Migration
      */
     public function up()
     {
-        Schema::create('formation_inscrits', function (Blueprint $table) {
+        Schema::create('inscrit_formation', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('formation_id')->unsigned();
             $table->bigInteger('inscrit_id')->unsigned();
@@ -32,6 +32,6 @@ class CreateFormationInscritsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('formation_inscrits');
+        Schema::dropIfExists('inscrit_formation');
     }
 }

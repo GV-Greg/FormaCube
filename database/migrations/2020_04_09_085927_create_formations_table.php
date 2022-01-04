@@ -22,7 +22,7 @@ class CreateFormationsTable extends Migration
             $table->integer('min_stagiaires');
             $table->integer('max_stagiaires');
             $table->integer('nbre_heures')->default(0);
-            $table->string('salle')->nullable();
+            $table->bigInteger('salle_id')->unsigned();
             $table->float('prix')->default(0.00)->nullable();
             $table->text('commentaire_formation')->nullable();
             $table->string('statut');

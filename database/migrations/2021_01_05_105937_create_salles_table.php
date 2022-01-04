@@ -18,6 +18,10 @@ class CreateSallesTable extends Migration
             $table->string('nom');
             $table->timestamps();
         });
+
+        Schema::table('formations', function (Blueprint $table) {
+            $table->foreign('salle_id')->references('id')->on('salles')->cascadeOnDelete();
+        });
     }
 
     /**
@@ -27,6 +31,9 @@ class CreateSallesTable extends Migration
      */
     public function down()
     {
+        Schema::table('formations', function (Blueprint $table) {
+            $table->dropForeign(['salle_id']);
+        });
         Schema::dropIfExists('salles');
     }
 }

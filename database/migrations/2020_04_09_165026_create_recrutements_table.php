@@ -19,7 +19,7 @@ class CreateRecrutementsTable extends Migration
             $table->date('date');
             $table->timestamps();
 
-            $table->foreign('id_formation')->references('id')->on('formations')->cascadeOnDelete();
+            $table->foreign('formation_id')->references('id')->on('formations')->cascadeOnDelete();
         });
     }
 

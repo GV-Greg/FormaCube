@@ -17,12 +17,12 @@ class DatabaseSeeder extends Seeder
             UserTableSeeder::class,
             PouvSubTableSeeder::class,
             SalleSeeder::class,
-            FormationsTableSeeder::class,
-            PouvSubInfosTableSeeder::class,
-            InscritsTableSeeder::class,
-            RecrutementsTableSeeder::class,
-            RecrutementInscritTableSeeder::class,
-            FormationInscritTableSeeder::class,
+//            FormationsTableSeeder::class,
+//            PouvSubInfosTableSeeder::class,
+//            InscritsTableSeeder::class,
+//            RecrutementsTableSeeder::class,
+//            RecrutementInscritTableSeeder::class,
+//            FormationInscritTableSeeder::class,
         ]);
     }
 }

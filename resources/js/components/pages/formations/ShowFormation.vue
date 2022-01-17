@@ -460,9 +460,24 @@
                     <v-tab-item value="documents">
                         <v-card flat tile>
                             <v-card-text>
-                                <a :href="'api/excel/formation-participants/' + formation.id" class="btn btn-interface button-link">Liste des participants</a>
-                                <button class="btn btn-interface button-link" @click="uploadListePresence()">Liste des pr&eacute;sences</button>
-                                <button class="btn btn-interface button-link" @click="uploadAbsences()">Doc. Absences justifi&eacute;es</button>
+                                <v-container>
+                                    <v-row>
+                                        <v-col class="px-1">
+                                            <a :href="'api/excel/formation-participants/' + formation.id" class="btn btn-interface button-link">Liste des participants</a>
+                                            <button class="btn btn-interface button-link" @click="uploadListePresence()">Liste des pr&eacute;sences</button>
+                                            <button class="btn btn-interface button-link" @click="uploadAbsences()">Doc. Absences justifi&eacute;es</button>
+                                            <button class="btn btn-interface button-link" @click="openModalAttestationParticipation()">Attestation de participation</button>
+                                            <button class="btn btn-interface button-link" @click="uploadAttestationDeplacement()">Attestation d&eacute;placement</button>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mt-1">
+                                        <v-col class="px-1">
+                                            <a v-show="formation.pouvsub === 'Cefora'" :href="'api/excel/suivi-stagiaires/' + formation.id" class="btn btn-interface button-link">Suivi des stagiaires</a>
+                                            <button v-show="formation.prix > 0" class="btn btn-interface button-link" @click="uploadAttestationsPaiement()">Attestations de paiement</button>
+                                            <button v-show="formation.nom === 'PMTIC'" class="btn btn-interface button-link" @click="uploadAttestationsPMTIC()">Attestations PMTIC</button>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
                             </v-card-text>
                         </v-card>
                     </v-tab-item>
@@ -910,6 +925,49 @@
                 </div>
             </div>
         </div>
+        <!-- Modal d'export d'attestation de participation à la formation -->
+        <v-dialog v-model="dialog_attestation_participation" persistent width="550">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Attestations de participation</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container>
+                        <div v-if="stagiaires.length > 0">
+                            <v-simple-table fixed-header>
+                                <template v-slot:default>
+                                    <thead class>
+                                    <tr>
+                                        <th class="text-center text-uppercase">Pr&eacute;nom</th>
+                                        <th class="text-center text-uppercase">Nom</th>
+                                        <th class="text-center text-uppercase">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="(stagiaire, index) in stagiaires" :key="index">
+                                        <td><strong>{{ stagiaire.prenom }}</strong></td>
+                                        <td><strong>{{ stagiaire.nom | upperCase }}</strong></td>
+                                        <td class="d-flex justify-center py-1">
+                                            <v-btn depressed color="success" @click="uploadAttestationParticipation(stagiaire)">
+                                                T&eacute;l&eacute;charger
+                                            </v-btn>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </template>
+                            </v-simple-table>
+                        </div>
+                        <div v-else>
+                            Pas de stagiaire
+                        </div>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn depressed color="error" @click="dialog_attestation_participation = false">Close</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <!-- Modal de traitement -->
         <v-dialog v-model="dialog_recrutements_traitement" persistent width="400">
             <v-card color="bg-light-interface" dark class="pt-4">
@@ -1048,6 +1106,7 @@
                 formTag : new Form({
                     tag: null,
                 }),
+                dialog_attestation_participation: false,
             }
         },
         watch: {
@@ -1065,15 +1124,6 @@
         mounted() {
             console.log('Show Formation component mounted');
             this.getDatas();
-            // MailtoUI.run({
-            //     title:"Envoyer l'email avec",
-            //     buttonText1:"Gmail via navigateur",
-            //     buttonText2:"Outlook via navigateur",
-            //     buttonText3:"Yahoo via navigateur",
-            //     buttonText4:"Via votre programme de messagerie par défaut",
-            //     buttonTextCopy:"Copier",
-            //     buttonTextCopyAction:"Copié"
-            // });
         },
         computed: {
             currentUser() {
@@ -1655,6 +1705,7 @@
                     this.dialog_recrutements_traitement = false;
                 }
             },
+
             verifRecrutement(recrutement) {
                 this.listCandidatsTemp = [];
                 this.candidats = [];
@@ -1696,6 +1747,7 @@
                 this.dialog_verif_recrutement = true;
                 this.transfertCandidat = false;
             },
+
             reportCandidat(candidat_id, candidat, id, recrutement) {
                 if(recrutement === undefined) {
                     Snackbar.fire({
@@ -1727,6 +1779,7 @@
                         Snackbar.fire('Transfert du candidat non effectué !');
                     })
             },
+
             deleteRecrutement(recrutement_id) {
                 this.$Progress.start();
                 this.nbreTransfertFalse = 0;
@@ -1777,7 +1830,6 @@
                                     .then(response => {
                                         this.listNewDatesRecrutements = [];
                                         this.getRecrutements();
-                                        // Fire.$emit('RefreshPage');
                                         Toast.fire('Recrutement Supprimé! \n Transfert du candidat effectué');
                                         this.$Progress.finish();
                                         this.dialog_verif_recrutement = false;
@@ -1807,6 +1859,7 @@
                     });
                 }
             },
+
             forceFileDownload(response, fichier) {
                 let headers = response.headers;
                 let blob = new Blob([response.data], {type: headers['content-type']});
@@ -1816,6 +1869,7 @@
                 link.click();
                 link.remove();
             },
+
             uploadListeParticipants() {
                 axios.get('api/excel/formation-participants/' + this.formation.id)
                     .catch(error => {
@@ -1824,6 +1878,7 @@
                         this.traitements.push('Excel non exporté.');
                     })
             },
+
             uploadListePresence() {
                 axios({
                     url: '/PDF/formation/presences/' + this.formation.id,
@@ -1837,6 +1892,7 @@
                         console.log(error.response);
                     })
             },
+
             uploadAbsences() {
                 axios({
                     url: '/PDF/formation/absences/' + this.formation.id,
@@ -1850,6 +1906,75 @@
                         console.log(error.response);
                     })
             },
+
+            openModalAttestationParticipation() {
+                this.dialog_attestation_participation = true;
+            },
+
+            uploadAttestationParticipation(stagiaire) {
+                axios({
+                    url: '/PDF/formation/participation/' + this.formation.id + '/' + stagiaire.id,
+                    method: 'GET',
+                    responseType: 'blob',
+                })
+                    .then(response => {
+                        this.forceFileDownload(response, `attestation_participation_${stagiaire.nom}_${stagiaire.prenom}.pdf`);
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                        Snackbar.fire("Problème avec l'attestation de participation à télécharger !");
+                    })
+            },
+
+            uploadAttestationDeplacement() {
+                axios({
+                    url: '/PDF/formation/deplacement/' + this.formation.id,
+                    method: 'GET',
+                    responseType: 'blob',
+                })
+                    .then(response => {
+                        this.forceFileDownload(response, `attestations_deplacement.pdf`);
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                        Snackbar.fire("Problème avec les attestations de déplacement à télécharger !");
+                    })
+            },
+
+            uploadSuiviStagiaires() {
+
+            },
+
+            uploadAttestationsPaiement() {
+                axios({
+                    url: '/PDF/formation/paiements/' + this.formation.id,
+                    method: 'GET',
+                    responseType: 'blob',
+                })
+                    .then(response => {
+                        this.forceFileDownload(response, `attestations_paiement_${this.formation.abreviation}.pdf`);
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                        Snackbar.fire("Problème avec les attestations de paiement à télécharger !");
+                    })
+            },
+
+            uploadAttestationsPMTIC() {
+                axios({
+                    url: '/PDF/formation/pmtic/' + this.formation.id,
+                    method: 'GET',
+                    responseType: 'blob',
+                })
+                    .then(response => {
+                        this.forceFileDownload(response, `attestations_pmtic.pdf`);
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                        Snackbar.fire("Problème avec les attestations à télécharger de fréquentation et des capacités pour le PMTIC !");
+                    })
+            },
+
             destroyFormation() {
                 this.$Progress.start();
                 Suppression.fire().then((result) => {

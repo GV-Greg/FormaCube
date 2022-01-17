@@ -36,6 +36,9 @@ class ParticipantsExport implements fromCollection,
     private $nbreStagiaires;
     private $tableau;
 
+    /**
+     * @param Formation $formation
+     */
     public function __construct(Formation $formation)
     {
         $this->formation = $formation;
@@ -43,11 +46,17 @@ class ParticipantsExport implements fromCollection,
         $this->tableau = 'A6:F' . ($this->nbreStagiaires + 6);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
+     */
     public function collection()
     {
         return $this->formation->inscrits()->orderBy('nom', 'ASC')->get();
     }
 
+    /**
+     * @return string[]
+     */
     public function properties(): array
     {
         return [
@@ -60,16 +69,26 @@ class ParticipantsExport implements fromCollection,
         ];
     }
 
+    /**
+     * @return string
+     */
     public function title(): string
     {
         return 'ListeParticipants';
     }
 
+    /**
+     * @return string
+     */
     public function startCell(): string
     {
         return 'A6';
     }
 
+    /**
+     * @param mixed $inscrit
+     * @return array
+     */
     public function map($inscrit): array
     {
         return [
@@ -82,6 +101,9 @@ class ParticipantsExport implements fromCollection,
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function headings(): array
     {
         return [
@@ -94,6 +116,10 @@ class ParticipantsExport implements fromCollection,
         ];
     }
 
+    /**
+     * @return Drawing[]
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     */
     public function drawings(): array
     {
         $formation = $this->formation->pouvsub()->get()->first();
@@ -120,6 +146,9 @@ class ParticipantsExport implements fromCollection,
         return $drawings;
     }
 
+    /**
+     * @return int[]
+     */
     public function columnWidths(): array
     {
         return [
@@ -132,6 +161,10 @@ class ParticipantsExport implements fromCollection,
         ];
     }
 
+    /**
+     * @param Worksheet $sheet
+     * @return array[]
+     */
     public function styles(Worksheet $sheet): array
     {
         return [
@@ -178,6 +211,9 @@ class ParticipantsExport implements fromCollection,
         ];
     }
 
+    /**
+     * @return \Closure[]
+     */
     public function registerEvents(): array
     {
         return array(

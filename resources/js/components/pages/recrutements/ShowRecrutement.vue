@@ -234,6 +234,8 @@
                         <v-card flat tile>
                             <v-card-text>
                                 <button class="btn btn-interface button-link" @click="uploadListePresence()">Liste des présences</button>
+                                <button class="btn btn-interface button-link" @click="openModalAttestation()">Attestation de participation</button>
+                                <button class="btn btn-interface button-link" @click="uploadFicheSignaletique()">Fiche signal&eacute;tique</button>
                             </v-card-text>
                         </v-card>
                     </v-tab-item>
@@ -385,6 +387,49 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <!-- Modal d'export d'attestation de participation au recrutement -->
+        <v-dialog v-model="dialog_attestation_participation" persistent width="550">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Attestations de participation</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container>
+                        <div v-if="candidats.length > 0">
+                            <v-simple-table fixed-header>
+                                <template v-slot:default>
+                                    <thead class>
+                                    <tr>
+                                        <th class="text-center text-uppercase">Pr&eacute;nom</th>
+                                        <th class="text-center text-uppercase">Nom</th>
+                                        <th class="text-center text-uppercase">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="(candidat, index) in candidats" :key="index">
+                                        <td><strong>{{ candidat.prenom }}</strong></td>
+                                        <td><strong>{{ candidat.nom | upperCase }}</strong></td>
+                                        <td class="d-flex justify-center py-1">
+                                            <v-btn depressed color="success" @click="uploadAttestation(candidat)">
+                                                T&eacute;l&eacute;charger
+                                            </v-btn>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </template>
+                            </v-simple-table>
+                        </div>
+                        <div v-else>
+                            Pas de candidat
+                        </div>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn depressed color="error" @click="dialog_attestation_participation = false">Close</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <!-- Modal de traitement -->
         <v-dialog v-model="dialog_recrutements_traitement" persistent width="400">
             <v-card color="bg-light-interface" dark class="pt-4">
@@ -466,6 +511,7 @@
                 dialog_recrutements_traitement: false,
                 traitements: [],
                 vitesse: 1000,
+                dialog_attestation_participation: false,
             }
         },
         watch: {
@@ -489,26 +535,20 @@
         mounted() {
             console.log('Show Recrutement component mounted');
             this.getRecrutement();
-            // MailtoUI.run({
-            //     title:"Envoyer l'email avec",
-            //     buttonText1:"Gmail via navigateur",
-            //     buttonText2:"Outlook via navigateur",
-            //     buttonText3:"Yahoo via navigateur",
-            //     buttonText4:"Via votre programme de messagerie par défaut",
-            //     buttonTextCopy:"Copier",
-            //     buttonTextCopyAction:"Copié"
-            // });
         },
         methods: {
             goBack() {
                 return this.$router.go(-1);
             },
+
             save (date) {
                 this.$refs.menu.save(date)
             },
+
             allowedDays: function(a){
                 return val => a.indexOf(val) === -1 && ![0,6].includes(new Date(val).getDay());
             },
+
             getRecrutement() {
                 this.$Progress.start();
                 this.loading = false;
@@ -535,6 +575,7 @@
                         Snackbar.fire('Problème avec la récupération des infos du recrutement');
                     })
             },
+
             getOthersRecrutements() {
                 this.listDatesOthersRecrutements = [];
                 axios.get(`/api/recrutements/others/` + this.recrutement.id + '/' + this.recrutement.formation_id)
@@ -550,6 +591,7 @@
                         Snackbar.fire('Problème avec la récupération des infos des autres recrutements');
                     })
             },
+
             getListCandidatsAllRecrutements() {
                 this.listCandidats = [];
                 axios.get(`/api/recrutements/recrutementsFormation/` + this.recrutement.formation_id)
@@ -575,6 +617,7 @@
                 }
                 this.loadingDatas = true;
             },
+
             deleteCandidat(id) {
                 this.$Progress.start();
                 Suppression.fire({
@@ -597,6 +640,7 @@
                 });
 
             },
+
             searchInscrits() {
                 if(this.query != null) {
                     axios.get('api/inscrits/search', { params: { query: this.query } })
@@ -604,6 +648,7 @@
                         .catch(error => { console.log(error.response) } );
                 }
             },
+
             ajoutCandidat: function(id, nom, prenom) {
                 this.candidat['id'] = id;
                 this.candidat['nom'] = nom;
@@ -611,9 +656,11 @@
                 this.ajoutListCandidats(this.candidat);
                 this.candidat= {};
             },
+
             ajoutListCandidats(candidat) {
                 this.listCandidats.push(candidat);
             },
+
             deleteListCandidats: function (index) {
                 this.listCandidats.splice(index, 1);
             },
@@ -653,16 +700,16 @@
                 }
             },
 
-            forceFileDownload(response) {
+            forceFileDownload(response, fichier) {
                 let headers = response.headers;
-                let date = this.recrutement.date;
                 let blob = new Blob([response.data], {type: headers['content-type']});
                 let link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
-                link.download = `${date}_recrutement-liste-presence.pdf`;
+                link.download = fichier;
                 link.click();
                 link.remove();
             },
+
             uploadListePresence() {
                 axios({
                     url: '/PDF/recrutement/presences/' + this.recrutement.id,
@@ -670,19 +717,55 @@
                     responseType: 'blob',
                 })
                     .then(response => {
-                        this.forceFileDownload(response);
+                        this.forceFileDownload(response, `${this.recrutement.date}_liste-presence.pdf`);
                     })
                     .catch(error => {
                         console.log(error.response);
                         Snackbar.fire('Problème avec la liste des présences à télécharger !');
                     })
             },
+
+            openModalAttestation() {
+                this.dialog_attestation_participation = true;
+            },
+
+            uploadAttestation(candidat) {
+                axios({
+                    url: '/PDF/recrutement/participation/' + this.recrutement.id + '/' + candidat.id,
+                    method: 'GET',
+                    responseType: 'blob',
+                })
+                    .then(response => {
+                        this.forceFileDownload(response, `attestation_${candidat.nom}_${candidat.prenom}.pdf`);
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                        Snackbar.fire("Problème avec l'attestation à télécharger !");
+                    })
+            },
+
+            uploadFicheSignaletique() {
+                axios({
+                    url: '/PDF/recrutement/fiche/' + this.recrutement.id,
+                    method: 'GET',
+                    responseType: 'blob',
+                })
+                    .then(response => {
+                        this.forceFileDownload(response, `${this.recrutement.date}_fiche-signaletique.pdf`);
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                        Snackbar.fire('Problème avec la a fiche signalétique à télécharger !');
+                    })
+            },
+
             editRecrutement() {
                 this.formRecrutement.reset();
                 this.formRecrutement.clear();
                 this.formRecrutement.fill(this.recrutement);
                 this.dialog_edition = true;
             },
+
             updateRecrutement(recrutement) {
                 this.$Progress.start();
                 this.formRecrutement.busy = true;
@@ -703,6 +786,7 @@
                         Snackbar.fire('Problème avec la modification du recrutement !');
                     })
             },
+
             verifRecrutement(recrutement) {
                 this.listCandidatsTemp = [];
                 this.candidats = [];
@@ -736,6 +820,7 @@
                 this.dialog_verif_recrutement = true;
                 this.transfertCandidat = false;
             },
+
             reportCandidat(candidat_id, candidat, recrutement) {
                 if(recrutement === undefined) {
                     Snackbar.fire('Vous n\'avez pas encodé de date pour ' + candidat);
@@ -765,6 +850,7 @@
                         })
                 }
             },
+
             verifReportCandidat(candidat) {
                 this.dialog_report_candidat = true;
                 this.candidat = [];
@@ -776,6 +862,7 @@
                     }
                 }
             },
+
             storeReportCandidat(candidat) {
                 if(candidat === undefined) {
                     Snackbar.fire('Vous n\'avez pas choisi une autre date de recrutement !');
@@ -798,6 +885,7 @@
                         })
                 }
             },
+
             destroyRecrutement(recrutement) {
                 this.$Progress.start();
                 this.nbreTransfertFalse = 0;

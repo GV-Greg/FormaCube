@@ -139,11 +139,12 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
         Route::get('/show/{id}', 'API\LogController@show')->name('logs.show');
     });
 
-    /*  Gestion des inscriptions à la newsletter via l'API de Send in blue  */
+    /*  Test de Récupération de 10 contacts de la liste de la newsletter via l'API de Send in blue  */
     Route::get('contacts', 'SendInBlueController@contacts');
 
     /* Exports de fichiers excel */
     Route::prefix('excel')->group( function() {
         Route::get('/formation-participants/{id}', 'API\ExportsExcelController@formationListeParticipants')->name('excel.formation.participants');
+        Route::get('/suivi-stagiaires/{id}', 'API\ExportsExcelController@formationSuiviStagiaires')->name('excel.formation.suivi');
     });
 });

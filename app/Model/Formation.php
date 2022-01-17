@@ -15,6 +15,9 @@ class Formation extends Model
         'nom', 'session', 'date_debut', 'date_fin', 'min_stagiaires', 'max_stagiaires', 'nbre_heures', 'salle', 'prix', 'commentaire_formation', 'statut', 'abreviation', "duree_rgpd",
     ];
 
+    protected $dates = ['date_debut', 'date_fin'];
+
+
     public function user()
     {
         return $this->belongsTo(User::class);

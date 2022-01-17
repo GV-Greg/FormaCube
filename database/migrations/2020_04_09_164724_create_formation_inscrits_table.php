@@ -17,11 +17,21 @@ class CreateFormationInscritsTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('formation_id')->unsigned();
             $table->bigInteger('inscrit_id')->unsigned();
-            $table->bigInteger('infos_id')->unsigned();
             $table->date('date_ajout');
+            $table->boolean('pmtic_module_1')->default(0);
+            $table->boolean('pmtic_module_2')->default(0);
+            $table->boolean('pmtic_module_3')->default(0);
+            $table->date('date_rappel')->nullable();
+            $table->unsignedBigInteger('rappel_user_id')->nullable();
+            $table->string('rappel_resultat', 100)->nullable();
+            $table->date('date_rdv')->nullable();
+            $table->unsignedBigInteger('rdv_user_id')->nullable();
+            $table->boolean('validation_rdv')->nullable();
+
             $table->foreign('formation_id')->references('id')->on('formations')->cascadeOnDelete();
             $table->foreign('inscrit_id')->references('id')->on('inscrits')->cascadeOnDelete();
-            $table->foreign('infos_id')->references('id')->on('inscrit_infos')->cascadeOnDelete();
+            $table->foreign('rappel_user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('rdv_user_id')->references('id')->on('users')->cascadeOnDelete();
         });
     }
 

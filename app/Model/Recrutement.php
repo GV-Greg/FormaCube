@@ -12,6 +12,8 @@ class Recrutement extends Model
         'date'
     ];
 
+    protected $dates = ['date'];
+
     public function formation()
     {
         return $this->belongsTo(Formation::class);

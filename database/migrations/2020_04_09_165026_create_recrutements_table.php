@@ -17,6 +17,8 @@ class CreateRecrutementsTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('formation_id')->unsigned();
             $table->date('date');
+            $table->boolean('selection')->default(0);
+            $table->boolean('prospection')->default(0);
             $table->timestamps();
 
             $table->foreign('formation_id')->references('id')->on('formations')->cascadeOnDelete();

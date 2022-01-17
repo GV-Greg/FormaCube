@@ -28,13 +28,13 @@ class CreateInscritsTable extends Migration
             $table->string('gsm', 20)->nullable();
             $table->text('commentaire_inscrit')->nullable();
             $table->integer('age')->nullable();
-            $table->string('num_national', 15);
-            $table->string('statut_legal', 100);
-            $table->string('diplome', 100);
+            $table->string('num_national', 15)->nullable();
+            $table->string('statut_legal', 100)->nullable();
+            $table->string('diplome', 100)->nullable();
             $table->enum('duree_chomage', ['aucun','-1an','-2ans','+2ans'])->nullable();
-            $table->string('source_info', 200);
+            $table->string('source_info', 200)->nullable();
             $table->enum('groupe_social', ['réfugié','sociale','médicale'])->nullable();
-            $table->boolean('newsletter');
+            $table->boolean('newsletter')->default(false);
             $table->boolean('prospect');
             $table->timestamps();
         });

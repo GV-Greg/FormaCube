@@ -18,6 +18,7 @@ class CreateRecrutementInscritsTable extends Migration
             $table->bigInteger('recrutement_id')->unsigned();
             $table->bigInteger('inscrit_id')->unsigned();
             $table->date('date_ajout');
+            $table->boolean('selection')->default(0);
 
             $table->foreign('recrutement_id')->references('id')->on('recrutements')->cascadeOnDelete();
             $table->foreign('inscrit_id')->references('id')->on('inscrits')->cascadeOnDelete();

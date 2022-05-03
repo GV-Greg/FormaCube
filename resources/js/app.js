@@ -80,8 +80,6 @@ const Snackbar = Swal.mixin({
     toast: true,
     position: 'top',
     showConfirmButton: true,
-    timer: 2500,
-    timerProgressBar: true,
     onOpen: (toast) => {
         toast.addEventListener('mouseenter', Swal.stopTimer);
         toast.addEventListener('mouseleave', Swal.resumeTimer)

@@ -1,7 +1,6 @@
-<p align="center">
-<img src="https://sd-1.archive-host.com/membres/up/9115037260420014/WebDevelopper/readme-github/Logo_FormaCube-Noir.png#gh-light-mode-only" width="400">
-<img src="https://sd-1.archive-host.com/membres/up/9115037260420014/WebDevelopper/readme-github/Logo_FormaCube-Blanc.png#gh-dark-mode-only" width="400">
-</p>
+<div align="center">
+    ![Logo Project](https://sd-1.archive-host.com/membres/up/9115037260420014/WebDevelopper/readme-github/Logo_FormaCube-Blanc.png#gh-dark-mode-only)
+</div>
 
 <p align="center">
 

@@ -27,7 +27,6 @@ class CreateFormationsTable extends Migration
             $table->text('commentaire_formation')->nullable();
             $table->string('statut');
             $table->bigInteger('user_id')->unsigned();
-            $table->bigInteger('pouvsub_id')->unsigned();
             $table->string('abreviation', 15);
             $table->integer('duree_rgpd');
             $table->timestamps();

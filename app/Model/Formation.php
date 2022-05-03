@@ -23,19 +23,9 @@ class Formation extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function pouvsub()
-    {
-        return $this->belongsTo(Pouvsub::class);
-    }
-
     public function recrutements()
     {
         return $this->hasMany(Recrutement::class);
-    }
-
-    public function pouvsubinfos()
-    {
-        return $this->hasOne(PouvsubInfos::class);
     }
 
     public function inscrits()

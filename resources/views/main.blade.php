@@ -20,9 +20,9 @@
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     </head>
     <body>
-        <div id="app" class="bg-interface">
-            <app-container></app-container>
+        <div id="app">
             <vue-progress-bar></vue-progress-bar>
+            <app-container></app-container>
         </div>
     </body>
 </html>

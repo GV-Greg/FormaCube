@@ -18,8 +18,5 @@ $factory->define(FormationInscrit::class, function (Faker $faker) {
         'formation_id' => $faker->randomElement($formations),
         'inscrit_id' => $faker->unique()->randomElement($stagiaires),
         'date_ajout' => $faker->dateTimeBetween($startDate = 'now', $endDate = '2 month', $timezone = 'Europe/Paris'),
-        'pmtic_module_1' => false,
-        'pmtic_module_2' => false,
-        'pmtic_module_3' => false,
     ];
 });

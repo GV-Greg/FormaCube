@@ -122,8 +122,9 @@ Vue.use(Vuex);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 
+// fonction qui regroupe les fonctions de general.js du dossier helpers
 const store = new Vuex.Store(storeData);
-initialize(store, router); // fonction qui regroupe les fonctions dans le fichier general.js du dossier helpers
+initialize(store, router);
 
 const app = new Vue({
     vuetify,

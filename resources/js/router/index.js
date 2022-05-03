@@ -19,8 +19,6 @@ import MainProfil from "../components/pages/utilisateurs/MainProfil.vue";
 import Profil from "../components/pages/utilisateurs/Profil.vue";
 import EditProfil from "../components/pages/utilisateurs/ProfilEdit.vue";
 
-import PouvSubs from "../components/pages/PouvsubsComponent.vue";
-
 import MainFormations from "../components/pages/formations/MainFormations.vue";
 import ListFormations from "../components/pages/formations/ListFormations.vue";
 import ShowFormation from "../components/pages/formations/ShowFormation.vue";
@@ -117,10 +115,6 @@ const routes = [
                         props: true,
                     },
                 ]
-            },
-            {
-                path: "/pouvsubs",
-                component: PouvSubs,
             },
             {
                 path: "/formations",

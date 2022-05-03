@@ -122,18 +122,6 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
     /*  Recherche pour les tags  */
     Route::get('search/tags/{colonne}/{search}', 'API\TagController@search');
 
-    /*  Gestion des pouvoirs subsidiants  */
-    Route::apiResource('pouvsubs', 'API\PouvsubController');
-    Route::get('search/pouvsubs/{colonne}/{search}', 'API\PouvsubController@search');
-
-    /*  Gestion des tags des infos pour les pouvoirs subsidiants  */
-    Route::prefix('pouvsub-infos')->group( function() {
-        Route::get('/infos/{id}', 'API\PouvsubInfosController@getInfos')->name('pouvsub-infos.infos');
-        Route::post('/create', 'API\PouvsubInfosController@store')->name('pouvsub-infos.store');
-        Route::put('/edit/{id}', 'API\PouvsubInfosController@update')->name('pouvsub-infos.update');
-        Route::delete('/{id}', 'API\PouvsubInfosController@destroy')->name('pouvsub-infos.destroy');
-    });
-
     /*  Gestion des logs  */
     Route::prefix('logs')->group( function() {
         Route::get('/show/{id}', 'API\LogController@show')->name('logs.show');

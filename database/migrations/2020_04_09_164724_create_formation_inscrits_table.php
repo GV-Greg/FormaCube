@@ -18,9 +18,6 @@ class CreateFormationInscritsTable extends Migration
             $table->bigInteger('formation_id')->unsigned();
             $table->bigInteger('inscrit_id')->unsigned();
             $table->date('date_ajout');
-            $table->boolean('pmtic_module_1')->default(0);
-            $table->boolean('pmtic_module_2')->default(0);
-            $table->boolean('pmtic_module_3')->default(0);
             $table->date('date_rappel')->nullable();
             $table->unsignedBigInteger('rappel_user_id')->nullable();
             $table->string('rappel_resultat', 100)->nullable();

@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://sd-1.archive-host.com/membres/up/9115037260420014/WebDevelopper/readme-github/Logo_FormaCube-Noir.png" alt="logo project dark">
+    <img src="https://sd-1.archive-host.com/membres/up/9115037260420014/WebDevelopper/readme-github/Logo_FormaCube-github.png" alt="logo project">
 </div>
 
 <p align="center">

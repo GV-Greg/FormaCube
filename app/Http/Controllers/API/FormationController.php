@@ -74,23 +74,23 @@ class FormationController extends Controller
                 $max = $formations[$x]->max_stagiaires;
                 $inscritsFormation = FormationInscrit::where('formation_id', $formations[$x]->id)->get()->all();
                 $nbreStagiaire = FormationInscrit::where('formation_id', $formations[$x]->id)->count();
-                array_push($tempStagiaire, $nbreStagiaire);
+                $tempStagiaire[] = $nbreStagiaire;
                 $maxStagiaires = $formations[$x]->max_stagiaires;
-                array_push($tempStagiaire, $maxStagiaires);
-                array_push($nbreStagiaires, $tempStagiaire);
+                $tempStagiaire[] = $maxStagiaires;
+                $nbreStagiaires[] = $tempStagiaire;
                 for($y=0; $y < count($inscritsFormation); $y++) {
                     $inscrits++;
                 }
-                array_push($temp, $inscrits);
+                $temp[] = $inscrits;
                 if($inscrits < $min) {
                     $etat = 'Insuffisant';
                 } else if ($inscrits >= $min && $inscrits < $max) {
                     $etat = 'Incomplet';
-                } else if ($inscrits === $max) {
+                } else if ($inscrits == $max) {
                     $etat = 'Complet';
                 }
-                array_push($temp, $etat);
-                array_push($stagiaires, $temp);
+                $temp[] = $etat;
+                $stagiaires[] = $temp;
             }
         }
 

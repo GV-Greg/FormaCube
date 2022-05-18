@@ -1,158 +1,145 @@
 <template>
-    <div>
-        <h1 class="ml-5 mb-n2">
-            <a @click="goBack">
-                <button class="btn btn-light mt-n2">
-                    <i class="fas fa-reply fa-lg text-interface"></i>
-                </button>
-            </a>
+    <div class="container">
+        <h1 class="d-flex align-content-center">
+            <button class="btn btn-light pb-2 mr-2" @click="goBack">
+                <i class="fas fa-reply fa-lg text-primary-dark"></i>
+            </button>
             S&eacute;lection des stagiaires
         </h1>
-        <v-row justify="center" class="mb-n3" v-if="loading === true">
-            <v-col cols="12">
-                <v-card class="mx-auto" shaped>
-                    <v-card-text class="px-3 ml-2 pt-5 pb-n5">
-                        <v-row class="mt-n2">
-                            <v-col>
-                                <i>Recrutement du {{ recrutement.date | newDate }}</i><br/>
-                                <i>Pour la formation {{ recrutement.formation }}</i>
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-        <v-row v-else class="text-center text-light mt-10">
-            <v-col class="d-flex flex-column justify-center align-center">
-                <v-progress-circular :size="70" :width="10" color="white" indeterminate></v-progress-circular>
-                <span class="mt-5">Chargement...</span>
-            </v-col>
-        </v-row>
-        <v-row class="mb-n5" v-show="loading === true">
-            <v-col>
-                <v-tabs class="elevation-2" dark>
-                    <v-tabs-slider></v-tabs-slider>
-                    <v-tab href="#listCandidats">Liste des candidat·e·s</v-tab>
-                    <v-tab-item value="listCandidats" v-if="date_today >= date_recrutement">
-                        <h4 v-if="recrutement.selection === 0" class="text-light-interface text-center mt-3">Sélection des candidats repris pour la formation</h4>
-                        <h4 v-if="recrutement.selection === 1 && recrutement.prospection === 0" class="text-light-interface text-center mt-3 mb-3">Liste des candidats non repris</h4>
-                        <v-card flat tile>
-                            <v-card-text v-if="recrutement.selection === 0">
-                                <v-row>
-                                    <v-col cols="12">
-                                        <h5 class="text-center font-weight-bold text-red">Il reste {{ nbrePlaces }} places.</h5>
-                                    </v-col>
-                                </v-row>
-                                <v-row>
-                                    <v-col cols="12">
-                                        Choisissez les candidats repris pour la formation :
-                                    </v-col>
-                                </v-row>
-                                <v-row class="ml-5" v-if="candidats.length > 0">
-                                    <v-col cols="3" v-for="(candidat, index) in candidats" :key="index">
-                                        <v-checkbox
-                                            v-model="selected"
-                                            :hide-details="index !== candidats.length - 1"
-                                            :value="candidat.id"
-                                            :label="candidat.fullname"
-                                            color="interface"
-                                        ></v-checkbox>
-                                    </v-col>
-                                </v-row>
-                                <v-row v-else>
-                                    <v-col>
-                                        Aucun·e candidat·e au recrutement
-                                    </v-col>
-                                </v-row>
-                                <v-row v-if="nbrePlaces < 0">
-                                    <v-col class="d-flex justify-center" >
-                                        <div class="font-weight-bold text-red text-center">
-                                            <span class="text-uppercase">Attention !</span> Vous avez choisi trop de candidats par rapport au nombre maximum de stagiaires autorisés pour cette formation.<br>
-                                            Veuillez en décocher pour pouvoir exécuter la sélection...
-                                        </div>
-                                    </v-col>
-                                </v-row>
-                                <v-row>
-                                    <v-col class="d-flex justify-center">
-                                        <v-btn class="btn-interface text-light" @click="startTraitementSelection()" v-if="nbrePlaces >= 0">Ex&eacute;cuter</v-btn>
-                                        <v-btn class="btn-interface text-light" v-else disabled>Ex&eacute;cuter</v-btn>
-                                    </v-col>
-                                </v-row>
-                            </v-card-text>
-                            <v-card-text v-if="recrutement.selection === 1 && recrutement.prospection === 0">
-                                <v-row class="ml-5" v-if="candidatsNonSelected.length > 0">
-                                    <v-col cols="12">
-                                        <v-row>
-                                            Vous pouvez ajouter des tags de centres d'int&eacute;r&ecirc;ts à chaque personne (cliquez sur le bouton <i class="fas fa-tag px-1 pt-1"></i>) :
-                                        </v-row>
-                                        <v-row class="d-flex justify-center mt-1">
-                                            <v-col cols="6">
-                                                <v-simple-table fixed-header style="width:700px;">
-                                                    <thead class>
-                                                        <tr>
-                                                            <th>N°</th>
-                                                            <th>PRÉNOM</th>
-                                                            <th>NOM</th>
-                                                            <th class="text-center">ACTIONS</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-show="candidatsNonSelected.length" v-for="(item, index) in candidatsNonSelected" :key="item.id">
-                                                            <th scope="row">
-                                                                {{ index + 1 }}
-                                                            </th>
-                                                            <td>
-                                                                {{ item.prenom }}
-                                                            </td>
-                                                            <td>
-                                                                {{ item.nom | upperCase }}
-                                                            </td>
-                                                            <td class="text-center" v-if="item.traitement === false">
-                                                                <v-btn class="btn-interface my-2" @click="openModalChoiceTags(item.id)">
-                                                                    <i class="fas fa-tag fa-lg text-white"></i>
-                                                                </v-btn>
-                                                            </td>
-                                                            <td class="text-center" v-else>
-                                                                <i class="fas fa-check fa-lg text-success"></i>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </v-simple-table>
-                                            </v-col>
-                                        </v-row>
-                                        <v-row>
-                                            <v-col class="d-flex justify-center">
-                                                <h6 class="text-red">Si vous avez fini, cliquez :</h6>
-                                            </v-col>
-                                        </v-row>
-                                        <v-row>
-                                            <v-col class="mt-n5 d-flex justify-center">
-                                                <v-btn class="btn-interface text-light" @click="startProspection()">Ex&eacute;cuter</v-btn>
-                                            </v-col>
-                                        </v-row>
-                                    </v-col>
-                                </v-row>
-                                <v-row v-else>
-                                    <v-col>
-                                        Aucun·e candidat·e non s&eacute;lectionn&eacute;
-                                    </v-col>
-                                </v-row>
-                            </v-card-text>
-                            <v-card-text v-if="recrutement.selection === 1 && recrutement.prospection === 1">
-                                <v-row class="ml-5">
-                                    <v-col cols="3">
-                                        S&eacute;lection & prospection d&eacute;j&agrave; effectu&eacute;es
-                                    </v-col>
-                                </v-row>
-                            </v-card-text>
-                        </v-card>
-                    </v-tab-item>
-                    <v-tab-item value="listCandidats" v-else>
-                        <h4 class="text-red font-weight-bold text-center mt-3">Impossible de sélectionner les candidats si le jour du recrutement n'a pas eu lieu</h4>
-                    </v-tab-item>
-                </v-tabs>
-            </v-col>
-        </v-row>
+        <div class="row mt-2" v-if="loading === true">
+            <v-card class="mx-auto w-100" shaped>
+                <v-card-text class="px-3 ml-2 pt-5 pb-n5">
+                    <v-row class="mt-n2">
+                        <v-col>
+                            <i>Recrutement du {{ recrutement.date | newDate }}</i><br/>
+                            <i>Pour la formation {{ recrutement.formation }}</i>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+            <v-tabs class="w-100 elevation-2 mt-2 mb-5" dark>
+                <v-tabs-slider></v-tabs-slider>
+                <v-tab href="#listCandidats">Liste des candidat·e·s</v-tab>
+                <v-tab-item value="listCandidats" v-if="date_today >= date_recrutement">
+                    <h4 v-if="recrutement.selection === 0" class="text-light-interface text-center mt-3">Sélection des candidats repris pour la formation</h4>
+                    <h4 v-if="recrutement.selection === 1 && recrutement.prospection === 0" class="text-light-interface text-center mt-3 mb-3">Liste des candidats non repris</h4>
+                    <v-card flat tile>
+                        <v-card-text v-if="recrutement.selection === 0">
+                            <v-row>
+                                <v-col cols="12">
+                                    <h5 class="text-center font-weight-bold text-red">Il reste {{ nbrePlaces }} places.</h5>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col cols="12">
+                                    Choisissez les candidats repris pour la formation :
+                                </v-col>
+                            </v-row>
+                            <v-row class="ml-5" v-if="candidats.length > 0">
+                                <v-col cols="3" v-for="(candidat, index) in candidats" :key="index">
+                                    <v-checkbox
+                                        v-model="selected"
+                                        :hide-details="index !== candidats.length - 1"
+                                        :value="candidat.id"
+                                        :label="candidat.fullname"
+                                        color="interface"
+                                    ></v-checkbox>
+                                </v-col>
+                            </v-row>
+                            <v-row v-else>
+                                <v-col>
+                                    Aucun·e candidat·e au recrutement
+                                </v-col>
+                            </v-row>
+                            <v-row v-if="nbrePlaces < 0">
+                                <v-col class="d-flex justify-center" >
+                                    <div class="font-weight-bold text-red text-center">
+                                        <span class="text-uppercase">Attention !</span> Vous avez choisi trop de candidats par rapport au nombre maximum de stagiaires autorisés pour cette formation.<br>
+                                        Veuillez en décocher pour pouvoir exécuter la sélection...
+                                    </div>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col class="d-flex justify-center">
+                                    <v-btn class="btn btn-primary" @click="startTraitementSelection()" v-if="nbrePlaces >= 0">Ex&eacute;cuter</v-btn>
+                                    <v-btn class="btn btn-primary" v-else disabled>Ex&eacute;cuter</v-btn>
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+                        <v-card-text v-if="recrutement.selection === 1 && recrutement.prospection === 0">
+                            <v-row class="ml-5" v-if="candidatsNonSelected.length > 0">
+                                <v-col cols="12">
+                                    <v-row>
+                                        Vous pouvez ajouter des tags de centres d'int&eacute;r&ecirc;ts à chaque personne (cliquez sur le bouton <i class="fas fa-tag px-1 pt-1"></i>) :
+                                    </v-row>
+                                    <v-row class="d-flex justify-center mt-1">
+                                        <v-col cols="6">
+                                            <v-simple-table fixed-header style="width:700px;">
+                                                <thead class>
+                                                    <tr>
+                                                        <th>N°</th>
+                                                        <th>PRÉNOM</th>
+                                                        <th>NOM</th>
+                                                        <th class="text-center">ACTIONS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-show="candidatsNonSelected.length" v-for="(item, index) in candidatsNonSelected" :key="item.id">
+                                                        <th scope="row">
+                                                            {{ index + 1 }}
+                                                        </th>
+                                                        <td>
+                                                            {{ item.prenom }}
+                                                        </td>
+                                                        <td>
+                                                            {{ item.nom | upperCase }}
+                                                        </td>
+                                                        <td class="text-center" v-if="item.traitement === false">
+                                                            <v-btn class="btn btn-primary my-2" @click="openModalChoiceTags(item.id)">
+                                                                <i class="fas fa-tag fa-lg text-white"></i>
+                                                            </v-btn>
+                                                        </td>
+                                                        <td class="text-center" v-else>
+                                                            <i class="fas fa-check fa-lg text-success"></i>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </v-simple-table>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col class="d-flex justify-center">
+                                            <h6 class="text-red">Si vous avez fini, cliquez :</h6>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col class="mt-n5 d-flex justify-center">
+                                            <v-btn class="btn btn-primary" @click="startProspection()">Ex&eacute;cuter</v-btn>
+                                        </v-col>
+                                    </v-row>
+                                </v-col>
+                            </v-row>
+                            <v-row v-else>
+                                <v-col>
+                                    Aucun·e candidat·e non s&eacute;lectionn&eacute;
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+                        <v-card-text v-if="recrutement.selection === 1 && recrutement.prospection === 1">
+                            <v-row class="ml-5">
+                                <v-col cols="3">
+                                    S&eacute;lection & prospection d&eacute;j&agrave; effectu&eacute;es
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+                    </v-card>
+                </v-tab-item>
+                <v-tab-item value="listCandidats" v-else>
+                    <h4 class="text-red font-weight-bold text-center mt-3">Impossible de sélectionner les candidats si le jour du recrutement n'a pas eu lieu</h4>
+                </v-tab-item>
+            </v-tabs>
+        </div>
+        <Spinner v-else />
         <!-- Modal pour le choix de tags par candidat -->
         <v-dialog v-model="dialog_choice_tags" persistent max-width="700px">
             <v-card>
@@ -208,7 +195,7 @@
                                         </div>
                                     </template>
                                 </b-form-group>
-                                <v-btn class="btn-interface text-light" @click="createTags()">Créer les tags</v-btn>
+                                <v-btn class="btn btn-primary" @click="createTags()">Créer les tags</v-btn>
                             </v-col>
                         </v-row>
                     </v-container>
@@ -243,9 +230,13 @@
 
 <script>
     import {Form} from "vform";
+    import Spinner from "../../elements/Spinner";
 
     export default {
         name: "SelectionToFormation",
+        components: {
+            Spinner,
+        },
         data() {
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -563,16 +554,16 @@
                     .post('api/tags/create')
                     .then(response => {
                         if (this.formTag.successful) {
-                            this.$Progress.finish();
                             Toast.fire('Tag(s) créé(s)');
                             this.getTags();
                             this.newTags = [];
                             this.formTags.tags.push(this.formTag.tag);
+                            this.$Progress.finish();
                         }
                     })
                     .catch(error => {
                         this.$Progress.fail();
-                        console.log(error.response);
+                        console.error(error.response);
                         Snackbar.fire('Problème avec la création de tag');
                     })
             },

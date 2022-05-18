@@ -14,7 +14,7 @@
                     <v-card-text>
                         <div class="d-flex align-items-start">
                             <v-avatar class="mr-3">
-                                <img :src="'images/avatars/'+user.avatar" class="img-circle elevation-2" alt="User Image">
+                                <img :src="'storage/images/avatars/'+user.avatar" class="img-circle elevation-2" alt="User Image">
                             </v-avatar>
                             <div>
                         <span class="display-1 text--primary font-weight-bold">

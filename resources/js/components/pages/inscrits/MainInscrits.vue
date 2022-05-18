@@ -1,16 +1,15 @@
 <template>
-    <div class="container mt-n5">
-        <div class="row justify-content-center">
-            <div class="col-lg-12">
-                <router-view></router-view>
-            </div>
-        </div>
-    </div>
+    <MainPage></MainPage>
 </template>
 
 <script>
+    import MainPage from "../../elements/MainPage"
+
     export default {
-        name: "Inscrits-main",
+        name: "inscrits-main",
+        components: {
+            MainPage,
+        },
     }
 </script>
 

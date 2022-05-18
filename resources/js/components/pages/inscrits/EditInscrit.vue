@@ -1,503 +1,324 @@
 <template>
-    <div>
-        <h1>
-            <button class="btn btn-light" @click="retour">
-                <i class="fas fa-reply fa-lg text-interface"></i>
+    <div class="container">
+        <h1 class="d-flex align-content-center">
+            <button class="btn btn-light pb-2 mr-2" @click="retour">
+                <i class="fas fa-reply fa-lg text-primary-dark"></i>
             </button>
             Modification d'une fiche
         </h1>
-        <v-stepper v-model="step">
-            <v-stepper-header>
-                <v-stepper-step :complete="step > 1" step="1">Généralités</v-stepper-step>
+        <div class="row mt-2">
+            <v-stepper v-model="step" class="w-100">
+                <v-stepper-header>
+                    <v-stepper-step :complete="step > 1" step="1">Généralités</v-stepper-step>
 
-                <v-divider class="light"></v-divider>
+                    <v-divider class="light"></v-divider>
 
-                <v-stepper-step step="2">Infos Supp.</v-stepper-step>
-            </v-stepper-header>
-            <v-stepper-items class="pb-1">
-                <!-- Contenu partie 1 : les généralités -->
-                <v-stepper-content step="1" v-show="loading === true">
-                    <div class="step-content mb-6">
-                        <form>
-                            <div class="row row-cols-2">
-                                <div class="col">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                            <b-input-group-prepend is-text>
-                                                <span class="text-light-interface font-weight-bold">Nom*</span>
-                                            </b-input-group-prepend>
-                                            <b-form-input v-model="formInscrit.nom" type="text"
-                                                          :state="validationNom"
-                                                          class="form-control rounded-r" :class="{ 'is-invalid': formInscrit.errors.has('nom') || validationMaxNom === false}"
+                    <v-stepper-step step="2">Généralités (suite)</v-stepper-step>
+                </v-stepper-header>
+                <v-stepper-items class="pb-1">
+                    <!-- Contenu partie 1 : les généralités -->
+                    <v-stepper-content step="1">
+                        <div class="step-content mb-6" v-if="loading === true">
+                            <form>
+                                <div class="row row-cols-2">
+                                    <div class="col">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Nom*">
+                                            <b-form-input v-model="formInscrit.nom" type="text" :state="validationMinNom"
+                                                          class="rounded-right" :class="{ 'is-invalid': formInscrit.errors.has('nom') || validationMaxNom === false }"
                                                           name="nom" id="nom" placeholder="Nom">
                                             </b-form-input>
+                                            <b-form-invalid-feedback id="nom-feedback" v-show="formInscrit.nom === ''">
+                                                Le nom est requis.
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="nom-min-feedback" v-show="formInscrit.nom !== '' && validationMinNom === false">
+                                                Le nom doit &ecirc;tre compos&eacute; d'au moins 2 lettres.
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="nom-max-feedback" v-show="formInscrit.nom !== '' && validationMaxNom === false">
+                                                Le nom ne peut contenir plus de 190 caract&egrave;res.
+                                            </b-form-invalid-feedback>
                                             <has-error :form="formInscrit" field="nom"></has-error>
                                         </b-input-group>
-                                        <p v-show="validationNom === false" class="text-danger small mt-1 mb-0">Le nom doit &ecirc;tre compos&eacute; d'au moins 2 lettres.</p>
-                                        <p v-show="validationMaxNom === false" class="text-danger small mt-1 mb-0">Le champ nom ne peut contenir plus de 190 caract&egrave;res.</p>
-                                    </b-input-group>
+                                    </div>
+                                    <div class="col">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Prénom*">
+                                            <b-form-input v-model="formInscrit.prenom" type="text" :state="validationMinPrenom"
+                                                          class="rounded-right" :class="{ 'is-invalid': formInscrit.errors.has('prenom') || validationMaxPrenom === false }"
+                                                          name="prenom" id="prenom" placeholder="Prénom">
+                                            </b-form-input>
+                                            <b-form-invalid-feedback id="prenom-feedback" v-show="formInscrit.prenom === ''">
+                                                Le prénom est requis.
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="prenom-min-feedback" v-show="formInscrit.prenom !== '' && validationMinPrenom === false">
+                                                Le prénom doit &ecirc;tre compos&eacute; d'au moins 2 lettres.
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="prenom-max-feedback" v-show="formInscrit.prenom !== '' && validationMaxPrenom === false">
+                                                Le prénom ne peut contenir plus de 190 caract&egrave;res.
+                                            </b-form-invalid-feedback>
+                                            <has-error :form="formInscrit" field="prenom"></has-error>
+                                        </b-input-group>
+                                    </div>
                                 </div>
-                                <div class="col">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Pr&eacute;nom*</span>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model="formInscrit.prenom" type="text"
-                                                      :state="validationPrenom"
-                                                      class="form-control rounded-r" :class="{ 'is-invalid': formInscrit.errors.has('prenom') || validationMaxPrenom === false }"
-                                                      name="prenom" id="prenom" placeholder="Prénom">
-                                        </b-form-input>
-                                        <has-error :form="formInscrit" field="prenom"></has-error>
-                                    </b-input-group>
-                                    <p v-show="validationPrenom === false" class="text-danger small mt-1 mb-0">Le pr&eacute;nom doit &ecirc;tre compos&eacute; d'au moins 2 lettres.</p>
-                                    <p v-show="validationMaxPrenom === false" class="text-danger small mt-1 mb-0">Le champ pr&eacute;nom ne peut contenir plus de 190 caract&egrave;res.</p>
-                                </div>
-                            </div>
-                            <div class="row row-cols-2">
-                                <div class="col">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0 mt-6">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Genre*</span>
-                                        </b-input-group-prepend>
-                                        <b-form-select v-model="formInscrit.genre"
-                                                       :state="validationGenre"
-                                                       class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('genre') }"
-                                                       name="genre" id="genre">
-                                            <b-form-select-option :value="null">Choisissez</b-form-select-option>
-                                            <b-form-select-option value="homme">Homme</b-form-select-option>
-                                            <b-form-select-option value="femme">Femme</b-form-select-option>
-                                            <b-form-select-option value="3e genre">3e genre</b-form-select-option>
-                                        </b-form-select>
-                                        <b-input-group-append is-text>
-                                            <b-form-checkbox v-model="champsObligatoires.genre" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
-                                        </b-input-group-append>
-                                        <has-error :form="formInscrit" field="genre"></has-error>
-                                    </b-input-group>
-                                    <p v-show="formInscrit.genre === '' && champsObligatoires.genre === false" class="text-danger small mt-n3 mb-0">Le genre est requis.</p>
-                                </div>
-                                <div class="col">
-                                    <label for="date_naissance" class="text-light-interface font-weight-bold">Date de naissance*</label>
-                                    <b-input-group class="mt-n2 mb-2">
-                                        <b-input-group-prepend>
-                                            <b-form-datepicker
-                                                v-model="formInscrit.date_naissance" locale="fr"
+                                <div class="row row-cols-2 mt-n3">
+                                    <div class="col">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Genre*">
+                                            <b-form-select v-model="formInscrit.genre" :state="validationGenre"
+                                                           :class="{ 'is-invalid': formInscrit.errors.has('genre') }"
+                                                           name="genre" id="genre">
+                                                <b-form-select-option :value="null">Choisissez</b-form-select-option>
+                                                <b-form-select-option value="homme">Homme</b-form-select-option>
+                                                <b-form-select-option value="femme">Femme</b-form-select-option>
+                                                <b-form-select-option value="3e genre">3e genre</b-form-select-option>
+                                            </b-form-select>
+                                            <b-input-group-append is-text>
+                                                <b-form-checkbox v-model="champsObligatoires.genre" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
+                                            </b-input-group-append>
+                                            <b-form-invalid-feedback id="genre-feedback" v-show="formInscrit.genre === null && champsObligatoires.genre === false">
+                                                Le genre est requis (ou cocher la case "ND").
+                                            </b-form-invalid-feedback>
+                                            <has-error :form="formInscrit" field="genre"></has-error>
+                                        </b-input-group>
+                                    </div>
+                                    <div class="col">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+                                            <b-input-group-prepend>
+                                                <b-input-group-text class="text-light-interface font-weight-bold">Date de naissance*</b-input-group-text>
+                                                <b-form-datepicker
+                                                    v-model="formInscrit.date_naissance" locale="fr"
+                                                    min="1950-01-01" :max="new Date().toISOString().substr(0, 10)"
+                                                    button-only left
+                                                    aria-controls="date_naissance"
+                                                    @context="onContext"
+                                                ></b-form-datepicker>
+                                            </b-input-group-prepend>
+                                            <b-form-input
+                                                id="date_naissance" type="date"
+                                                v-model="formInscrit.date_naissance"
                                                 min="1950-01-01" :max="new Date().toISOString().substr(0, 10)"
-                                                button-only
-                                                left
-                                                aria-controls="date_naissance"
-                                                @context="onContext"
-                                            ></b-form-datepicker>
-                                        </b-input-group-prepend>
-                                        <b-form-input
-                                            id="date_naissance" type="date"
-                                            v-model="formInscrit.date_naissance"
-                                            min="1950-01-01" :max="new Date().toISOString().substr(0, 10)"
-                                            :state="validationNaissance && !validDateNaissance"
-                                            placeholder="YYYY-MM-DD"
-                                            autocomplete="off"
-                                        ></b-form-input>
-                                        <has-error :form="formInscrit" field="date_naissance"></has-error>
-                                        <b-input-group-append is-text>
-                                            <b-form-checkbox v-model="champsObligatoires.date_naissance" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
-                                        </b-input-group-append>
-                                    </b-input-group>
-                                    <p v-show="!validDateNaissance === false" class="text-danger small mt-1 mb-n1">La date de naissance ne peut être une date future ou datant après {{ yearsAgo }}.</p>
+                                                :state="validationNaissance && !validDateNaissance"
+                                                placeholder="YYYY-MM-DD"
+                                                autocomplete="off"
+                                            ></b-form-input>
+                                            <b-input-group-append is-text>
+                                                <b-form-checkbox v-model="champsObligatoires.date_naissance" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
+                                            </b-input-group-append>
+                                            <b-form-invalid-feedback id="date-naissance-feedback" v-show="formInscrit.date_naissance === '' && champsObligatoires.date_naissance === false">
+                                                La date de naissance est requise (ou cocher la case "ND").
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="verif-date-naissance-feedback" v-show="!validDateNaissance === false">
+                                                La date de naissance ne peut être une date future ou datant après {{ yearsAgo }}.
+                                            </b-form-invalid-feedback>
+                                            <has-error :form="formInscrit" field="date_naissance"></has-error>
+                                        </b-input-group>
+                                    </div>
                                 </div>
+                                <div class="row row-cols-2 mt-n4">
+                                    <div class="col col-lg-9">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Rue">
+                                            <b-form-input v-model="formInscrit.rue" type="text"
+                                                          class="rounded-right" :class="{ 'is-invalid': formInscrit.errors.has('rue') || validationMaxRue === false }"
+                                                          name="rue" id="rue" placeholder="Rue">
+                                            </b-form-input>
+                                            <b-form-invalid-feedback id="rue-max-feedback" v-show="validationMaxRue === false">
+                                                La rue ne peut contenir plus de 190 caract&egrave;res.
+                                            </b-form-invalid-feedback>
+                                            <has-error :form="formInscrit" field="rue"></has-error>
+                                        </b-input-group>
+                                    </div>
+                                    <div class="col col-lg-3">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="N°">
+                                            <b-form-input v-model.number="formInscrit.numero" type="number" min="0"
+                                                          class="rounded-right" :class="{ 'is-invalid': formInscrit.errors.has('numero') || (formInscrit.numero !== '' && validationMaxNumero === false) }"
+                                                          name="numero" id="numero" placeholder="Numéro">
+                                            </b-form-input>
+                                            <b-form-invalid-feedback id="numero-feedback" v-show="formInscrit.numero !== '' && validationMaxNumero === false">
+                                                Le num&eacute;ro doit être compris entre 1 et 9999.
+                                            </b-form-invalid-feedback>
+                                            <has-error :form="formInscrit" field="numero"></has-error>
+                                        </b-input-group>
+                                    </div>
+                                </div>
+                                <div class="row row-cols-2">
+                                    <div class="col col-lg-3">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Boite">
+                                            <b-form-input v-model="formInscrit.boite" type="text"
+                                                          class="rounded-right" :class="{ 'is-invalid': formInscrit.errors.has('boite') || validationMaxBoite === false }"
+                                                          name="boite" id="boite" placeholder="Boite">
+                                            </b-form-input>
+                                            <b-form-invalid-feedback id="boite-max-feedback" v-show="formInscrit.boite !== '' && validationMaxBoite === false">
+                                                La boite ne peut contenir plus de 10 caract&egrave;res.
+                                            </b-form-invalid-feedback>
+                                            <has-error :form="formInscrit" field="boite"></has-error>
+                                        </b-input-group>
+                                    </div>
+                                    <div class="col col-lg-9">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="CP & Ville*">
+                                            <b-form-select v-model="formInscrit.ville_id" :state="validationVille"
+                                                           :class="{ 'is-invalid': formInscrit.errors.has('ville_id') }"
+                                                           name="ville_id" id="ville_id">
+                                                <b-form-select-option :value="null">Choisissez</b-form-select-option>
+                                                <b-form-select-option v-for="ville in villes.villes" :key="ville.id" :value="ville.id">{{ ville.code_postal + ' ' + ville.ville }}</b-form-select-option>
+                                            </b-form-select>
+                                            <b-input-group-append is-text>
+                                                <b-form-checkbox v-model="champsObligatoires.ville_id" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
+                                            </b-input-group-append>
+                                            <b-form-invalid-feedback id="boite-max-feedback" v-show="formInscrit.ville_id === null && champsObligatoires.ville_id === false">
+                                                Le code postal et la ville sont requis (ou cocher la case "ND").
+                                            </b-form-invalid-feedback>
+                                            <has-error :form="formInscrit" field="ville_id"></has-error>
+                                        </b-input-group>
+                                    </div>
+                                </div>
+                                <div class="row row-cols-2">
+                                    <div class="col col-lg-8">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Email*">
+                                            <b-form-input v-model="formInscrit.email" :state="(validationEmail && checkEmail && validationMaxEmail) && (checkNewsletter && checkEmail && validationMaxEmail)" type="email"
+                                                          :class="{ 'is-invalid': formInscrit.errors.has('email') || validationMaxEmail === false, 'rounded-r': formInscrit.newsletter === true }"
+                                                          name="email" id="email" placeholder="Email">
+                                            </b-form-input>
+                                            <b-input-group-append is-text v-show="formInscrit.newsletter !== true">
+                                                <b-form-checkbox v-model="champsObligatoires.email" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
+                                            </b-input-group-append>
+                                            <b-form-invalid-feedback id="email-feedback" v-show="formInscrit.email === '' && checkNewsletter !== false && champsObligatoires.email === false">
+                                                L'email est requis (ou cocher la case "ND").
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="email-valide-feedback" v-show="champsObligatoires.email !== true && checkEmail === false">
+                                                L'email n'est pas valide.
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="email-max-feedback" v-show="champsObligatoires.email !== true && validationMaxEmail === false">
+                                                L'email ne peut contenir plus de 190 caract&egrave;res.
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="email-news-feedback" v-show="checkNewsletter === false">
+                                                L'email est requis pour la newsletter.
+                                            </b-form-invalid-feedback>
+                                            <has-error :form="formInscrit" field="email"></has-error>
+                                        </b-input-group>
+                                    </div>
+                                    <div class="col col-lg-4">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Newsletter">
+                                            <b-form-select v-model="formInscrit.newsletter"
+                                                           class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('newsletter') }"
+                                                           name="newsletter" id="newsletter">
+                                                <b-form-select-option :value="false">Non</b-form-select-option>
+                                                <b-form-select-option :value="true">Oui</b-form-select-option>
+                                            </b-form-select>
+                                            <has-error :form="formInscrit" field="newsletter"></has-error>
+                                        </b-input-group>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="mt-3 d-flex justify-content-between">
+                                <span class="font-weight-light font-italic text-primary-dark mt-2"><small>Tous les champs avec * sont obligatoires</small></span>
+                                <v-btn class="btn-primary" @click="validationStepOne()">Continuer</v-btn>
                             </div>
-                            <div class="row row-cols-2 mt-n4">
-                                <div class="col col-lg-9">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Rue</span>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model="formInscrit.rue" type="text"
-                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('rue') || validationMaxRue === false }"
-                                                      name="rue" id="rue" placeholder="Rue">
-                                        </b-form-input>
-                                        <has-error :form="formInscrit" field="rue"></has-error>
-                                    </b-input-group>
-                                    <p v-show="validationMaxRue === false" class="text-danger small mt-1 mb-n1">Le champ rue ne peut contenir plus de 190 caract&egrave;res.</p>
+                        </div>
+                        <Spinner v-else />
+                    </v-stepper-content>
+                    <!-- Contenu partie 2 : Infos supplémentaires -->
+                    <v-stepper-content step="2">
+                        <div class="step-content mb-6">
+                            <h6>Informations supplémentaires</h6>
+                            <form>
+                                <div class="row">
+                                    <div class="col col-lg-6">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="GSM*">
+
+                                            <b-form-input type="tel" v-model="gsm_national" :state="validationGsm_national"
+                                                          name="gsm_national" id="gsm_national" placeholder="+32"
+                                                          pattern="[\+]\d{2}" style="max-width:85px;" maxlength="4"
+                                                          :class="{ 'is-invalid': validationGsm_national === false }">
+                                            </b-form-input>
+                                            <b-form-input type="tel" v-model="formInscrit.gsm" :state="checkGsm && validationMinGsm && validationMaxGsm"
+                                                          name="gsm" id="gsm" placeholder="0xxx/xxx.xxx"
+                                                          pattern="([\/\.\s\(\)]?[0-9]){9,16}" maxlength="16"
+                                                          :class="{ 'is-invalid': formInscrit.errors.has('gsm') || validationMaxGsm === false }">
+                                            </b-form-input>
+                                            <b-input-group-append is-text>
+                                                <b-form-checkbox v-model="champsObligatoires.gsm" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
+                                            </b-input-group-append>
+                                            <b-form-invalid-feedback id="prefix-gsm-feedback" v-show="validationGsm_national === false">
+                                                Le préfixe doit contenir au minimum 3 caract&egrave;res.
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="gsm-feedback" v-show="checkGsm === false && champsObligatoires.gsm === false">
+                                                Le numéro de gsm est requis (ou cocher la case "ND").
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="gsm-min-feedback" v-show="formInscrit.gsm !== '' && validationMinGsm === false">
+                                                Le numéro de gsm doit contenir au minimum 9 caract&egrave;res.
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="gsm-max-feedback" v-show="formInscrit.gsm !== '' && validationMaxGsm === false">
+                                                Le numéro de gsm doit contenir au maximum 16 caract&egrave;res.
+                                            </b-form-invalid-feedback>
+                                            <has-error :form="formInscrit" field="gsm_national"></has-error>
+                                        </b-input-group>
+                                    </div>
+                                    <div class="col col-lg-6">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Tél. fix">
+                                            <b-form-input type="tel" v-model="tel_national" :state="validationTel_national"
+                                                          name="tel_national" id="tel_national" placeholder="+32"
+                                                          pattern="[\+]\d{2}" style="max-width:85px;" maxlength="4"
+                                                          :class="{ 'is-invalid': validationTel_national === false }">
+                                            </b-form-input>
+                                            <b-form-input type="tel" v-model="formInscrit.tel" :state="checkTel && validationMinTel && validationMaxTel"
+                                                          name="tel" id="tel" placeholder="0xx/xxx.xxx"
+                                                          pattern="([\/\.\s\(\)]?[0-9]){8,15}" maxlength="15"
+                                                          :class="{ 'is-invalid': formInscrit.errors.has('tel') || validationMaxTel === false }">
+                                            </b-form-input>
+                                            <b-input-group-append is-text>
+                                                <b-form-checkbox v-model="champsObligatoires.tel" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
+                                            </b-input-group-append>
+                                            <b-form-invalid-feedback id="prefix-tel-feedback" v-show="validationTel_national === false">
+                                                Le préfixe doit contenir au minimum 3 caract&egrave;res.
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="tel-feedback" v-show="checkTel === false && champsObligatoires.tel === false">
+                                                Le numéro de tél. fix est requis (ou cocher la case "ND").
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="tel-min-feedback" v-show="formInscrit.tel !== '' && validationMinTel === false">
+                                                Le numéro de tél. fix doit contenir au minimum 9 caract&egrave;res.
+                                            </b-form-invalid-feedback>
+                                            <b-form-invalid-feedback id="tel-max-feedback" v-show="formInscrit.tel !== '' && validationMaxTel === false">
+                                                Le numéro de tél. fix doit contenir au maximum 16 caract&egrave;res.
+                                            </b-form-invalid-feedback>
+                                            <has-error :form="formInscrit" field="gsm_national"></has-error>
+                                        </b-input-group>
+                                    </div>
                                 </div>
-                                <div class="col col-lg-3">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">N°</span>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model.number="formInscrit.numero" type="number" min="0"
-                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('numero') || (formInscrit.numero !== '' && validationMaxNumero === false) }"
-                                                      name="numero" id="numero" placeholder="Numéro">
-                                        </b-form-input>
-                                        <has-error :form="formInscrit" field="numero"></has-error>
-                                    </b-input-group>
-                                    <p v-show="formInscrit.numero !== '' && validationMaxNumero === false" class="text-danger small ml-n4 mt-1 mb-n1">Le champ num&eacute;ro doit être compris entre 1 et 9999.</p>
+                                <div class="row">
+                                    <div class="col">
+                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+                                            <b-input-group-prepend is-text>
+                                                <span class="text-light-interface font-weight-bold">Commentaire(s)</span>
+                                            </b-input-group-prepend>
+                                            <b-form-textarea v-model="formInscrit.commentaire_inscrit" rows="1" class="form-control"
+                                                             name="commentaire_inscrit" id="commentaire_inscrit" placeholder="Entrez  un commentaire...">
+                                            </b-form-textarea>
+                                            <has-error :form="formInscrit" field="commentaire_inscrit"></has-error>
+                                        </b-input-group>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row row-cols-2">
-                                <div class="col col-lg-3">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Boite</span>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model="formInscrit.boite" type="text"
-                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('boite') || validationMaxBoite === false }"
-                                                      name="boite" id="boite" placeholder="Complément">
-                                        </b-form-input>
-                                        <has-error :form="formInscrit" field="boite"></has-error>
-                                    </b-input-group>
-                                </div>
-                                <div class="col col-lg-9">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">CP & Ville*</span>
-                                        </b-input-group-prepend>
-                                        <b-form-select v-model="formInscrit.ville_id" :state="validationVille"
-                                                       class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('ville_id') }"
-                                                       name="ville_id" id="ville_id">
-                                            <b-form-select-option :value="null">Choisissez</b-form-select-option>
-                                            <b-form-select-option v-for="ville in villes.villes" :key="ville.id" :value="ville.id">{{ ville.code_postal + ' ' + ville.ville }}</b-form-select-option>
-                                        </b-form-select>
-                                        <b-input-group-append is-text>
-                                            <b-form-checkbox v-model="champsObligatoires.ville_id" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
-                                        </b-input-group-append>
-                                        <has-error :form="formInscrit" field="ville_id"></has-error>
-                                    </b-input-group>
-                                </div>
-                                <p v-show="validationMaxBoite === false" class="text-danger small ml-4 mt-n2">Le champ boite ne peut contenir plus de 10 caract&egrave;res.</p>
-                            </div>
-                            <div class="row row-cols-2">
-                                <div class="col col-lg-8">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Email*</span>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model="formInscrit.email" :state="(validationEmail && checkEmail && validationMaxEmail) && (checkNewsletter && checkEmail && validationMaxEmail)" type="email"
-                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('email'), 'rounded-r': formInscrit.newsletter === true }"
-                                                      name="email" id="email" placeholder="Email">
-                                        </b-form-input>
-                                        <b-input-group-append is-text v-show="pouvsubInfos.email === 1">
-                                            <i v-if="formInscrit.email === ''"
-                                               class="fas fa-exclamation-triangle fa-lg text-orange font-weight-bold"></i>
-                                            <i v-else
-                                               class="fas fa-check fa-lg text-green font-weight-bold"></i>
-                                        </b-input-group-append>
-                                        <b-input-group-append is-text v-show="formInscrit.newsletter !== true">
-                                            <b-form-checkbox v-model="champsObligatoires.email" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
-                                        </b-input-group-append>
-                                        <has-error :form="formInscrit" field="email"></has-error>
-                                    </b-input-group>
-                                    <p v-show="champsObligatoires.email !== true && checkEmail === false" class="text-danger small mt-1 mb-n1">L'adresse mail n'est pas valide.</p>
-                                    <p v-show="champsObligatoires.email !== true && validationMaxEmail === false" class="text-danger small mt-1 mb-n1">L'email ne peut contenir plus de 190 caract&egrave;res.</p>
-                                    <p v-show="checkNewsletter === false" class="text-danger small mt-1 mb-n1">L'email est requis pour la newsletter.</p>
-                                </div>
-                                <div class="col col-lg-4">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Newsletter</span>
-                                        </b-input-group-prepend>
-                                        <b-form-select v-model="formInscrit.newsletter"
-                                                       class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('newsletter') }"
-                                                       name="newsletter" id="newsletter">
-                                            <b-form-select-option :value="false">Non</b-form-select-option>
-                                            <b-form-select-option :value="true">Oui</b-form-select-option>
-                                        </b-form-select>
-                                        <has-error :form="formInscrit" field="newsletter"></has-error>
-                                    </b-input-group>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col col-lg-6">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">GSM*</span>
-                                        </b-input-group-prepend>
-                                        <b-form-input type="tel" v-model="gsm_national" :state="validationGsm_national"
-                                                      name="gsm_national" id="gsm_national" placeholder="+32"
-                                                      pattern="[\+]\d{2}" style="max-width:85px;" maxlength="4">
-                                        </b-form-input>
-                                        <b-form-input type="tel" v-model="formInscrit.gsm" :state="validationGsm || checkGsm"
-                                                      name="gsm" id="gsm" placeholder="0xxx/xxx.xxx"
-                                                      pattern="([\/\.\s\(\)]?[0-9]){9,16}" maxlength="16"
-                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('gsm') || validationGsm === false || checkGsm === false }">
-                                        </b-form-input>
-                                        <b-input-group-append is-text>
-                                            <b-form-checkbox v-model="champsObligatoires.gsm" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
-                                        </b-input-group-append>
-                                    </b-input-group>
-                                    <p v-show="validationGsm_national === false" class="text-danger small mt-1 mb-n1">Le préfixe doit contenir au minimum 3 caract&egrave;res.</p>
-                                    <p v-show="validationGsm === false" class="text-danger small mt-1 mb-0">Le numéro de gsm doit contenir au minimum 9 caract&egrave;res.</p>
-                                </div>
-                                <div class="col col-lg-6">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">T&eacute;l. fix</span>
-                                        </b-input-group-prepend>
-                                        <b-form-input type="tel" v-model="tel_national" :state="validationTel_national"
-                                                      name="tel_national" id="tel_national" placeholder="+32"
-                                                      pattern="[\+]\d{2}" style="max-width:85px;" maxlength="4">
-                                        </b-form-input>
-                                        <b-form-input type="tel" v-model="formInscrit.tel" :state="validationTel || checkTel"
-                                                      name="tel" id="tel" placeholder="0xx/xxx.xxx"
-                                                      pattern="([\/\.\s\(\)]?[0-9]){8,15}" maxlength="15"
-                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('tel') || validationTel === false || checkTel === false }">
-                                        </b-form-input>
-                                        <b-input-group-append is-text>
-                                            <b-form-checkbox v-model="champsObligatoires.tel" class="mb-2 mr-sm-2 mb-sm-0">ND</b-form-checkbox>
-                                        </b-input-group-append>
-                                    </b-input-group>
-                                    <p v-show="validationTel_national === false" class="text-danger small mt-1 mb-n1">Le préfixe doit contenir au minimum 3 caract&egrave;res.</p>
-                                    <p v-show="validationTel === false" class="text-danger small mt-1 mb-0">Le numéro de téléphone doit contenir au minimum 8 caract&egrave;res.</p>
-                                </div>
-                            </div>
-                            <span class="font-weight-light font-italic text-light-interface"><small>Tous les champs avec * sont obligatoires</small></span>
-                        </form>
-                    </div>
-                    <div class="text-right" v-show="loading === true">
-                        <v-btn class="btn-interface text-light" @click="validationStepOne()">Continuer</v-btn>
-                    </div>
-                    <div v-show="loading === false">
-                        <v-row class="text-center text-interface mt-10">
-                            <v-col class="d-flex flex-column justify-center align-center">
-                                <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
-                                <span class="mt-5">Chargement...</span>
-                            </v-col>
-                        </v-row>
-                    </div>
-                </v-stepper-content>
-                <!-- Contenu partie 2 : Infos supplémentaires -->
-                <v-stepper-content step="2">
-                    <div class="step-content mb-6">
-                        <h6>Informations supplémentaires</h6>
-                        <form>
-                            <div class="row">
-                                <div class="col">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Commentaire(s)</span>
-                                        </b-input-group-prepend>
-                                        <b-form-textarea v-model="formInscrit.commentaire_inscrit" rows="1" class="form-control"
-                                                         name="commentaire_inscrit" id="commentaire_inscrit" placeholder="Entrez  un commentaire...">
-                                        </b-form-textarea>
-                                        <has-error :form="formInscrit" field="commentaire_inscrit"></has-error>
-                                    </b-input-group>
-                                </div>
-                            </div>
-                            <div class="row row-cols-3">
-                                <div class="col-3">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">&Acirc;ge</span>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-if="formInscrit.date_naissance !== null" v-model.number="formInscrit.age" type="number"
-                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('age') }"
-                                                      name="age" id="age" disabled>
-                                        </b-form-input>
-                                        <b-form-input v-else v-model.number="formInscrit.age" type="number" min="1" max="999"
-                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('age') || (checkAge === false && validationAge === false)  }"
-                                                      name="age" id="age" :maxlength="maxLengthAge"
-                                                      oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
-                                        </b-form-input>
-                                        <b-input-group-append is-text v-show="pouvsubInfos.age === 1">
-                                            <i v-if="formInscrit.age === null || formInscrit.age === '' || (checkAge === false && validationAge === false)"
-                                               class="fas fa-exclamation-triangle fa-lg text-orange font-weight-bold"></i>
-                                            <i v-else
-                                               class="fas fa-check fa-lg text-green font-weight-bold"></i>
-                                        </b-input-group-append>
-                                        <has-error :form="formInscrit" field="age"></has-error>
-                                    </b-input-group>
-                                    <p v-show="checkAge === false && validationAge === false" class="text-danger small mt-1 mb-n1">Le champ âge doit être sup&eacute;rieur à 0 et inférieur à 999.</p>
-                                </div>
-                                <div class="col-4">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0" v-show="user.role === 'admin' || user.role === 'master'">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">N° national</span>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model="formInscrit.num_national" type="text"
-                                                      class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('num_national') }"
-                                                      name="num_national" id="num_national" placeholder="xxxxxx-xxx.xx" maxlength="13">
-                                        </b-form-input>
-                                        <b-input-group-append is-text v-show="pouvsubInfos.num_national === 1">
-                                            <i v-if="formInscrit.num_national === null"
-                                               class="fas fa-exclamation-triangle fa-lg text-orange font-weight-bold"></i>
-                                            <i v-else
-                                               class="fas fa-check fa-lg text-green font-weight-bold"></i>
-                                        </b-input-group-append>
-                                        <has-error :form="formInscrit" field="num_national"></has-error>
-                                    </b-input-group>
-                                </div>
-                                <div class="col-5">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Statut l&eacute;gal</span>
-                                        </b-input-group-prepend>
-                                        <b-form-select v-model="formInscrit.statut_legal"
-                                                       class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('statut_legal') }"
-                                                       name="statut_legal" id="statut_legal">
-                                            <b-form-select-option :value="null">Choisissez...</b-form-select-option>
-                                            <b-form-select-option value="stage d'attente">Stage d'attente</b-form-select-option>
-                                            <b-form-select-option value="Dem. Emploi indemnisé">Dem. Emploi indemnis&eacute;</b-form-select-option>
-                                            <b-form-select-option value="Dem. Emploi libre">Dem. Emploi libre</b-form-select-option>
-                                            <b-form-select-option value="Rev. d'intégra. sociale">Rev. int&eacute;gra. soc.</b-form-select-option>
-                                            <b-form-select-option value="Mutuelle">Mutuelle</b-form-select-option>
-                                            <b-form-select-option value="Pensionné">Pensionn&eacute;</b-form-select-option>
-                                            <b-form-select-option value="Autres">Autres</b-form-select-option>
-                                        </b-form-select>
-                                        <b-input-group-append is-text v-show="pouvsubInfos.statut_legal === 1">
-                                            <i v-if="formInscrit.statut_legal === null"
-                                               class="fas fa-exclamation-triangle fa-lg text-orange font-weight-bold"></i>
-                                            <i v-else
-                                               class="fas fa-check fa-lg text-green font-weight-bold"></i>
-                                        </b-input-group-append>
-                                        <has-error :form="formInscrit" field="statut_legal"></has-error>
-                                    </b-input-group>
-                                </div>
-                            </div>
-                            <div class="row row-cols-2" v-show="user.role === 'admin' || user.role === 'master'">
-                                <div class="col">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Dur&eacute;e de ch&ocirc;mage</span>
-                                        </b-input-group-prepend>
-                                        <b-form-select v-model="formInscrit.duree_chomage"
-                                                       class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('duree_chomage') }"
-                                                       name="duree_chomage" id="duree_chomage">
-                                            <b-form-select-option :value="null">Choisissez...</b-form-select-option>
-                                            <b-form-select-option value="aucun">Pas de ch&ocirc;mage</b-form-select-option>
-                                            <b-form-select-option value="-1an">Moins d'1 an</b-form-select-option>
-                                            <b-form-select-option value="1-2ans">Entre 1 et 2 ans</b-form-select-option>
-                                            <b-form-select-option value="+2ans">Plus de 2 ans</b-form-select-option>
-                                        </b-form-select>
-                                        <b-input-group-append is-text>
-                                            <i v-if="formInscrit.duree_chomage === null"
-                                               class="fas fa-exclamation-triangle fa-lg text-orange font-weight-bold"></i>
-                                            <i v-else
-                                               class="fas fa-check fa-lg text-green font-weight-bold"></i>
-                                        </b-input-group-append>
-                                        <has-error :form="formInscrit" field="duree_chomage"></has-error>
-                                    </b-input-group>
-                                </div>
-                                <div class="col">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Groupe social</span>
-                                        </b-input-group-prepend>
-                                        <b-form-select v-model="formInscrit.groupe_social"
-                                                       class="form-control" :class="{ 'is-invalid': formInscrit.errors.has('groupe_social') }"
-                                                       name="groupe_social" id="groupe_social">
-                                            <b-form-select-option :value="null">Choisissez...</b-form-select-option>
-                                            <b-form-select-option value="réfugié">Probl&eacute;matique des r&eacute;fugi&eacute;s</b-form-select-option>
-                                            <b-form-select-option value="sociale">Probl&eacute;matique sociale</b-form-select-option>
-                                            <b-form-select-option value="médicale">Probl&eacute;matique m&eacute;dicale</b-form-select-option>
-                                        </b-form-select>
-                                        <b-input-group-append is-text v-show="pouvsubInfos.groupe_social === 1">
-                                            <i v-if="formInscrit.groupe_social === null"
-                                               class="fas fa-exclamation-triangle fa-lg text-orange font-weight-bold"></i>
-                                            <i v-else
-                                               class="fas fa-check fa-lg text-green font-weight-bold"></i>
-                                        </b-input-group-append>
-                                        <has-error :form="formInscrit" field="groupe_social"></has-error>
-                                    </b-input-group>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Dipl&ocirc;me</span>
-                                        </b-input-group-prepend>
-                                        <b-form-select v-model="listDiplomes"
-                                                       class="form-control col-5" :class="{ 'is-invalid': formInscrit.errors.has('diplome') }"
-                                                       name="list_diplomes" id="list_diplomes" >
-                                            <b-form-select-option :value="null">Choisissez...</b-form-select-option>
-                                            <b-form-select-option value="Aucun">Pas de dipl&ocirc;me</b-form-select-option>
-                                            <b-form-select-option value="CEB">CEB</b-form-select-option>
-                                            <b-form-select-option value="CESI">CESI</b-form-select-option>
-                                            <b-form-select-option value="CESS">CESS</b-form-select-option>
-                                            <b-form-select-option value="Non Universitaire Type Court">Non universitaire type court</b-form-select-option>
-                                            <b-form-select-option value="Non Universitaire Type Long">Non universitaire type long</b-form-select-option>
-                                            <b-form-select-option value="Universitaire">Universitaire</b-form-select-option>
-                                            <b-form-select-option value="Étranger sans équivalence">Dipl&ocirc;me &eacute;tranger (sans équivalence)</b-form-select-option>
-                                            <b-form-select-option value="Étranger avec équivalence">Dipl&ocirc;me &eacute;tranger (avec équivalence)</b-form-select-option>
-                                            <b-form-select-option value="autre">Autre</b-form-select-option>
-                                            <b-form-select-option v-show="verifListDiplomes" :value="listDiplomes">{{ listDiplomes }}</b-form-select-option>
-                                        </b-form-select>
-                                        <b-form-input v-model="formInscrit.diplome" type="text" v-show="listDiplomes === 'autre'"
-                                                      class="form-control col-7" :class="{ 'is-invalid': formInscrit.errors.has('diplome') }"
-                                                      name="diplome" id="diplome" placeholder="Précisez..." maxlength="90">
-                                        </b-form-input>
-                                        <b-input-group-append is-text v-show="pouvsubInfos.diplome === 1">
-                                            <i v-if="listDiplomes === null || (listDiplomes === 'autre' && formInscrit.diplome === null)"
-                                               class="fas fa-exclamation-triangle fa-lg text-orange font-weight-bold"></i>
-                                            <i v-else
-                                               class="fas fa-check fa-lg text-green font-weight-bold"></i>
-                                        </b-input-group-append>
-                                        <has-error :form="formInscrit" field="diplome"></has-error>
-                                    </b-input-group>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface font-weight-bold">Source ?</span>
-                                        </b-input-group-prepend>
-                                        <b-form-select v-model="listSources"
-                                                       class="form-control col-5" :class="{ 'is-invalid': formInscrit.errors.has('listSources') }"
-                                                       name="list_sources" id="list_sources" >
-                                            <b-form-select-option :value="null">Choisissez où la personne a eu l'info...</b-form-select-option>
-                                            <b-form-select-option value="Facebook">Facebook</b-form-select-option>
-                                            <b-form-select-option value="Forem/Adressage forem">Forem/Adressage forem</b-form-select-option>
-                                            <b-form-select-option value="Site internet">Site internet</b-form-select-option>
-                                            <b-form-select-option value="Affiches/flyers">Affiches/flyers</b-form-select-option>
-                                            <b-form-select-option value="Ancien stagiaire">Ancien stagiaire</b-form-select-option>
-                                            <b-form-select-option value="Autre formation">Autre formation</b-form-select-option>
-                                            <b-form-select-option value="Bouche à oreille">Bouche à oreille</b-form-select-option>
-                                            <b-form-select-option value="CEFO">CEFO</b-form-select-option>
-                                            <b-form-select-option value="CPAS/Synergie emploi">CPAS/Synergie emploi</b-form-select-option>
-                                            <b-form-select-option value="Croix rouge">Croix rouge</b-form-select-option>
-                                            <b-form-select-option value="Instagram">Instagram</b-form-select-option>
-                                            <b-form-select-option value="La Charnière">La Charnière</b-form-select-option>
-                                            <b-form-select-option value="Mailing">Mailing</b-form-select-option>
-                                            <b-form-select-option value="Maison de l'emploi">Maison de l'emploi</b-form-select-option>
-                                            <b-form-select-option value="Mirena">Mirena</b-form-select-option>
-                                            <b-form-select-option value="Partenaires">Partenaires</b-form-select-option>
-                                            <b-form-select-option value="Proximag">Proximag</b-form-select-option>
-                                            <b-form-select-option value="Vlan">Vlan</b-form-select-option>
-                                            <b-form-select-option value="autre">Autre</b-form-select-option>
-                                            <b-form-select-option v-show="verifListSources" :value="listSources">{{ listSources }}</b-form-select-option>
-                                        </b-form-select>
-                                        <b-form-input v-model="formInscrit.source_info" type="text" maxlength="190"  v-show="listSources === 'autre'"
-                                                      class="form-control col-7" :class="{ 'is-invalid': formInscrit.errors.has('source_info') }"
-                                                      name="source_info" id="source_info" placeholder="Précisez...">
-                                        </b-form-input>
-                                        <b-input-group-append is-text v-show="pouvsubInfos.source_info === 1">
-                                            <i v-if="listSources === null || (listSources === 'autre' && formInscrit.source_info === null)"
-                                               class="fas fa-exclamation-triangle fa-lg text-orange font-weight-bold"></i>
-                                            <i v-else
-                                               class="fas fa-check fa-lg text-green font-weight-bold"></i>
-                                        </b-input-group-append>
-                                        <has-error :form="formInscrit" field="source_info"></has-error>
-                                    </b-input-group>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="text-right">
-                        <v-btn class="btn btn-danger text-light" @click="step = 1">Retour</v-btn>
-                        <v-btn class="btn-success text-light" @click="validationStepTwo()">&Eacute;diter</v-btn>
-                    </div>
-                </v-stepper-content>
-            </v-stepper-items>
-        </v-stepper>
+                            </form>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-between">
+                            <v-btn class="btn-danger" @click="step = 1">Retour</v-btn>
+                            <span class="font-weight-light font-italic text-primary-dark mt-2"><small>Tous les champs avec * sont obligatoires</small></span>
+                            <v-btn class="btn-success" @click="update()">&Eacute;diter</v-btn>
+                        </div>
+                    </v-stepper-content>
+                </v-stepper-items>
+            </v-stepper>
+        </div>
     </div>
 </template>
 
 <script>
     import { Form } from "vform";
     import moment from 'moment';
+    import Spinner from "../../elements/SpinnerStepper";
     const now = moment();
 
     export default {
         name: "Edit-Inscrit",
+        components: {
+            Spinner,
+        },
         data() {
             return {
                 loading: false,
@@ -517,18 +338,11 @@
                     boite: '',
                     ville_id: null,
                     email: '',
-                    tel: null,
-                    gsm: null,
+                    tel: '',
+                    gsm: '',
                     commentaire_inscrit: '',
                     newsletter: false,
                     prospect: 0,
-                    age: null,
-                    num_national: null,
-                    statut_legal: null,
-                    diplome: null,
-                    duree_chomage: null,
-                    source_info: null,
-                    groupe_social: null,
                     current_user: null,
                 }),
                 champsObligatoires: {
@@ -542,12 +356,7 @@
                 yearsAgo: moment().subtract(15, 'years').format('YYYY'),
                 inscrit: [],
                 villes: [],
-                calculAge: null,
                 formationInscrit: [],
-                pouvsubInfos: [],
-                maxLengthAge: 3,
-                listDiplomes: null,
-                listSources: null,
             }
         },
         watch: {
@@ -560,29 +369,19 @@
                     this.champsObligatoires.email = newValue;
                 }
             },
-            listDiplomes: function(oldDiplome) {
-                if(oldDiplome === 'autre') {
-                    this.formInscrit.diplome = '';
-                }
-            },
-            listSources: function(oldSource) {
-                if(oldSource === 'autre') {
-                    this.formInscrit.source_info = '';
-                }
-            },
         },
         mounted() {
             console.log('EditInscrit component mounted');
             this.getDatas();
         },
         computed: {
-            validationNom() {
+            validationMinNom() {
                 return this.formInscrit.nom.length > 1;
             },
             validationMaxNom() {
                 return this.formInscrit.nom.length < 190;
             },
-            validationPrenom() {
+            validationMinPrenom() {
                 return this.formInscrit.prenom.length > 1;
             },
             validationMaxPrenom() {
@@ -613,7 +412,7 @@
                 return Number(this.formInscrit.numero) > 0 && Number(this.formInscrit.numero) < 10000;
             },
             validationMaxBoite() {
-                return this.formInscrit.boite.length < 11;
+                return this.formInscrit.boite.length <= 10;
             },
             validationVille() {
                 if(this.champsObligatoires.ville_id === false) {
@@ -634,69 +433,63 @@
                 return this.formInscrit.email.length < 190;
             },
             checkNewsletter() {
-                if(this.formInscrit.email.length === 0) {
-                    return this.formInscrit.newsletter !== true;
-                }
-            },
-            validationTel_national() {
-                if(this.champsObligatoires.tel === false && this.formInscrit.tel_national !== null) {
-                    return this.tel_national.length > 2 && this.tel_national.length < 5;
-                }
-            },
-            checkTel() {
-                if(this.champsObligatoires.tel === false) {
-                    return this.formInscrit.tel !== null;
-                }
-            },
-            validationTel() {
-                if(this.champsObligatoires.tel === false && this.formInscrit.tel !== null) {
-                    return this.formInscrit.tel.length > 7 && this.formInscrit.tel.length < 16;
+                if(this.formInscrit.newsletter === true) {
+                    return this.formInscrit.email !== '';
+                } else {
+                    return true;
                 }
             },
             validationGsm_national() {
-                if(this.champsObligatoires.gsm === false && this.formInscrit.gsm_national !== null) {
+                if(this.champsObligatoires.gsm === false && this.gsm_national !== '') {
                     return this.gsm_national.length > 2 && this.gsm_national.length < 5;
                 }
             },
             checkGsm() {
                 if(this.champsObligatoires.gsm === false) {
-                    return this.formInscrit.gsm !== null;
+                    return this.formInscrit.gsm !== '' && this.formInscrit.gsm !== null;
                 }
             },
-            validationGsm() {
-                if(this.champsObligatoires.gsm === false && this.formInscrit.gsm !== null) {
-                    return this.formInscrit.gsm.length > 8 && this.formInscrit.gsm.length < 17;
+            validationMinGsm() {
+                if(this.champsObligatoires.gsm === false && this.formInscrit.gsm !== '' && this.formInscrit.gsm !== null) {
+                    return this.formInscrit.gsm.length > 8;
                 }
             },
-            checkAge() {
-                return this.formInscrit.age === null || this.formInscrit.age === '';
+            validationMaxGsm() {
+                if(this.champsObligatoires.gsm === false && this.formInscrit.gsm !== '' && this.formInscrit.gsm !== null) {
+                    return this.formInscrit.gsm.length < 17;
+                }
             },
-            validationAge() {
-                return Number(this.formInscrit.age) > 0 && Number(this.formInscrit.age) < 1000;
+            validationTel_national() {
+                if(this.champsObligatoires.tel === false && this.tel_national !== '') {
+                    return this.tel_national.length > 2 && this.tel_national.length < 5;
+                }
             },
-            verifListDiplomes() {
-                return this.listDiplomes !== 'Aucun' && this.listDiplomes !== 'CEB' &&
-                    this.listDiplomes !== 'CESI' && this.listDiplomes !== 'CESS' &&
-                    this.listDiplomes !== 'Non Universitaire Type Court' &&
-                    this.listDiplomes !== 'Non Universitaire Type Long' && this.listDiplomes !== 'Universitaire' &&
-                    this.listDiplomes !== 'Étranger sans équivalence' && this.listDiplomes !== 'Étranger avec équivalence';
+            checkTel() {
+                if(this.champsObligatoires.tel === false) {
+                    return this.formInscrit.tel !== '' && this.formInscrit.tel !== null;
+                }
             },
-            verifListSources() {
-                return this.listSources !== 'Facebook' && this.listSources !== 'Forem/Adressage forem' &&
-                    this.listSources !== 'Site internet' && this.listSources !== 'Affiches/flyes' &&
-                    this.listSources !== 'Ancien stagiaire' && this.listSources !== 'Autre formation' &&
-                    this.listSources !== 'Bouche à oreille' && this.listSources !== 'CEFO' &&
-                    this.listSources !== 'CPAS/Synergie emploi' && this.listSources !== 'Croix rouge' &&
-                    this.listSources !== 'Instagram' && this.listSources !== 'La Charnière' &&
-                    this.listSources !== 'Mailing' && this.listSources !== 'Maison de l\'emploi' &&
-                    this.listSources !== 'Mirena' && this.listSources !== 'Partenaires' &&
-                    this.listSources !== 'Proximag' && this.listSources !== 'Vlan';
-            }
+            validationMinTel() {
+                if(this.champsObligatoires.tel === false && this.formInscrit.tel !== '' && this.formInscrit.tel !== null) {
+                    return this.formInscrit.tel.length > 7;
+                }
+            },
+            validationMaxTel() {
+                if(this.champsObligatoires.tel === false && this.formInscrit.tel !== '' && this.formInscrit.tel !== null) {
+                    return this.formInscrit.tel.length < 16;
+                }
+            },
         },
         methods: {
             retour() {
-                Suppression.fire({
+                Swal.fire({
+                    title: 'Êtes-vous sûr?',
                     text: "Si vous continuez, vous retournez à la liste des inscrits !",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3CB521',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '<strong>RETOUR</strong>'
                 }).then((result) => {
                     if (result.value) {
                         return this.$router.go(-1);
@@ -714,13 +507,6 @@
                 this.getInscrit();
                 this.getVilles();
                 this.currentUser();
-            },
-            checkDateNaissance() {
-                if(this.champsObligatoires.date_naissance === false){
-                    this.champsObligatoires.date_naissance = true;
-                } else {
-                    this.champsObligatoires.date_naissance = false;
-                }
             },
             validEmail: function (email) {
                 let re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -741,15 +527,6 @@
                         if(response.data.formationInscrit != null) {
                             this.formationInscrit = response.data.formationInscrit;
                             this.stagiaire = true;
-                        }
-                        if(response.data.pouvsubInfos != null) {
-                            this.pouvsubInfos = response.data.pouvsubInfos;
-                        }
-                        if(response.data.inscrit.diplome != null) {
-                            this.listDiplomes = response.data.inscrit.diplome;
-                        }
-                        if(response.data.inscrit.source_info != null) {
-                            this.listSources = response.data.inscrit.source_info;
                         }
                         this.getFormInscrit(this.inscrit);
                         this.verifInscrit();
@@ -844,80 +621,63 @@
                 } else if(this.validation(this.formInscrit.email !== '' && this.validEmail(this.formInscrit.email) === false, "Vous n'avez pas renseigné un email valide !")) {
                 } else if(this.validation(this.formInscrit.email !== '' && !this.validationMaxEmail, "Le champ email ne peut contenir plus de 190 caractères !")) {
                 } else if(this.validation(this.checkNewsletter === false, "L'email est requis pour la newsletter !")) {
-                } else if(this.validation(this.champsObligatoires.gsm === false && (this.gsm_national === '' || this.formInscrit.gsm === '' || this.gsm_national === null || this.formInscrit.gsm === null), "Vous n'avez pas rempli tous les champs du n° de gsm ou cochez la case 'non disponible' (ND) correspondante !")) {
-                } else if(this.validation(this.champsObligatoires.gsm === false && (this.gsm_national.length < 3 || this.formInscrit.gsm.length < 9 ), "Il n'y pas le minimum de caractères requis dans un des champs du n° de gsm !")) {
-                } else if(this.validation(this.champsObligatoires.tel === false && (this.tel_national === '' || this.formInscrit.tel === '' || this.tel_national === null || this.formInscrit.tel === null), "Vous n'avez pas rempli le tél. fix ou cochez la case 'non disponible' (ND) correspondante !")) {
-                } else if(this.validation(this.champsObligatoires.tel === false && (this.tel_national.length < 3 || this.formInscrit.tel.length < 8 ), "Il n'y pas le minimum de caractères requis dans un des champs du n° de tél. fix !")) {
                 } else {
                     if(this.formInscrit.ville_id == null) {
                         this.formInscrit.ville_id = 2766
                     }
-                    this.getAge();
                     this.step = 2;
                 }
             },
-            getAge() {
-                if(this.formInscrit.date_naissance !== null && this.formInscrit.date_naissance !== '') {
-                    this.calculAge = moment().diff(moment(this.formInscrit.date_naissance), 'years');
-                    this.formInscrit.age = this.calculAge;
-                }
-            },
-            validationStepTwo() {
-                if(this.validation(this.formInscrit.age !== null && this.formInscrit.age !== '' && this.formInscrit.age < 1, "L'âge ne peut être négatif ou valoir 0 !")) {
+            update() {
+                if(this.validation(this.champsObligatoires.gsm === false && (this.gsm_national === '' || this.formInscrit.gsm === '' || this.gsm_national === null || this.formInscrit.gsm === null), "Vous n'avez pas rempli tous les champs du n° de gsm ou cochez la case 'non disponible' (ND) correspondante !")) {
+                } else if(this.validation(this.champsObligatoires.gsm === false && (this.gsm_national.length < 3 || this.formInscrit.gsm.length < 9 ), "Il n'y pas le minimum de caractères requis dans un des champs du n° de gsm !")) {
+                } else if(this.validation(this.champsObligatoires.tel === false && (this.tel_national === '' || this.formInscrit.tel === '' || this.tel_national === null || this.formInscrit.tel === null), "Vous n'avez pas rempli le tél. fix ou cochez la case 'non disponible' (ND) correspondante !")) {
+                } else if(this.validation(this.champsObligatoires.tel === false && (this.tel_national.length < 3 || this.formInscrit.tel.length < 8 ), "Il n'y pas le minimum de caractères requis dans un des champs du n° de tél. fix !")) {
                 } else {
-                    this.updateInscrit();
-                }
-            },
-            updateInscrit() {
-                this.$Progress.start();
-                if(this.formInscrit.tel !== null) {
-                    let telTab = this.formInscrit.tel.split('');
-                    if(telTab[0] == 0) {
-                        telTab.splice(0, 0, '(');
-                        telTab.splice(2, 0, ')');
-                        this.formInscrit.tel = telTab.join('');
-                    } else if(telTab[0] !== '(' && telTab[1] !== '0' && telTab[2] !== ')') {
-                        telTab.splice(0, 0, '(0)');
-                        this.formInscrit.tel = telTab.join('');
-                    }
-                    this.formInscrit.tel = this.tel_national + this.formInscrit.tel;
-                }
-                if(this.formInscrit.gsm !== null) {
-                    let gsmTab = this.formInscrit.gsm.split('');
-                    if(gsmTab[0] == 0) {
-                        gsmTab.splice(0, 0, '(');
-                        gsmTab.splice(2, 0, ')');
-                        this.formInscrit.gsm = gsmTab.join('');
-                    } else if(gsmTab[0] !== '(' && gsmTab[1] !== '0' && gsmTab[2] !== ')') {
-                        gsmTab.splice(0, 0, '(0)');
-                        this.formInscrit.gsm = gsmTab.join('');
-                    }
-                    this.formInscrit.gsm = this.gsm_national + this.formInscrit.gsm;
-                }
-                if(this.listDiplomes !== null && this.listDiplomes !== 'autre') {
-                    this.formInscrit.diplome = this.listDiplomes
-                }
-                if(this.listSources !== null && this.listSources !== 'autre') {
-                    this.formInscrit.source_info = this.listSources
-                }
-                this.formInscrit
-                    .put(`/api/inscrits/update/${this.$route.params.id}`)
-                    .then(response => {
-                        if(this.formInscrit.successful) {
-                            this.$Progress.finish();
-                            Toast.fire('Fiche éditée');
-                            this.$router.go(-1);
+                    this.$Progress.start();
+                    if(this.formInscrit.tel !== null) {
+                        let telTab = this.formInscrit.tel.split('');
+                        if(telTab[0] == 0) {
+                            telTab.splice(0, 0, '(');
+                            telTab.splice(2, 0, ')');
+                            this.formInscrit.tel = telTab.join('');
+                        } else if(telTab[0] !== '(' && telTab[1] !== '0' && telTab[2] !== ')') {
+                            telTab.splice(0, 0, '(0)');
+                            this.formInscrit.tel = telTab.join('');
                         }
-                    })
-                    .catch(error => {
-                        console.log(error.response);
-                        this.$Progress.fail();
-                        if (error.response.status && error.response.status === 422) {
-                            Snackbar.fire('Personne déjà inscrite');
-                        } else {
-                            Snackbar.fire('Problème avec la modification de la personne !');
+                        this.formInscrit.tel = this.tel_national + this.formInscrit.tel;
+                    }
+                    if(this.formInscrit.gsm !== null) {
+                        let gsmTab = this.formInscrit.gsm.split('');
+                        if(gsmTab[0] == 0) {
+                            gsmTab.splice(0, 0, '(');
+                            gsmTab.splice(2, 0, ')');
+                            this.formInscrit.gsm = gsmTab.join('');
+                        } else if(gsmTab[0] !== '(' && gsmTab[1] !== '0' && gsmTab[2] !== ')') {
+                            gsmTab.splice(0, 0, '(0)');
+                            this.formInscrit.gsm = gsmTab.join('');
                         }
-                    })
+                        this.formInscrit.gsm = this.gsm_national + this.formInscrit.gsm;
+                    }
+                    this.formInscrit
+                        .put(`/api/inscrits/update/${this.$route.params.id}`)
+                        .then(response => {
+                            if(this.formInscrit.successful) {
+                                this.$Progress.finish();
+                                Toast.fire('Fiche éditée');
+                                this.$router.go(-1);
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error.response);
+                            this.$Progress.fail();
+                            if (error.response.status && error.response.status === 422) {
+                                Snackbar.fire('Personne déjà inscrite');
+                            } else {
+                                Snackbar.fire('Problème avec la modification de la personne !');
+                            }
+                        })
+                }
             },
         }
     }

@@ -1,17 +1,16 @@
 <template>
-    <div class="container mt-n5">
-        <div class="row justify-content-center">
-            <div class="col-lg-12">
-                <router-view></router-view>
-            </div>
-        </div>
-    </div>
+    <MainPage></MainPage>
 </template>
 
 <script>
-    export default {
-        name: "Main-Formations",
-    }
+import MainPage from "../../elements/MainPage"
+
+export default {
+    name: "formations-main",
+    components: {
+        MainPage,
+    },
+}
 </script>
 
 <style scoped>

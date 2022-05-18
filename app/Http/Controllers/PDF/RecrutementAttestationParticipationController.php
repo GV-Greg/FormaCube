@@ -21,9 +21,10 @@ class RecrutementAttestationParticipationController extends Controller
         $recrutement = Recrutement::find($idRecrutement);
         $formation = Formation::where('id', $recrutement->formation_id)->get()->first();
         $candidat = Inscrit::find($idCandidat);
-        $date = Carbon::now()->isoFormat('D MMMM Y');
+        $date_courte = Carbon::now()->isoFormat('DD-MM-YY');
+        $date_longue = Carbon::now()->isoFormat('D MMMM Y');
 
-        $pdf = PDF::loadView('documents.recrutement.participation', compact('recrutement', 'formation', 'candidat', 'date'));
+        $pdf = PDF::loadView('documents.recrutement.participation', compact('recrutement', 'formation', 'candidat', 'date_courte', 'date_longue'));
 
         return $pdf->download();
     }

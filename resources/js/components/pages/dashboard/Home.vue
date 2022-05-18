@@ -1,67 +1,66 @@
 <template>
-    <div class="ui container d-flex flex-column">
-        <div v-if="loading === true">
-            <div class="row row-cols-4 d-flex justify-content-center">
-                <div class="col text-light">
-                    <router-link :to="{ name: 'testPage' }" class="d-flex align-items-center">
-                        <i class="fas fa-question-circle fa-lg mr-2"></i>
-                        <span>Page test</span>
-                    </router-link>
-                </div>
-                <div class="col mb-5">
-                    <b-form-input type="text" placeholder="Rechercher un·e inscrit·e" v-model="query"></b-form-input>
-                    <div v-if="results.length > 0 && query" class="list_inscrits elevation-4">
-                        <ul>
-                            <li v-for="result in results.slice(0,10)" :key="result.id">
-                                <a :href="result.url">
-                                    <div class="d-inline-flex">
-                                        <i class="fas fa-user fa-lg"></i><div v-text="result.title" class="inscrit"></div>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
+    <div class="mx-5 d-flex flex-column justify-content-center">
+        <div v-if="loading === true" class="mx-5">
+            <div class="row justify-content-end mt-3">
+                <div class="col col-lg-11">
+                    <div class="row justify-content-center">
+                        <div class="d-flex flex-column mb-4">
+                            <b-form-input type="text" placeholder="Rechercher un·e inscrit·e" v-model="query"></b-form-input>
+                            <div v-if="results.length > 0 && query" class="list_inscrits elevation-4">
+                                <ul>
+                                    <li v-for="result in results.slice(0,10)" :key="result.id">
+                                        <a :href="result.url">
+                                            <div class="d-inline-flex">
+                                                <i class="fas fa-user fa-lg"></i><div v-text="result.title" class="inscrit"></div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col">
-
                 </div>
             </div>
-            <div class="d-flex justify-content-center mb-5">
-                <router-link to="/inscrits/create">
-                    <div class="mr-5">
-                        <b-img v-bind="images" center src="../images/BoutonAjoutPerso.png" alt="Center image"></b-img>
-                        <span class="text-light text-uppercase">Faire une inscription</span>
+            <div class="row justify-content-end mb-3">
+                <div class="col col-lg-11">
+                    <div class="row justify-content-center">
+                        <router-link to="/inscrits/create">
+                            <div class="mr-5">
+                                <b-img v-bind="images" center src="../storage/images/BoutonAjoutPerso.png" alt="Center image"></b-img>
+                                <span class="text-light text-uppercase">Faire une inscription</span>
+                            </div>
+                        </router-link>
+                        <router-link to="/formations/create" v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
+                            <div class="ml-5">
+                                <b-img v-bind="images" center src="../storage/images/BoutonAjoutFormation.png" alt="Center image"></b-img>
+                                <span class="text-light text-uppercase">Créer une formation</span>
+                            </div>
+                        </router-link>
                     </div>
-                </router-link>
-                <router-link to="/formations/create" v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
-                    <div class="ml-5">
-                        <b-img v-bind="images" center src="../images/BoutonAjoutFormation.png" alt="Center image"></b-img>
-                        <span class="text-light text-uppercase">Créer une formation</span>
-                    </div>
-                </router-link>
+                </div>
             </div>
-            <v-tabs v-model="tabIndex" background-color="indigo accent-4"
-                    class="elevation-2" dark centered grow icons-and-text>
-                <v-tabs-slider class="slider"></v-tabs-slider>
+            <div class="row justify-content-end">
+                <div class="col col-lg-11">
+                    <v-tabs v-model="tabIndex" background-color="indigo accent-4"
+                            class="elevation-2" dark centered grow icons-and-text>
+                        <v-tabs-slider class="slider"></v-tabs-slider>
 
-                <v-tab :href="`#formation`">
-                    Formations
-                    <i class="fas fa-chalkboard-teacher fa-lg"></i>
-                </v-tab>
+                        <v-tab :href="`#formation`">
+                            Formations
+                            <i class="fas fa-chalkboard-teacher fa-lg"></i>
+                        </v-tab>
 
-                <v-tabs-slider class="slider"></v-tabs-slider>
+                        <v-tabs-slider class="slider"></v-tabs-slider>
 
-                <v-tab :href="`#recrutement`">
-                    Recrutements
-                    <i class="fas fa-calendar-plus fa-lg"></i>
-                </v-tab>
+                        <v-tab :href="`#recrutement`">
+                            Recrutements
+                            <i class="fas fa-calendar-plus fa-lg"></i>
+                        </v-tab>
 
-                <v-tab-item value="formation" class="tab-item">
-                    <div class="p-2 container" >
-                        <div class="row row-cols-12 default mt-n2 mr-2">
-                            <div class="col" v-if="loadingFormationNotPmtic === true">
-                                <div class="row row-cols-3"  v-if="formationsNotPmtic.length > 0">
-                                    <div class="col" v-for="(formation, index) in formationsNotPmtic" :key="formation.id">
+                        <v-tab-item value="formation" class="tab-item">
+                            <v-container class="p-3" v-if="loadingDatas === true">
+                                <div class="default d-flex flex-wrap justify-content-around" v-if="formations.length > 0">
+                                    <div class="mx-2 my-3" v-for="(formation, index) in formations" :key="formation.id">
                                         <router-link  :to="{ name: 'showFormation', params: { id: formation.id }}"
                                                       class="link default">
                                             <div class="blocFormation elevation-5">
@@ -70,8 +69,8 @@
                                                     <span class="small">Du : </span>{{ formation.date_debut | newDate }}<br>
                                                     <span class="small">Au : </span>{{ formation.date_fin | newDate }}
                                                 </div>
-                                                <div class="text-center"><strong>{{ stagiairesNotPmtic[index][0] }} sur {{ formation.max_stagiaires }}</strong></div>
-                                                <div class="titre text-center" :class="stagiairesNotPmtic[index][1]"><strong>{{ stagiairesNotPmtic[index][1] }}</strong></div>
+                                                <div class="text-center"><strong>{{ stagiaires[index][0] }} sur {{ formation.max_stagiaires }}</strong></div>
+                                                <div class="titre text-center" :class="stagiaires[index][1]"><strong>{{ stagiaires[index][1] }}</strong></div>
                                                 <div class="small text-center">
                                                     <span v-if="formation.tuteur_genre === 'man.png'">Tuteur : </span>
                                                     <span v-show="formation.tuteur_genre === 'woman.png'">Tutrice : </span>
@@ -82,87 +81,57 @@
                                         </router-link>
                                     </div>
                                 </div>
-                                <div class="row row-cols-12 text-white d-flex justify-content-center mt-2" v-else>
+                                <div v-else class="text-white text-center mt-2">
                                     Aucune formation prévue
                                 </div>
-                            </div>
-                            <div v-else class="col">
-                                <v-row class="text-center text-white mt-10">
-                                    <v-col class="d-flex flex-column justify-center align-center">
+                            </v-container>
+                            <v-container v-else class="ml-2">
+                                <v-row align="center" class="text-center text-white mt-10">
+                                    <v-col class="justify-content-center align-center">
                                         <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
                                         <span class="mt-5">Chargement...</span>
                                     </v-col>
                                 </v-row>
-                            </div>
-                            <div class="col pmtic ml-2" v-if="loadingFormationPmtic === true">
-                                <div class="row row-cols-3" v-if="formationsPmtic.length > 0">
-                                    <div class="col" v-for="(formation, index) in formationsPmtic" :key="formation.id" >
-                                        <router-link  :to="{ name: 'showFormation', params: { id: formation.id }}"
-                                                      class="link default">
-                                            <div class="blocFormation elevation-5">
-                                                <div class="titre text-center"><strong>{{ formation.abreviation }}</strong></div>
+                            </v-container>
+                        </v-tab-item>
+                        <v-tab-item value="recrutement" class="tab-item">
+                            <v-container class="p-3 pt-5" v-if="loadingDatas === true">
+                                <div class="default d-flex flex-wrap justify-content-around" v-if="recrutements.length > 0">
+                                    <div class="mx-2" v-for="(recrutement, index) in recrutements" :key="recrutement.id">
+                                        <router-link :to="{ name: 'showRecrutement', params: { id: recrutement.id }}"
+                                                     class="link default">
+                                            <div class="blocRecrutement mb-5 elevation-2">
+                                                <div class="titre text-center"><strong>{{ recrutement.abreviation }}</strong></div>
                                                 <div>
-                                                    <span class="small">Du : </span>{{ formation.date_debut | newDate }}<br>
-                                                    <span class="small">Au : </span>{{ formation.date_fin | newDate }}
+                                                    <span class="small">Date : </span><strong>{{ recrutement.date | newDate }}</strong>
                                                 </div>
-                                                <div class="text-center"><strong>{{ stagiairesPmtic[index][0] }} sur {{ formation.max_stagiaires }}</strong></div>
-                                                <div class="titre text-center" :class="stagiairesPmtic[index][1]"><strong>{{ stagiairesPmtic[index][1] }}</strong></div>
+                                                <div class="text-center titre candidats"><strong>{{ candidats[index] }} candidat<span v-if="candidats[index] > 0">s</span></strong></div>
+                                                <div class="small text-center">
+                                                    <span v-if="recrutement.tuteur_genre === 'man.png'">Tuteur : </span>
+                                                    <span v-show="recrutement.tuteur_genre === 'woman.png'">Tutrice : </span>
+                                                    <span v-show="recrutement.tuteur_genre === 'user.png'">Tuteur·rice : </span>
+                                                    <strong>{{ recrutement.tuteur_prenom }}</strong>
+                                                </div>
                                             </div>
                                         </router-link>
                                     </div>
                                 </div>
-                                <div class="row row-cols-12 text-white d-flex justify-content-center mt-2" v-else>
-                                    Aucune formation PMTIC prévue
+                                <div v-else class="text-white text-center mt-2">
+                                    Aucun recrutement prévu
                                 </div>
-                            </div>
-                            <div v-else class="col pmtic ml-2">
-                                <v-row class="text-center text-white mt-10">
-                                    <v-col class="d-flex flex-column justify-center align-center">
+                            </v-container>
+                            <v-container v-else class="p-2">
+                                <v-row align="center" class="text-center text-white mt-10">
+                                    <v-col class="justify-content-center align-center">
                                         <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
                                         <span class="mt-5">Chargement...</span>
                                     </v-col>
                                 </v-row>
-                            </div>
-                        </div>
-                    </div>
-
-                </v-tab-item>
-                <v-tab-item value="recrutement" class="tab-item">
-                    <div class="p-3 pt-5 container" v-if="loadingDatas === true">
-                        <div class="row row-cols-12 ml-4 default" v-if="recrutements.length > 0">
-                            <div class="col default" v-for="(recrutement, index) in recrutements" :key="recrutement.id">
-                                <router-link :to="{ name: 'showRecrutement', params: { id: recrutement.id }}"
-                                             class="link default">
-                                    <div class="blocRecrutement mb-5 elevation-2">
-                                        <div class="titre text-center"><strong>{{ recrutement.abreviation }}</strong></div>
-                                        <div>
-                                            <span class="small">Date : </span><strong>{{ recrutement.date | newDate }}</strong>
-                                        </div>
-                                        <div class="text-center titre candidats"><strong>{{ candidats[index] }} candidat<span v-if="candidats[index] > 0">(s)</span></strong></div>
-                                        <div class="small text-center">
-                                            <span v-if="recrutement.tuteur_genre === 'man.png'">Tuteur : </span>
-                                            <span v-show="recrutement.tuteur_genre === 'woman.png'">Tutrice : </span>
-                                            <span v-show="recrutement.tuteur_genre === 'user.png'">Tuteur·rice : </span>
-                                            <strong>{{ recrutement.tuteur_prenom }}</strong>
-                                        </div>
-                                    </div>
-                                </router-link>
-                            </div>
-                        </div>
-                        <div class="row row-cols-12 text-white d-flex justify-content-center mt-2" v-else>
-                            Aucun recrutement prévu
-                        </div>
-                    </div>
-                    <div v-else class="p-2 container">
-                        <v-row class="text-center text-white mt-10">
-                            <v-col class="d-flex flex-column justify-center align-center">
-                                <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
-                                <span class="mt-5">Chargement...</span>
-                            </v-col>
-                        </v-row>
-                    </div>
-                </v-tab-item>
-            </v-tabs>
+                            </v-container>
+                        </v-tab-item>
+                    </v-tabs>
+                </div>
+            </div>
         </div>
         <div v-else>
             <v-row class="text-center text-white mt-10">
@@ -181,17 +150,13 @@
             return {
                 loading: false,
                 loadingDatas: false,
-                loadingFormationNotPmtic: false,
-                loadingFormationPmtic: false,
                 tabIndex: 0,
                 images: { blank: false, width: 80, height: 55, class: 'mb-1 ombre' },
                 tabs: 2,
                 query: null,
                 results: [],
-                formationsNotPmtic: [],
-                stagiairesNotPmtic: [],
-                formationsPmtic: [],
-                stagiairesPmtic: [],
+                formations: [],
+                stagiaires: [],
                 recrutements: [],
                 candidats: [],
             }
@@ -202,11 +167,9 @@
            }
         },
         mounted() {
-            console.log('Home component mounted');
             this.loading = false;
             this.loadingDatas = false;
-            this.getFormationsPmtic();
-            this.getFormationsNotPmtic();
+            this.getFormations();
             this.getRecrutements();
             this.loading = true;
         },
@@ -216,27 +179,12 @@
             }
         },
         methods: {
-            getFormationsPmtic() {
-                this.loadingFormationPmtic = false;
-                axios.get('api/formations/all-pmtic')
+            getFormations() {
+                this.loadingDatas = false;
+                axios.get('api/formations/all')
                     .then(response => {
-                        this.formationsPmtic = response.data.formations;
-                        this.stagiairesPmtic = response.data.stagiaires;
-                        this.loadingFormationPmtic = true;
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        this.error = 'Oups, il y a un hic !';
-                        this.snackbar = true;
-                    })
-            },
-            getFormationsNotPmtic() {
-                this.loadingFormationNotPmtic = false;
-                axios.get('api/formations/all-not-pmtic')
-                    .then(response => {
-                        this.formationsNotPmtic = response.data.formations;
-                        this.stagiairesNotPmtic = response.data.stagiaires;
-                        this.loadingFormationNotPmtic = true;
+                        this.formations = response.data.formations;
+                        this.stagiaires = response.data.stagiaires;
                     })
                     .catch(error => {
                         console.log(error);
@@ -267,6 +215,11 @@
 </script>
 
 <style scoped>
+    .myCard {
+        height: 180px;
+        width: 180px;
+    }
+
     .list_inscrits {
         z-index: 100;
         background-color: #fff;
@@ -376,9 +329,5 @@
 
     .candidats {
         color: #44d27f;
-    }
-
-    .pmtic {
-        border-left: 2px solid #3f96a5;
     }
 </style>

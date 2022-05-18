@@ -2,10 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Actions\CreateContactNewsletterAction;
-use App\Actions\DeleteContactNewsletterAction;
-use App\Actions\UpdateContactNewsletterAction;
-use App\Exports\ProspectsExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\InscritCollection;
 use App\Http\Resources\InscritResource;
@@ -14,27 +10,19 @@ use App\Model\FormationInscrit;
 use App\Model\Inscrit;
 use App\Model\InscritTag;
 use App\Model\Log;
-use App\Model\PouvsubInfos;
 use App\Model\Recrutement;
 use App\Model\RecrutementInscrit;
 use App\Model\Tag;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Excel;
-use PhpOffice\PhpSpreadsheet\Writer\Exception;
 
 class InscritController extends Controller
 {
 
     /**
-     * Display a listing of the resource.
-     *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index()
+    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $inscrits = Inscrit::orderBy('id', 'DESC')->paginate(10);
 
@@ -46,26 +34,27 @@ class InscritController extends Controller
      * @param $search
      * @return InscritCollection
      */
-    public function search($field, $search)
+    public function search($field, $search): InscritCollection
     {
         return new InscritCollection(Inscrit::where($field,'LIKE',"%$search%")->latest()->paginate(10));
     }
 
+
     /**
      * @return InscritResource
      */
-    public function latest()
+    public function latest(): InscritResource
     {
         return new InscritResource(Inscrit::orderBy('id', 'DESC')->first());
     }
 
+
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @throws \SendinBlue\Client\ApiException
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|InscritResource
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request, CreateContactNewsletterAction $action)
+    public function store(Request $request): \Illuminate\Http\JsonResponse|InscritResource
     {
         $this->validate($request, [
             'nom' => 'required',
@@ -80,7 +69,6 @@ class InscritController extends Controller
 
         if($search === false) {
             $inscrit = new Inscrit();
-
             $inscrit->nom = $request->nom;
             $inscrit->prenom = $request->prenom;
             $inscrit->genre = $request->genre;
@@ -94,13 +82,7 @@ class InscritController extends Controller
             $inscrit->gsm = $request->gsm;
             $inscrit->commentaire_inscrit = $request->commentaire_inscrit;
             $inscrit->prospect = $request->prospect;
-            $inscrit->age = $request->age;
-            $inscrit->num_national = $request->num_national;
-            $inscrit->statut_legal = $request->statut_legal;
-            $inscrit->diplome = $request->diplome;
-            $inscrit->duree_chomage = $request->duree_chomage;
-            $inscrit->source_info = $request->source_info;
-            $inscrit->groupe_social = $request->groupe_social;
+            $inscrit->newsletter = $request->newsletter;
             $inscrit->save();
         } else {
             $inscrit = Inscrit::where('email', $request->email)->get()->first();
@@ -140,20 +122,13 @@ class InscritController extends Controller
         if($idformation !== null) {
             $formation = Formation::find($idformation);
             if($search === false) {
-                $inscrit->formations()->attach($formation, ['date_ajout' => $date_ajout, 'pmtic_module_1' => $request->pmtic_module_1, 'pmtic_module_2' => $request->pmtic_module_2, 'pmtic_module_3' => $request->pmtic_module_3]);
+                $inscrit->formations()->attach($formation, ['date_ajout' => $date_ajout]);
             } else {
                 $searchFormation = FormationInscrit::where(['formation_id' => $idformation, 'inscrit_id' => $inscrit->id])->exists();
                 if($searchFormation === false) {
-                    $inscrit->formations()->attach($formation, ['date_ajout' => $date_ajout, 'pmtic_module_1' => $request->pmtic_module_1, 'pmtic_module_2' => $request->pmtic_module_2, 'pmtic_module_3' => $request->pmtic_module_3]);
+                    $inscrit->formations()->attach($formation, ['date_ajout' => $date_ajout]);
                 }
             }
-        }
-
-        // Mise à jour de la liste de newsletter de Send in blue
-        if($request->newsletter === true) {
-            $inscrit->newsletter = true;
-            $inscrit->save();
-            $action->execute($request);
         }
 
         if($search === false) {
@@ -176,13 +151,12 @@ class InscritController extends Controller
         }
     }
 
+
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show($id): \Illuminate\Http\JsonResponse
     {
         $inscrit = new InscritResource(Inscrit::where('id', '=', $id)->with('tags')->with('recrutements')->with('formations')->get()->first());
 
@@ -204,10 +178,13 @@ class InscritController extends Controller
         ]);
     }
 
+
     /**
      * @param int $id
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function edit(int $id) {
+    public function edit(int $id): \Illuminate\Http\JsonResponse
+    {
         $inscrit = new InscritResource(Inscrit::where('id', '=', $id)->with('tags')->with('recrutements')->with('formations')->get()->first());
 
         $listFormations = Formation::all();
@@ -220,34 +197,22 @@ class InscritController extends Controller
             }
         }
 
-        $pouvsubInfos = null;
-        $latestFormation = FormationInscrit::where('inscrit_id', $id)->select('formation_id', 'inscrit_id')->orderBy('date_ajout', 'desc')->get()->first();
-
-        for($y=0; $y < count($inscrit->formations); $y++) {
-            if($inscrit->formations[$y]->id === $latestFormation->formation_id) {
-                if(strtotime($inscrit->formations[$y]->date_fin) > strtotime(date("Y-m-d"))) {
-                    $pouvsubInfos = PouvsubInfos::where('formation_id', $latestFormation->formation_id)->get()->first();
-                }
-            }
-        }
-
         return response()->json([
             'inscrit' => $inscrit,
             'tags' => $inscrit->tags,
             'recrutements' => $inscrit->recrutements,
             'formations' => $inscrit->formations,
-            'pouvsubInfos' => $pouvsubInfos,
         ]);
     }
 
+
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param Request $request
+     * @param int $id
      * @return InscritResource
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function update(Request $request, int $id, UpdateContactNewsletterAction $action)
+    public function update(Request $request, int $id): InscritResource
     {
         $this->validate($request, [
             'nom' => 'required',
@@ -255,9 +220,6 @@ class InscritController extends Controller
         ]);
 
         $inscrit = Inscrit::findOrFail($id);
-
-        // Mise à jour de la liste de newsletter de Send in blue
-        $action->execute($inscrit, $request);
 
         $modifications = '';
         $modif_compteur = 0;
@@ -351,62 +313,6 @@ class InscritController extends Controller
             }
             $modif_compteur++;
         }
-        if($request->age && $inscrit->age != $request->age) {
-            if($modif_compteur > 0){
-                $modifications .= ', âge';
-            } else {
-                $modifications .= 'âge';
-            }
-            $modif_compteur++;
-        }
-        if($request->num_national && $inscrit->num_national != $request->num_national) {
-            if($modif_compteur > 0){
-                $modifications .= ', n° national';
-            } else {
-                $modifications .= 'n° national';
-            }
-            $modif_compteur++;
-        }
-        if($request->statut_legal && $inscrit->statut_legal != $request->statut_legal) {
-            if($modif_compteur > 0){
-                $modifications .= ', statut légal';
-            } else {
-                $modifications .= 'statut légal';
-            }
-            $modif_compteur++;
-        }
-        if($request->diplome && $inscrit->diplome != $request->diplome) {
-            if($modif_compteur > 0){
-                $modifications .= ', diplôme';
-            } else {
-                $modifications .= 'diplôme';
-            }
-            $modif_compteur++;
-        }
-        if($request->duree_chomage && $inscrit->duree_chomage!= $request->duree_chomage) {
-            if($modif_compteur > 0){
-                $modifications .= ', durée de chômage';
-            } else {
-                $modifications .= 'durée de chômage';
-            }
-            $modif_compteur++;
-        }
-        if($request->source_info && $inscrit->source_info != $request->source_info) {
-            if($modif_compteur > 0){
-                $modifications .= ", source de l'info";
-            } else {
-                $modifications .= "source de l'info";
-            }
-            $modif_compteur++;
-        }
-        if($request->groupe_social && $inscrit->groupe_social != $request->groupe_social) {
-            if($modif_compteur > 0){
-                $modifications .= ", groupe social";
-            } else {
-                $modifications .= "groupe social";
-            }
-            $modif_compteur++;
-        }
 
         $inscrit->nom = $request->nom;
         $inscrit->prenom = $request->prenom;
@@ -421,13 +327,6 @@ class InscritController extends Controller
         $inscrit->gsm = $request->gsm;
         $inscrit->commentaire_inscrit = $request->commentaire_inscrit;
         $inscrit->prospect = $request->prospect;
-        $inscrit->age = $request->age;
-        $inscrit->num_national = $request->num_national;
-        $inscrit->statut_legal = $request->statut_legal;
-        $inscrit->diplome = $request->diplome;
-        $inscrit->duree_chomage = $request->duree_chomage;
-        $inscrit->source_info = $request->source_info;
-        $inscrit->groupe_social = $request->groupe_social;
         $inscrit->newsletter = $request->newsletter;
         $inscrit->save();
 
@@ -443,32 +342,25 @@ class InscritController extends Controller
         return new InscritResource($inscrit);
     }
 
+
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
+     * @param $id
      * @return InscritResource
      */
-    public function destroy($id, DeleteContactNewsletterAction $action)
+    public function destroy($id): InscritResource
     {
         $inscrit = Inscrit::find($id);
-        // suppresion de l'inscrit dans la liste de diffusion de la newsletter de Sendinblue
-        if($inscrit->newsletter === 1) {
-            $action->execute($inscrit->email);
-        }
-
         $inscrit->delete();
 
         return new InscritResource($inscrit);
     }
 
+
     /**
-     * Display a listing of the resource.
-     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function prospects() {
-
+    public function prospects(): \Illuminate\Http\JsonResponse
+    {
         $prospects = Inscrit::with('tags')
             ->where('prospect', 1)
             ->select('id', 'prenom', 'nom')
@@ -479,13 +371,13 @@ class InscritController extends Controller
         ]);
     }
 
+
     /**
-     * @param $field
      * @param $search
      * @return \Illuminate\Http\JsonResponse
      */
-    public function searchProspects($search) {
-
+    public function searchProspects($search): \Illuminate\Http\JsonResponse
+    {
         $searchTags = explode(",", $search);
         $tags = [];
         for($i=0; $i < count($searchTags); $i++) {
@@ -557,19 +449,20 @@ class InscritController extends Controller
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function showSearch($id)
+    public function showSearch($id): \Illuminate\Http\JsonResponse
     {
         $inscrit = new InscritResource(Inscrit::findOrFail($id));
 
         return response()->json($inscrit);
     }
 
+
     /**
      * @param Request $request
      * @param $id
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
      */
-    public function addTags(Request $request, $id)
+    public function addTags(Request $request, $id): \Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         $inscrit = Inscrit::find($id);
 
@@ -600,9 +493,9 @@ class InscritController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
      */
-    public function addTagsAfterRecrutement(Request $request)
+    public function addTagsAfterRecrutement(Request $request): \Illuminate\Http\Response|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         $inscritFullname = $request->prenom . ' ' . $request->nom;
         $response = '';
@@ -641,9 +534,10 @@ class InscritController extends Controller
     /**
      * @param $idInscrit
      * @param $idTag
+     * @param $idCurrentUser
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteTags($idInscrit, $idTag, $idCurrentUser)
+    public function deleteTags($idInscrit, $idTag, $idCurrentUser): \Illuminate\Http\JsonResponse
     {
         $match = ['inscrit_id' => $idInscrit, 'tag_id' => $idTag];
         $inscritTag = InscritTag::where($match)->with('tag')->first();
@@ -659,14 +553,15 @@ class InscritController extends Controller
         ], 200);
     }
 
+
     /**
      * @param Request $request
      * @param $idInscrit
      * @param $idFormation
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function storeRdv(Request $request, $idInscrit, $idFormation) {
-
+    public function storeRdv(Request $request, $idInscrit, $idFormation): \Illuminate\Http\JsonResponse
+    {
             $match = ['formation_id' => $idFormation, 'inscrit_id' => $idInscrit];
 
             FormationInscrit::where($match)
@@ -676,11 +571,18 @@ class InscritController extends Controller
                     'validation_rdv' => false
                 ]);
 
-            return response(["message" => "Rendez-vous sauvegardé"], 200);
+            return response()->json([
+                "message" => "Rendez-vous sauvegardé"
+            ], 200);
     }
 
-    public function validateRdv(int $idInscrit, int $idFormation) {
-
+    /**
+     * @param int $idInscrit
+     * @param int $idFormation
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function validateRdv(int $idInscrit, int $idFormation): \Illuminate\Http\JsonResponse
+    {
         $match = ['formation_id' => $idFormation, 'inscrit_id' => $idInscrit];
 
         FormationInscrit::where($match)
@@ -692,12 +594,14 @@ class InscritController extends Controller
             "message" => "Rendez-vous validé",
         ], 200);
     }
+
     /**
      * @param int $idInscrit
      * @param int $idFormation
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteRdv(int $idInscrit, int $idFormation) {
+    public function deleteRdv(int $idInscrit, int $idFormation): \Illuminate\Http\JsonResponse
+    {
 
         $match = ['formation_id' => $idFormation, 'inscrit_id' => $idInscrit];
 
@@ -713,14 +617,15 @@ class InscritController extends Controller
         ], 200);
     }
 
+
     /**
      * @param Request $request
      * @param $idInscrit
      * @param $idFormation
      * @return \Illuminate\Http\JsonResponse
      */
-    public function storeRappel(Request $request, $idInscrit, $idFormation) {
-
+    public function storeRappel(Request $request, $idInscrit, $idFormation): \Illuminate\Http\JsonResponse
+    {
         $date_rappel = $request->date_rappel;
         $rappel_user_id = $request->rappel_user_id;
         $match = ['formation_id' => $idFormation, 'inscrit_id' => $idInscrit];
@@ -736,36 +641,22 @@ class InscritController extends Controller
         ], 200);
     }
 
+
     /**
      * @param $idInscrit
      * @param $idFormation
      * @param $idNewFormation
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      */
-    public function reportStagiaire($idInscrit, $idFormation, $idNewFormation)
+    public function reportStagiaire($idInscrit, $idFormation, $idNewFormation): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         try {
             $date_ajout = date('Y-m-d');
-
-            $formation = Formation::find($idNewFormation);
-            if(strtolower($formation->nom) === 'pmtic') {
-                $pmtic_module_1 = 1;
-                $pmtic_module_2 = 1;
-                $pmtic_module_3 = 1;
-            } else {
-                $pmtic_module_1 = 0;
-                $pmtic_module_2 = 0;
-                $pmtic_module_3 = 0;
-            }
-
             $match = ['formation_id' => $idFormation, 'inscrit_id' => $idInscrit];
             FormationInscrit::where($match)
                 ->update([
                     'formation_id' => $idNewFormation,
                     'date_ajout' => $date_ajout,
-                    'pmtic_module_1' => $pmtic_module_1,
-                    'pmtic_module_2' => $pmtic_module_2,
-                    'pmtic_module_3' => $pmtic_module_3,
                     'date_rappel' => null,
                     'rappel_user_id' => null,
                     'rappel_resultat' => null,
@@ -783,13 +674,14 @@ class InscritController extends Controller
         }
     }
 
+
     /**
      * @param $id
      * @param $idRecrutement
      * @param $idNewRecrutement
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      */
-    public function reportCandidat($id, $idRecrutement, $idNewRecrutement)
+    public function reportCandidat($id, $idRecrutement, $idNewRecrutement): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory
     {
         try {
             $date_ajout = date('Y-m-d');
@@ -807,14 +699,14 @@ class InscritController extends Controller
         }
     }
 
-
     /**
      * @param $idInscrit
      * @param $traitement
      * @param $prospect
      * @return \Illuminate\Http\JsonResponse
      */
-    public function candidatToProspect($idInscrit, $traitement, $prospect) {
+    public function candidatToProspect($idInscrit, $traitement, $prospect): \Illuminate\Http\JsonResponse
+    {
         $inscrit = Inscrit::where('id', $idInscrit)->get()->first();
 
         $prenom = $inscrit->prenom;
@@ -842,6 +734,13 @@ class InscritController extends Controller
         ], 200);
     }
 
+    /**
+     * @param $creation
+     * @param $update
+     * @param $idInscrit
+     * @param $idCurrentUser
+     * @param $informations
+     */
     public function addLog($creation, $update, $idInscrit, $idCurrentUser, $informations)
     {
         $date_ajout = date('Y-m-d');

@@ -48,8 +48,6 @@ import ListTags from "../components/pages/tags/ListTags.vue";
 import MainProspects from "../components/pages/prospects/MainProspects.vue";
 import ListProspects from "../components/pages/prospects/ListProspects.vue";
 
-import Test from "../components/pages/test.vue";
-
 import PageNotFound from "../components/elements/PageNotFound";
 
 const routes = [
@@ -64,11 +62,6 @@ const routes = [
             {
                 path: "/home",
                 component: Home,
-            },
-            {
-                path: "/test",
-                name: 'testPage',
-                component: Test,
             },
             {
                 path: "/users",

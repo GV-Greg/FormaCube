@@ -1,7 +1,6 @@
 <template>
-    <div>
-        <h1>Liste des Tags</h1>
-        <!-- Contenu de la page si chargement fini -->
+    <div class="container">
+        <h1 class="d-flex align-content-center">Liste des Tags</h1>
         <div v-if="loading === true">
             <div class="row align-items-center mt-2">
                 <div class="col-lg-3"></div>
@@ -59,16 +58,10 @@
             </div>
             <PaginationComponent class="mt-3" v-if="pagination.last_page > 1"
                                  :pagination="pagination" :offset="5"
-                                 @paginate="search === '' ? getData() : searchData()"
-            ></PaginationComponent>
+                                 @paginate="search === '' ? getData() : searchData()" />
         </div>
         <!-- Animation de chargement de page -->
-        <div v-else class="row text-center text-light mt-10">
-            <div class="col d-flex flex-column justify-center align-center">
-                <v-progress-circular :size="70" :width="10" color="white" indeterminate></v-progress-circular>
-                <span class="mt-5">Chargement...</span>
-            </div>
-        </div>
+        <Spinner v-else />
         <!-- Create & Edit Modal -->
         <div class="modal fade" id="tagModal" tabindex="-1" role="dialog" aria-labelledby="tagModalTitle" aria-hidden="true" data-backdrop="static">
             <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -103,9 +96,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
-                            <button :disabled="form.busy" type="submit" class="btn btn-success">{{ editMode ? "&Eacute;diter" : "Cr&eacute;er" }}</button>
+                        <div class="modal-footer d-flex justify-content-between">
+                            <v-btn class="btn-danger" data-dismiss="modal">Fermer</v-btn>
+                            <v-btn :disabled="form.busy" type="submit" class="btn-success">{{ editMode ? "&Eacute;diter" : "Cr&eacute;er" }}</v-btn>
                         </div>
                     </form>
                 </div>
@@ -117,11 +110,13 @@
 <script>
     import PaginationComponent from "../../elements/PaginationComponent";
     import { Form } from 'vform';
+    import Spinner from "../../elements/SpinnerStepper";
 
     export default {
         name: "TagsComponenent",
         components: {
             PaginationComponent,
+            Spinner,
         },
         data() {
             return {

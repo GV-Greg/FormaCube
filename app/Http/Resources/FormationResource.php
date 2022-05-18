@@ -35,8 +35,6 @@ class FormationResource extends JsonResource
             'user_id' => $this->user['id'],
             'tuteur_prenom' => $this->user['firstname'],
             'tuteur_genre' => $this->user['avatar'],
-            'pouvsub_id' => $this->pouvsub->id,
-            'pouvsub' => $this->pouvsub->nom,
             'statut' => $this->statut,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

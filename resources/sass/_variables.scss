@@ -1,5 +1,17 @@
-// Body
-$body-bg: #f8fafc;
+// App colors
+$color-primary-light: #00929E;
+$color-primary-dark: #193340;
+$color-secondary: #FF5F4D;
+$color-white: #f8fafc;
+$bg-color: $color-primary-light;
+$bg-light: $color-white;
+$bg-dark: $color-primary-dark;
+$text-light: $color-white;
+$text-color-primary-dark: $color-primary-dark;
+$text-color-primary-light: $color-primary-light;
+$text-color-secondary: $color-secondary;
+$text-link: $color-secondary;
+
 
 // Typography
 $font-family-sans-serif: 'Nunito', sans-serif;
@@ -17,20 +29,6 @@ $yellow: #ffed4a;
 $green: #38c172;
 $teal: #4dc0b5;
 $cyan: #6cb2eb;
-$interface: #254F5D;
-$interface-light: #c3d7de;
-
-.text-interface{
-    color: $interface !important;
-}
-
-.text-light-interface{
-    color: #317283 !important;
-}
-
-.text-dark-interface{
-    color: #193340 !important;
-}
 
 .text-pink{
     color: $pink !important;
@@ -52,26 +50,6 @@ $interface-light: #c3d7de;
     color: $green !important;
 }
 
-.text-other-green{
-    color: #5AB55E;
-}
-
 .text-blue{
     color: $blue !important;
-}
-
-.bg-app{
-    background-color: #3B424A !important;
-}
-
-.bg-interface{
-    background-color: $interface !important;
-}
-
-.bg-light-interface{
-    background-color: #317283 !important;
-}
-
-.bg-dark-interface{
-    background-color: #193340 !important;
 }

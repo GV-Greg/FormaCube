@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SalleCollection;
 use App\Http\Resources\SalleResource;
-use App\Model\Formation;
 use App\Model\Salle;
 use Illuminate\Http\Request;
 

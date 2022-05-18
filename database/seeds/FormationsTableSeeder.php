@@ -14,6 +14,6 @@ class FormationsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory(Formation::class, 20)->create();
+        factory(Formation::class, 10)->create();
     }
 }

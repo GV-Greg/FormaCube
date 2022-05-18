@@ -1,19 +1,13 @@
 <template>
-    <v-app class="bg-interface">
+    <div class="bg-interface">
         <v-navigation-drawer app expand-on-hover class="elevation-4">
             <v-list>
-                <v-list-item class="px-2" link  href="https://www.interface3namur.be" target="_blank" rel="noopener noreferrer">
-                    <v-img aspect-ratio="1" src="/images/Interface3Namur-favicon.png" alt="Logo" class="v-responsive__content-logo"></v-img>
-                    <v-list-item-content>
-                        <v-list-item-title>Interface3.Namur</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
                 <v-list-item class="px-2" link to="/profil">
                     <v-list-item-avatar>
                         <v-img :src="getProfileAvatar()" class="img-circle elevation-2" alt="User Image"></v-img>
                     </v-list-item-avatar>
                     <v-list-item-content>
-                        <v-list-item-title>{{ currentUser.firstname }}</v-list-item-title>
+                        <v-list-item-title><span class="ml-3">{{ currentUser.firstname }}</span></v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
                 <v-divider></v-divider>
@@ -23,14 +17,6 @@
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title>Accueil</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-list-item link to="/pouvsubs" v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
-                    <v-list-item-action>
-                        <i class="fas fa-hand-holding-usd fa-lg"></i>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>Pouvoirs Subsidiants</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
                 <v-list-item link to="/formations">
@@ -84,14 +70,14 @@
                             <v-list-item-title>Prospects</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
-                    <v-list-item link to="/archives">
-                        <v-list-item-action>
-                            <i class="fas fa-box-open fa-lg"></i>
-                        </v-list-item-action>
-                        <v-list-item-content>
-                            <v-list-item-title>Archives</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
+<!--                    <v-list-item link to="/archives">-->
+<!--                        <v-list-item-action>-->
+<!--                            <i class="fas fa-box-open fa-lg"></i>-->
+<!--                        </v-list-item-action>-->
+<!--                        <v-list-item-content>-->
+<!--                            <v-list-item-title>Archives</v-list-item-title>-->
+<!--                        </v-list-item-content>-->
+<!--                    </v-list-item>-->
                     <v-list-item link to="/users" v-show="currentUser.role === 'superAdmin' || currentUser.role === 'master'">
                         <v-list-item-action>
                             <i class="fas fa-users-cog fa-lg"></i>
@@ -113,36 +99,25 @@
         </v-navigation-drawer>
 
         <v-main>
-            <v-container class="fill-height" fluid>
-                <router-view class="ml-5"></router-view>
-            </v-container>
+            <router-view></router-view>
         </v-main>
         <v-footer app class="d-flex justify-content-center">
-            <span class="white--text">Version 4.5.3 &bull; <strong>Copyright &copy; 2019-{{ this.currentYear }} <a href="http://www.creacube.be" target="_blank" rel="noopener noreferrer" class="myLink">CreaCube</a>.</strong> All rights reserved. <strong><a :href="bugsLink" target="_blank" rel="noopener noreferrer" class="myLink ml-1">D&eacute;clarer un bug</a>.</strong></span>
+            <span class="white--text">Version 5.0 &bull; <strong>Copyright &copy; 2019-{{ this.currentYear }} <a href="http://www.creacube.be/" target="_blank" rel="noopener noreferrer" class="myLink">CreaCube</a>.</strong> All rights reserved.</span>
         </v-footer>
-    </v-app>
-
+    </div>
 </template>
 
 <script>
     import moment from 'moment';
 
-
-
     export default {
-        data() {
-            return {
-                bugsLink: 'https://docs.google.com/spreadsheets/d/1XS8YiWqcgHokWDhwznSKFyYC5F9oPuH3/edit?usp=sharing&ouid=113711131617140508701&rtpof=true&sd=true'
-            }
-        },
-
         methods: {
             logout() {
                 this.$store.commit('logout');
                 this.$router.push('/login');
             },
             getProfileAvatar(){
-                this.currentUserAvatar = "images/avatars/" + this.$store.state.currentUser.avatar;
+                this.currentUserAvatar = "storage/images/avatars/" + this.$store.state.currentUser.avatar;
 
                 return this.currentUserAvatar;
             },
@@ -189,6 +164,10 @@
         margin-top: 0.25rem;
         margin-bottom: 0.25rem;
         border-color: #254F5D !important;
+    }
+
+    .white--text {
+        color: #fff !important;
     }
 
     .myLink {

@@ -60,8 +60,8 @@ class ParticipantsExport implements fromCollection,
     public function properties(): array
     {
         return [
-            'creator' => 'Interface3.Namur',
-            'lastModifiedBy' => 'Interface3.Namur',
+            'creator' => 'FormaCube',
+            'lastModifiedBy' => 'FormaCube',
             'title' => $this->formation->nom . ' - Liste des participants',
             'description' => 'Liste des participants à la formation' . $this->formation->nom,
             'subject' => 'Formation',
@@ -96,7 +96,6 @@ class ParticipantsExport implements fromCollection,
             $inscrit->prenom,
             $inscrit->rue . ' ' . $inscrit->numero . $inscrit->boite . ', ' . $inscrit->ville->code_postal . ' ' . $inscrit->ville->ville,
             '',
-            '',
             $inscrit->email,
         ];
     }
@@ -110,8 +109,7 @@ class ParticipantsExport implements fromCollection,
             'NOM',
             'PRENOM',
             'ADRESSE',
-            'Nbre de KM domicile à IF3N',
-            'Droit à l\'image',
+            'Nbre de KM depuis domicile',
             'Email',
         ];
     }
@@ -122,26 +120,16 @@ class ParticipantsExport implements fromCollection,
      */
     public function drawings(): array
     {
-        $formation = $this->formation->pouvsub()->get()->first();
+        $formation = $this->formation->get()->first();
 
         $drawingLogoIf3n = new Drawing();
-        $drawingLogoIf3n->setName('logo-if3n');
-        $drawingLogoIf3n->setDescription('logo Interface3.Namur');
-        $drawingLogoIf3n->setPath(public_path("images/Interface3-logo.png"));
+        $drawingLogoIf3n->setName('logo-FormaCube');
+        $drawingLogoIf3n->setDescription('logo FormaCube');
+        $drawingLogoIf3n->setPath(public_path("storage/images/logos/Logo_FormaCube-Noir-125x25.png"));
         $drawingLogoIf3n->setHeight(60);
         $drawingLogoIf3n->setCoordinates('B2');
 
         $drawings = [$drawingLogoIf3n];
-
-        if($formation->nom != 'Interface3.Namur') {
-            $drawingLogoPouvSub = new Drawing();
-            $drawingLogoPouvSub->setName('logo-pouvoir-subsidiant');
-            $drawingLogoPouvSub->setDescription('logo Pouvoir Subsidiant');
-            $drawingLogoPouvSub->setPath(public_path("images/logos/" . $formation->logo));
-            $drawingLogoPouvSub->setHeight(60);
-            $drawingLogoPouvSub->setCoordinates('F2');
-            array_push($drawings, $drawingLogoPouvSub);
-        }
 
         return $drawings;
     }

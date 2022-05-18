@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <h1>Liste des Inscrits</h1>
-        <div class="row align-items-center mt-2">
+    <div class="container">
+        <h1 class="d-flex align-content-center">Liste des Inscrits</h1>
+        <div class="row align-items-center mt-n2">
             <div class="col-lg-4">
                 <div class="btn-wrapper">
                     <router-link to="/inscrits/create" class="btn btn-success px-3">
@@ -20,8 +20,10 @@
                 <v-text-field v-model="search" label="Recherche" color="blue-grey darken-4" class="mySearch bg-light" outlined dense hide-details="auto" append-icon="fas fa-search"></v-text-field>
             </div>
         </div>
-        <div v-show="colonne === 'date_naissance'" class="text-red text-right -mt-5 mb-1">
-            Le format de date doit &ecirc;tre : YYYY-MM-JJ
+        <div v-if="colonne === 'date_naissance'" class="d-flex justify-content-end mb-2 ml-16">
+            <div class="font-weight-bold bg-danger text-light text-end px-5 rounded-xl">
+                Le format de date doit &ecirc;tre : YYYY-MM-JJ
+            </div>
         </div>
         <v-simple-table fixed-header>
             <thead class>

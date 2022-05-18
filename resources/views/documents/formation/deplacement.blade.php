@@ -43,24 +43,14 @@
     }
 
     #entete {
-        margin: 0 90px 0 100px;
+        height: 100px;
     }
 
-    .logo {
+    #logo {
         width: 30%;
-    }
-
-    #logo-interface {
         position: relative;
         float: left;
-        margin-top: -35px;
-    }
-
-    #logo-pouvsub {
-        position: relative;
-        float: right;
-        margin-top: -10px;
-        margin-right: -50px;
+        margin-top: -25px;
     }
 
     #container-titre {
@@ -84,7 +74,7 @@
 
     p {
         font-size: 25px;
-        line-height: 23px;
+        line-height: 28px;
         text-align: justify;
     }
 
@@ -115,11 +105,6 @@
     #identite {
         margin-top: 120px;
     }
-
-    .bullet {
-        font-size: 25px;
-        font-weight: bold;
-    }
 </style>
 
 <body>
@@ -127,11 +112,8 @@
         <div class="inscritPage">
             <header>
                 <div id="entete">
-                    <div id="logo-interface">
-                        <img src="./images/Interface3Namur-logo.png" alt="logo-interface3namur" class="logo" >
-                    </div>
-                    <div id="logo-pouvsub">
-                        <img src="{{ './images/logos/' . $pouvsub->logo }}" alt="logo-pouvoir-subsidiant" class="logo">
+                    <div id="logo">
+                        <img src="./storage/images/logos/Logo_FormaCube-Noir-500x100.png" alt="logo-FormaCube">
                     </div>
                 </div>
             </header>
@@ -145,10 +127,9 @@
                 <div id="body-text">
                     <p>Je, soussign&eacute;e, <b>{{ strtoupper($formation->inscrits[$i]->nom) }} {{ $formation->inscrits[$i]->prenom }}</b>, déclare exact le nombre de kilom&egrave;tres s&eacute;parant
                         mon domicile (<b>{{ $formation->inscrits[$i]->rue }}, {{ $formation->inscrits[$i]->numero }} {{ $formation->inscrits[$i]->boite }}
-                            &agrave; {{ $formation->inscrits[$i]->ville->code_postal }} {{ $formation->inscrits[$i]->ville->ville }}</b>) au lieu de formation «Interface3.Namur»
-                        (Avenue Sergent Vrithoff, 2 - 5000 Namur):</p>
+                            &agrave; {{ $formation->inscrits[$i]->ville->code_postal }} {{ $formation->inscrits[$i]->ville->ville }}</b>) au lieu de formation «FormaCube» :</p>
                     <p>Nombre de kilom&egrave;tres :  . . . . . kms</p>
-                    <p id="compte">Num&eacute;ro de compte bancaire : BE . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</p>
+                    <p id="compte">Num&eacute;ro de compte bancaire : BE . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</p>
 
                 </div>
                 <div id="date">
@@ -159,13 +140,9 @@
                     <p id="certification">« Certifi&eacute; sinc&egrave;re et exact »</p>
                 </div>
                 <div id="identite">
-                    <p>Nom et pr&eacute;nom : . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .</p>
+                    <p>Nom et pr&eacute;nom : . . . . . . . . . . . . . . . . . . . . . . . . . . . .</p>
                 </div>
             </main>
-            <footer>
-                <b>Interface3.Namur</b> <span class="bullet">&#8226;</span> Avenue Sergent Vrithoff, 2 – 5000 Namur <span class="bullet">&#8226;</span> N° d’entreprise BE0870 417226<br />
-                Tél / Fax : 081/63 34 90 <span class="bullet">&#8226;</span> contact@interface3namur.be <span class="bullet">&#8226;</span> www.interface3namur.be
-            </footer>
         </div>
     @endfor
 </body>

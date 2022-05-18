@@ -25,7 +25,7 @@ class CreateFormationsTable extends Migration
             $table->bigInteger('salle_id')->unsigned();
             $table->float('prix')->default(0.00)->nullable();
             $table->text('commentaire_formation')->nullable();
-            $table->string('statut');
+            $table->enum('statut', ['future', 'en cours', 'finie', 'archive']);
             $table->bigInteger('user_id')->unsigned();
             $table->string('abreviation', 15);
             $table->integer('duree_rgpd');

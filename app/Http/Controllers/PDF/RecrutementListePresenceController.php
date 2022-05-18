@@ -17,7 +17,6 @@ class RecrutementListePresenceController extends Controller
     public function index($id) {
         $recrutement = Recrutement::find($id);
         $formation = Formation::where('id', $recrutement->formation_id)->get()->first();
-        $pouvsub = Pouvsub::where('id', $formation->pouvsub_id)->get()->first();
         $listCandidats = RecrutementInscrit::where('recrutement_id', $recrutement->id)->get()->all();
         $candidats= [];
 
@@ -34,7 +33,7 @@ class RecrutementListePresenceController extends Controller
 
         usort($candidats, build_sorter('nom'));
 
-        $pdf = PDF::loadView('documents.recrutement.presences', compact('recrutement', 'formation', 'pouvsub', 'candidats'));
+        $pdf = PDF::loadView('documents.recrutement.presences', compact('recrutement', 'formation', 'candidats'));
         $date = $recrutement->date;
         $name = $date . '_recrutement-liste-presence.pdf';
 

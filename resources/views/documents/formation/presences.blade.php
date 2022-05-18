@@ -9,30 +9,20 @@
     }
 
     #entete {
-        height: 125px;
+        height: 100px;
     }
 
-    .logo {
+    #logo {
         width: 30%;
-    }
-
-    #logo-interface {
         position: relative;
         float: left;
         margin-top: -25px;
     }
 
-    #logo-pouvsub {
-        position: relative;
-        float: right;
-        margin-top: -25px;
-        margin-right: -50px;
-    }
-
     h3 {
         width: 100vw;
         height: 50px;
-        margin: 5px 0 -40px 0;
+        margin: 0;
         padding: 0;
         font-family: 'blogger', sans-serif !important;
         font-weight: bold;
@@ -118,7 +108,7 @@
     }
 
     .th-stagiaires {
-        height: 40px;
+        height: 55px;
     }
 
     #nom-prenom-stagiaire {
@@ -127,7 +117,7 @@
     }
 
     .th-formateur {
-        height: 30px;
+        height: 40px;
     }
 
     #formateur-signature {
@@ -138,11 +128,8 @@
 
 <body>
     <div id="entete">
-        <div id="logo-interface">
-            <img src="./images/Interface3-logo.png" alt="logo-interface3namur" class="logo" >
-        </div>
-        <div id="logo-pouvsub">
-            <img src="{{ './images/logos/' . $pouvsub->logo }}" alt="logo-pouvoir-subsidiant" class="logo">
+        <div id="logo">
+            <img src="./storage/images/logos/Logo_FormaCube-Noir-500x100.png" alt="logo-FormaCube">
         </div>
     </div>
     <h3>Présences "{{ $formation->nom }}"</h3>

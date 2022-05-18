@@ -1,23 +1,20 @@
 <template>
-    <div>
-        <h1 class="ml-5 mb-n2">
-            <a @click="goBack">
-                <button class="btn btn-light mt-n2">
-                    <i class="fas fa-reply fa-lg text-interface"></i>
-                </button>
-            </a>
+    <div class="container">
+        <h1 class="d-flex align-content-center">
+            <button class="btn btn-light pb-2 mr-2" @click="goBack">
+                <i class="fas fa-reply fa-lg text-primary-dark"></i>
+            </button>
             Fiche d'inscrit<span v-show="inscrit.genre === 'femme'">e</span>
         </h1>
-        <v-row justify="center" class="mb-n3" v-show="loading === true">
-            <v-col cols="12">
-                <v-card class="mx-auto" shaped>
+        <div class="row mt-2" v-if="loading === true">
+            <v-card class="mx-auto w-100" shaped>
                     <v-card-text class="p-3 ml-2">
                         <v-row class="mt-n2">
                             <div class="col-11 d-flex align-items-start">
                                 <v-avatar class="mt-4 ml-3 mr-1">
-                                    <img v-show="inscrit.genre === 'homme'" :src="'images/avatars/man.png'" class="img-circle elevation-2" alt="avatar">
-                                    <img v-show="inscrit.genre === 'femme'" :src="'images/avatars/woman.png'" class="img-circle elevation-2" alt="avatar">
-                                    <img v-show="inscrit.genre === '3e genre' || inscrit.genre === null" :src="'images/avatars/user.png'" class="img-circle elevation-2" alt="avatar">
+                                    <img v-show="inscrit.genre === 'homme'" :src="'storage/images/avatars/man.png'" class="img-circle elevation-2" alt="avatar">
+                                    <img v-show="inscrit.genre === 'femme'" :src="'storage/images/avatars/woman.png'" class="img-circle elevation-2" alt="avatar">
+                                    <img v-show="inscrit.genre === '3e genre' || inscrit.genre === null" :src="'storage/images/avatars/user.png'" class="img-circle elevation-2" alt="avatar">
                                 </v-avatar>
                                 <div class="col-lg-10">
                                     <span class="display-1 text--primary font-weight-bold">
@@ -75,49 +72,6 @@
                                 <span id="vertical-line"></span>
                             </v-col>
                             <v-col class="pb-0">
-                                <strong>AGE :</strong> <span v-if="inscrit.age != null">{{ inscrit.age }} ans</span><span v-else class="no-information">Non renseigné</span><br>
-                                <div v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
-                                    <strong>N° NATIONAL :</strong> <span v-if="inscrit.num_national != null">{{ inscrit.num_national }}</span><span v-else class="no-information">Non renseigné</span><br>
-                                    <strong>STATUT L&Eacute;GAL :</strong> <span v-if="inscrit.statut_legal != null">{{ inscrit.statut_legal }}</span><span v-else class="no-information">Non renseigné</span><br>
-                                    <strong>DIPL&Ocirc;ME :</strong> <span v-if="inscrit.diplome != null">{{ inscrit.diplome }}</span><span v-else class="no-information">Non renseigné</span><br>
-                                    <strong>CH&Ocirc;MAGE :</strong>
-                                        <span v-show="inscrit.duree_chomage === 'aucun'">Pas de ch&ocirc;mage</span>
-                                        <span v-show="inscrit.duree_chomage === '-1an'">-1an</span>
-                                        <span v-show="inscrit.duree_chomage === '1-2ans'">Entre 1 et 2an(s)</span>
-                                        <span v-show="inscrit.duree_chomage === '+2ans'">+2ans</span>
-                                        <span v-show="inscrit.duree_chomage == null" class="no-information">Non renseigné</span><br>
-                                    <strong>GROUPE SOCIAL :</strong> <span v-if="inscrit.groupe_social != null">Probl&eacute;matique {{ inscrit.groupe_social }}</span><span v-else class="no-information">Non renseigné</span><br>
-                                    <strong>SOURCE INFO  :</strong> <span v-if="inscrit.source_info != null">{{ inscrit.source_info }}</span><span v-else class="no-information">Non renseigné</span><br>
-                                </div>
-                            </v-col>
-                        </v-row>
-                        <v-row>
-                            <v-col>
-                                <hr>
-                            </v-col>
-                        </v-row>
-                        <v-row class="ml-2 mt-n5 mb-n2">
-                            <v-col cols="8">
-                                <div class="mb-3">
-                                    <strong>FORMATION(S) :</strong>
-                                    <ul>
-                                        <li v-if="formations.length === 0" class="no-information">Aucune</li>
-                                        <li v-else v-for="formation in formations" :key="formation.id">
-                                            <span class="font-weight-bold">{{ formation.nom }}</span> <span v-show="formation.session !== null">- {{ formation.session }}</span> du {{ formation.date_debut | newDate}} au {{ formation.date_fin | newDate}}
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div>
-                                    <strong>RECRUTEMENT(S) :</strong>
-                                    <ul>
-                                        <li v-if="recrutements.length === 0" class="no-information">Aucun</li>
-                                        <li v-else v-for="(item, index) in recrutements" :key="index">
-                                            <span class="font-weight-bold">Recrutement du {{ item.date | newDate }}</span> pour la formation <span class="font-weight-bold">{{ item.formation_nom }}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </v-col>
-                            <v-col cols="4">
                                 <h6>Centre(s) d'int&eacute;r&ecirc;t :</h6>
                                 <div v-if="tags.length === 0" class="ml-2 mt-n2 no-information">Aucun</div>
                                 <div v-else class="mt-n2 ml-n4">
@@ -131,161 +85,176 @@
                                 </div>
                             </v-col>
                         </v-row>
+                        <v-row>
+                            <v-col>
+                                <hr>
+                            </v-col>
+                        </v-row>
+                        <v-row class="ml-2 mt-n3 mb-n2">
+                            <v-col>
+                                <strong>FORMATION(S) :</strong>
+                                <ul>
+                                    <li v-if="formations.length === 0" class="no-information">Aucune</li>
+                                    <li v-else v-for="formation in formations" :key="formation.id">
+                                        <span class="font-weight-bold">{{ formation.nom }}</span> <span v-show="formation.session !== null">- {{ formation.session }}</span> du {{ formation.date_debut | newDate}} au {{ formation.date_fin | newDate}}
+                                    </li>
+                                </ul>
+                            </v-col>
+                            <v-col>
+                                <strong>RECRUTEMENT(S) :</strong>
+                                <ul>
+                                    <li v-if="recrutements.length === 0" class="no-information">Aucun</li>
+                                    <li v-else v-for="(item, index) in recrutements" :key="index">
+                                        <span class="font-weight-bold">Recrutement du {{ item.date | newDate }}</span> pour la formation <span class="font-weight-bold">{{ item.formation_nom }}</span>
+                                    </li>
+                                </ul>
+                            </v-col>
+                        </v-row>
                     </v-card-text>
                 </v-card>
-            </v-col>
-        </v-row>
-        <v-row class="mb-n5" v-show="loading === true">
-            <v-col>
-                <v-tabs class="elevation-2" dark>
-                    <v-tabs-slider></v-tabs-slider>
-                    <v-tab href="#historique">Historique</v-tab>
-                    <v-tab href="#ajoutStagiaire">Inscrire à une formation</v-tab>
-                    <v-tab href="#ajoutCandidat">Inscrire à un recrutement</v-tab>
-                    <v-tab href="#tags">Tags</v-tab>
-                    <v-tab-item value="historique">
-                        <v-card flat tile>
-                            <v-card-text>
-                                <v-row class="ml-3 mt-n3" v-if="loadingData === true">
-                                    <v-col cols="12">
-                                        <ul>
-                                            <li v-for="log in logs" :key="log.id">
-                                                <span v-if="log.creation === 1"><strong>{{ log.date | newDate }} : {{ log.informations }} par {{ log.user }}</strong></span>
-                                                <span v-else>{{ log.date | newDate }} : {{ log.informations }} par {{ log.user }}</span>
-                                            </li>
-                                        </ul>
-                                    </v-col>
-                                </v-row>
-                                <v-row v-else class="text-center text-interface">
-                                    <v-col class="d-flex flex-column justify-center align-center">
-                                        <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
-                                        <span class="mt-5">Chargement...</span>
-                                    </v-col>
-                                </v-row>
-                            </v-card-text>
-                        </v-card>
-                    </v-tab-item>
-                    <v-tab-item value="ajoutStagiaire">
-                        <v-card flat tile>
-                            <v-card-text class="mb-n3">
-                                <v-row class="mt-n3 mb-n5" v-if="listFormations != null">
-                                    <v-col cols="10">
-                                        <b-form-group>
-                                            <b-form-select v-model="choix_formation" id="choix_formation" :state="validationFormation">
-                                                <b-form-select-option :value="null">Choisissez une formation...</b-form-select-option>
-                                                <b-form-select-option v-for="(formation, index) in listFormations" :key="formation.id" :value="formation.id" :disabled="nbreStagiaires[index][0] === nbreStagiaires[index][1]">
-                                                    {{ formation.nom }}
-                                                    <span v-show="formation.session !== null"> - {{ formation.session }} </span>
-                                                    <span> débutant le {{ formation.date_debut | newDate }} - {{ nbreStagiaires[index][0] }} stagiaires</span>
-                                                    <span v-if="nbreStagiaires[index][0] === nbreStagiaires[index][1]"> - complet</span>
-                                                </b-form-select-option>
-                                            </b-form-select>
-                                        </b-form-group>
-                                    </v-col>
-                                    <v-col cols="2">
-                                        <button type="submit" class="btn btn-success" @click.prevent="checkFormation()">Inscrire</button>
-                                    </v-col>
-                                </v-row>
-                                <v-row v-else>
-                                    <v-col cols="10">
-                                        <div class="alert alert-danger" role="alert">
-                                            Aucune future formation prévue.
-                                        </div>
-                                    </v-col>
-                                </v-row>
-                            </v-card-text>
-                        </v-card>
-                    </v-tab-item>
-                    <v-tab-item value="ajoutCandidat">
-                        <v-card flat tile>
-                            <v-card-text class="mb-n3">
-                                <v-row class="mt-n3 mb-n5" v-if="listRecrutements != null">
-                                    <v-col cols="10">
-                                        <b-form-group>
-                                            <b-form-select v-model="choix_recrutement" id="choix_recrutement" :state="validationRecrutement">
-                                                <b-form-select-option :value="null">Choisissez un recrutement...</b-form-select-option>
-                                                <b-form-select-option v-for="recrutement in listRecrutements" :key="recrutement.id" :value="recrutement.id">
-                                                    {{ recrutement.date | newDate}} - pour la formation : {{ recrutement.formation}}
-                                                </b-form-select-option>
-                                            </b-form-select>
-                                        </b-form-group>
-                                    </v-col>
-                                    <v-col cols="2">
-                                        <button type="submit" class="btn btn-success" @click.prevent="checkRecrutement()">Inscrire</button>
-                                    </v-col>
-                                </v-row>
-                                <v-row v-else>
-                                    <v-col cols="10">
-                                        <div class="alert alert-danger" role="alert">
-                                            Aucune futur recrutement prévu.
-                                        </div>
-                                    </v-col>
-                                </v-row>
-                            </v-card-text>
-                        </v-card>
-                    </v-tab-item>
-                    <v-tab-item value="tags">
-                        <div class="container p-4">
-                            <div class="row">
-                                <div class="col">
-                                    <b-form-group label="Sélectionnez les centres d'intérêt dans la liste déroulante">
-                                        <b-form-tags input-id="tags" v-model="inscritTags" size="lg" add-on-change no-outer-focus>
-                                            <template v-slot="{ tags, inputAttrs, inputHandlers, disabled, removeTag }">
-                                                <ul v-if="tags.length > 0" class="list-inline d-inline-block">
-                                                    <li v-for="tag in tags" :key="tag" class="list-inline-item">
-                                                        <b-form-tag
-                                                            @remove="removeTag(tag)"
-                                                            :title="tag"
-                                                            :disabled="disabled"
-                                                            variant="success"
-                                                        >{{ tag }}</b-form-tag>
-                                                    </li>
-                                                </ul>
-                                                <b-form-select v-bind="inputAttrs" v-on="inputHandlers" class="mt-3">
-                                                    <template v-slot:first>
-                                                        <!-- This is required to prevent bugs with Safari -->
-                                                        <option disabled value="">Choisissez un tag...</option>
-                                                        <option v-for="tag in listTags" :key="tag.id" :value="tag.tag">{{ tag.tag }}</option>
-                                                    </template>
-                                                </b-form-select>
-                                            </template>
-                                        </b-form-tags>
+            <v-tabs class="w-100 elevation-2 mt-2 mb-5" dark>
+                <v-tabs-slider></v-tabs-slider>
+                <v-tab href="#historique">Historique</v-tab>
+                <v-tab href="#ajoutStagiaire">Inscrire à une formation</v-tab>
+                <v-tab href="#ajoutCandidat">Inscrire à un recrutement</v-tab>
+                <v-tab href="#tags">Tags</v-tab>
+                <v-tab-item value="historique">
+                    <v-card flat tile>
+                        <v-card-text>
+                            <v-row class="ml-3 mt-n3" v-if="loadingData === true">
+                                <v-col cols="12">
+                                    <ul>
+                                        <li v-for="log in logs" :key="log.id">
+                                            <span v-if="log.creation === 1"><strong>{{ log.date | newDate }} : {{ log.informations }} par {{ log.user }}</strong></span>
+                                            <span v-else>{{ log.date | newDate }} : {{ log.informations }} par {{ log.user }}</span>
+                                        </li>
+                                    </ul>
+                                </v-col>
+                            </v-row>
+                            <v-row v-else class="text-center text-interface">
+                                <v-col class="d-flex flex-column justify-center align-center">
+                                    <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
+                                    <span class="mt-5">Chargement...</span>
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+                    </v-card>
+                </v-tab-item>
+                <v-tab-item value="ajoutStagiaire">
+                    <v-card flat tile>
+                        <v-card-text class="mb-n3">
+                            <v-row class="mt-n3 mb-n5" v-if="listFormations != null">
+                                <v-col cols="10">
+                                    <b-form-group>
+                                        <b-form-select v-model="choix_formation" id="choix_formation" :state="validationFormation">
+                                            <b-form-select-option :value="null">Choisissez une formation...</b-form-select-option>
+                                            <b-form-select-option v-for="(formation, index) in listFormations" :key="formation.id" :value="formation.id" :disabled="nbreStagiaires[index][0] === nbreStagiaires[index][1]">
+                                                {{ formation.nom }}
+                                                <span v-show="formation.session !== null"> - {{ formation.session }} </span>
+                                                <span> débutant le {{ formation.date_debut | newDate }} - {{ nbreStagiaires[index][0] }} stagiaires</span>
+                                                <span v-if="nbreStagiaires[index][0] === nbreStagiaires[index][1]"> - complet</span>
+                                            </b-form-select-option>
+                                        </b-form-select>
                                     </b-form-group>
-                                    <v-btn class="btn-success text-light" @click="addTags()">Ajouter les tags</v-btn>
-                                </div>
-                                <div class="col">
-                                    <b-form-group label="Si vous ne trouvez pas le centre d'intérêt dans la liste déroulante, créez-le :">
-                                        <b-form-tags
-                                            input-id="tags"
-                                            v-model="newTags"
-                                            :tag-validator="validator"
-                                            tag-variant="success"
-                                            tag-pills
-                                            size="md"
-                                            separator=",."
-                                            @tag-state="onTagState"
-                                            placeholder="Entrez un new tag séparé d'une virgule ou d'un point"
-                                        ></b-form-tags>
-                                        <template #description>
-                                            <div id="tags-validation-help">
-                                                Un nouveau tag doit être compris entre 3 et 50 caractères.<br>Séparez les nouveaux tags par une virgule ou un point ou appuyez sur Add.
-                                            </div>
+                                </v-col>
+                                <v-col cols="2">
+                                    <button type="submit" class="btn btn-success" @click.prevent="checkFormation()">Inscrire</button>
+                                </v-col>
+                            </v-row>
+                            <v-row v-else>
+                                <v-col cols="10">
+                                    <div class="alert alert-danger" role="alert">
+                                        Aucune future formation prévue.
+                                    </div>
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+                    </v-card>
+                </v-tab-item>
+                <v-tab-item value="ajoutCandidat">
+                    <v-card flat tile>
+                        <v-card-text class="mb-n3">
+                            <v-row class="mt-n3 mb-n5" v-if="listRecrutements != null">
+                                <v-col cols="10">
+                                    <b-form-group>
+                                        <b-form-select v-model="choix_recrutement" id="choix_recrutement" :state="validationRecrutement">
+                                            <b-form-select-option :value="null">Choisissez un recrutement...</b-form-select-option>
+                                            <b-form-select-option v-for="recrutement in listRecrutements" :key="recrutement.id" :value="recrutement.id">
+                                                {{ recrutement.date | newDate}} - pour la formation : {{ recrutement.formation}}
+                                            </b-form-select-option>
+                                        </b-form-select>
+                                    </b-form-group>
+                                </v-col>
+                                <v-col cols="2">
+                                    <button type="submit" class="btn btn-success" @click.prevent="checkRecrutement()">Inscrire</button>
+                                </v-col>
+                            </v-row>
+                            <v-row v-else>
+                                <v-col cols="10">
+                                    <div class="alert alert-danger" role="alert">
+                                        Aucune futur recrutement prévu.
+                                    </div>
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+                    </v-card>
+                </v-tab-item>
+                <v-tab-item value="tags">
+                    <div class="container p-4">
+                        <div class="row">
+                            <div class="col">
+                                <b-form-group label="Sélectionnez les centres d'intérêt dans la liste déroulante">
+                                    <b-form-tags input-id="tags" v-model="inscritTags" size="lg" add-on-change no-outer-focus>
+                                        <template v-slot="{ tags, inputAttrs, inputHandlers, disabled, removeTag }">
+                                            <ul v-if="tags.length > 0" class="list-inline d-inline-block">
+                                                <li v-for="tag in tags" :key="tag" class="list-inline-item">
+                                                    <b-form-tag
+                                                        @remove="removeTag(tag)"
+                                                        :title="tag"
+                                                        :disabled="disabled"
+                                                        variant="success"
+                                                    >{{ tag }}</b-form-tag>
+                                                </li>
+                                            </ul>
+                                            <b-form-select v-bind="inputAttrs" v-on="inputHandlers" class="mt-3">
+                                                <template v-slot:first>
+                                                    <!-- This is required to prevent bugs with Safari -->
+                                                    <option disabled value="">Choisissez un tag...</option>
+                                                    <option v-for="tag in listTags" :key="tag.id" :value="tag.tag">{{ tag.tag }}</option>
+                                                </template>
+                                            </b-form-select>
                                         </template>
-                                    </b-form-group>
-                                    <v-btn class="btn-interface text-light" @click="createTags()">Créer les tags</v-btn>
-                                </div>
+                                    </b-form-tags>
+                                </b-form-group>
+                                <v-btn class="btn-success text-light" @click="addTags()">Ajouter les tags</v-btn>
+                            </div>
+                            <div class="col">
+                                <b-form-group label="Si vous ne trouvez pas le centre d'intérêt dans la liste déroulante, créez-le :">
+                                    <b-form-tags
+                                        input-id="tags"
+                                        v-model="newTags"
+                                        :tag-validator="validator"
+                                        tag-variant="success"
+                                        tag-pills
+                                        size="md"
+                                        separator=",."
+                                        @tag-state="onTagState"
+                                        placeholder="Entrez un new tag séparé d'une virgule ou d'un point"
+                                    ></b-form-tags>
+                                    <template #description>
+                                        <div id="tags-validation-help">
+                                            Un nouveau tag doit être compris entre 3 et 50 caractères.<br>Séparez les nouveaux tags par une virgule ou un point ou appuyez sur Add.
+                                        </div>
+                                    </template>
+                                </b-form-group>
+                                <v-btn class="btn-primary" @click="createTags()">Créer les tags</v-btn>
                             </div>
                         </div>
-                    </v-tab-item>
-                </v-tabs>
-            </v-col>
-        </v-row>
-        <v-row v-show="loading === false" class="text-center text-light mt-10">
-            <v-col class="d-flex flex-column justify-center align-center">
-                <v-progress-circular :size="70" :width="10" color="white" indeterminate></v-progress-circular>
-                <span class="mt-5">Chargement...</span>
-            </v-col>
-        </v-row>
+                    </div>
+                </v-tab-item>
+            </v-tabs>
+        </div>
+        <Spinner v-else />
     </div>
 </template>
 
@@ -293,9 +262,13 @@
     import moment from 'moment';
     import {Form} from "vform";
     import MailtoUI from 'mailtoui/dist/mailtoui-min.js';
+    import Spinner from "../../elements/Spinner";
 
     export default {
-        name: "Show-Inscrit",
+        name: "ShowInscrit",
+        components: {
+            Spinner,
+        },
         data() {
             return {
                 loading: false,
@@ -545,15 +518,16 @@
                     .post('api/tags/create')
                     .then(response => {
                         if (this.formTag.successful) {
-                            this.$Progress.finish();
                             Toast.fire('Tag(s) créé(s)');
                             this.getListTags();
+                            this.inscritTags.push(this.formTag.tag);
                             this.newTags = [];
+                            this.$Progress.finish();
                         }
                     })
                     .catch(error => {
                         this.$Progress.fail();
-                        console.log(error.response);
+                        console.error(error.response);
                         Snackbar.fire('Problème avec la création de tags');
                     })
             },

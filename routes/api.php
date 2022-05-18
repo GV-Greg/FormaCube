@@ -19,6 +19,8 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
     /*  Gestion des utilisateurs  */
     Route::prefix('users')->group( function() {
         Route::get('', 'UsersController@all');
+        Route::get('/tuteurs', 'UsersController@tuteurs');
+        Route::get('/admins', 'UsersController@admins');
         Route::get('/archives', 'UsersController@archives');
         Route::post('/create', 'UsersController@new');
         Route::get('/edit/{id}', 'UsersController@edit');
@@ -27,6 +29,9 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
         Route::get('/{id}', 'UsersController@show');
         Route::delete('/{id}', 'UsersController@destroy');
     });
+    /*  Recherche pour les salles  */
+    Route::get('search/users/{colonne}/{search}', 'UsersController@search');
+    Route::get('search/users/archives/{colonne}/{search}', 'UsersController@searchArchives');
 
     /*  Gestion des salles  */
     Route::prefix('salles')->group( function() {
@@ -43,8 +48,6 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
     Route::prefix('formations')->group( function() {
         Route::get('', 'API\FormationController@index')->name('formations.index');
         Route::get('/all', 'API\FormationController@all')->name('formations.all');
-        Route::get('/all-pmtic', 'API\FormationController@all_pmtic')->name('formations.all_pmtic');
-        Route::get('/all-not-pmtic', 'API\FormationController@all_not_pmtic')->name('formations.all_not_pmtic');
         Route::get('/others/{id}', 'API\FormationController@others')->name('formations.others');
         Route::get('/latest', 'API\FormationController@latest')->name('formations.latest');
         Route::post('/create', 'API\FormationController@store')->name('formations.store');
@@ -133,6 +136,5 @@ Route::group(['middelware' => 'jwt.auth'], function ($router) {
     /* Exports de fichiers excel */
     Route::prefix('excel')->group( function() {
         Route::get('/formation-participants/{id}', 'API\ExportsExcelController@formationListeParticipants')->name('excel.formation.participants');
-        Route::get('/suivi-stagiaires/{id}', 'API\ExportsExcelController@formationSuiviStagiaires')->name('excel.formation.suivi');
     });
 });

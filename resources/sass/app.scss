@@ -30,42 +30,64 @@ $fa-font-path: "../webfonts";
 body {
     margin: 0;
     padding: 0;
-    height: auto;
+    height: 100vh;
+    width: 100vw;
     font-family: Gadugi, sans-serif;
-    background-color: #3B424A;
+    background-color: $bg-color;
+    color: $text-light;
+
+    #app {
+        height: 100vh;
+        width: 100vw;
+    }
 }
 
-body {
-    color: #fff;
+.bg-light {
+    background-color: $bg-light;
 }
 
-h1, h2 {
-    color: #fff;
-    padding-top: 5px;
+.bg-dark {
+    background-color: $bg-dark;
+}
+
+.text-light {
+    color: $text-light;
+}
+
+.text-primary-light {
+    color: $text-color-primary-light;
+}
+
+.text-primary-dark {
+    color: $text-color-primary-dark;
+}
+
+.text-secondary {
+    color: $text-color-secondary;
+}
+
+h1 {
+    font-weight: bolder;
 }
 
 table th, table td {
     color: #3b424a;
 }
 
-.v-application a {
-    color: #fff !important;
-}
-
-.v-application a:hover {
-    color: #1976d2 !important;
-}
-
-.link-interface {
-    color: #254F5D !important;
-}
-
-.link-interface:hover {
-    color: #1976d2 !important;
+.theme--light.v-application {
+    background-color: $bg-color;
 }
 
 a:link {
-    text-decoration:none;
+    text-decoration:none !important;
+}
+
+.v-application a {
+    color: $text-link;
+}
+
+.v-application a:hover {
+    color: $text-color-primary-light;
 }
 
 .content-wrapper {
@@ -80,22 +102,16 @@ a:link {
 }
 
 .router-link-exact-active {
-    color: #fff !important;
+    color: $color-white !important;
 }
 
-.theme--light.v-data-table.v-data-table--fixed-header thead th{
-    background-color: #193340 !important;
-    color: #fff !important;
-    height: 35px !important;
-}
-
-.v-data-table th, .v-data-table td{
-    height: 40px !important;
+.rounded-xl {
+    border-radius: 45px;
 }
 
 .modal-header {
     margin-right: -1px;
-    background-color: #317283;
+    background-color: $color-primary-light;
 }
 
 .modal-header .modal-title, .modal-header .close {
@@ -106,11 +122,11 @@ a:link {
     margin: 0;
     padding: 0;
     height: 30px;
-    background-color: #254F5D;
+    background-color: $bg-dark;
 }
 
 .main-footer a:hover{
-    color: #317283;
+    color: $color-primary-light;
     text-decoration: none;
 }
 
@@ -128,23 +144,23 @@ a:link {
 }
 
 .theme--light.v-footer {
-    background-color: #193340 !important;
+    background-color: $bg-dark !important;
 }
 
 // Custom SideBar
 .theme--light.v-navigation-drawer {
-    background-color: #193340;
+    background-color: $bg-dark;
     max-height: 100% !important;
 }
 
 .theme--light.v-navigation-drawer > .v-navigation-drawer__append > .v-list > .v-list-item,
 .theme--light.v-navigation-drawer > .v-navigation-drawer__content > .v-list > .v-list-item {
-    color: #fff !important;
+    color: $color-white !important;
 }
 
 .theme--light.v-navigation-drawer > .v-navigation-drawer__append > .v-list > .v-list-item--active,
 .theme--light.v-navigation-drawer > .v-navigation-drawer__content > .v-list > .v-list-item--active {
-    color: #5cdffd !important;
+    color: $text-color-primary-light !important;
 }
 
 .v-avatar {
@@ -158,56 +174,134 @@ a:link {
     margin-top: 10px;
 }
 
-.btn-interface {
-    background-image: linear-gradient(#32909e, #2c6c7a 50%, #254F5D);
+.btn-success, .btn-danger, .btn-primary {
     background-repeat: no-repeat;
     -webkit-filter: none;
     filter: none;
-    border: 1px solid $interface;
+    font-weight: bold;
+    color: $text-light !important;
+}
+
+.btn-primary {
+    background-image: linear-gradient(#32909e, #2c6c7a 50%, #254F5D);
+    border: 1px solid $color-primary-light;
+}
+
+.btn-success:hover, .btn-danger:hover {
+    color: $text-color-primary-dark !important;
+}
+
+.btn-primary:hover {
+    color: $text-color-secondary !important;
+}
+
+.link-light {
+    color: $text-light !important;
+}
+
+.link-light:hover {
+    color: $text-color-primary-dark !important;
+}
+
+.link-color {
+    color: $text-color-secondary !important;
+}
+
+.link-light:hover {
+    color: $text-color-primary-dark !important;
 }
 
 // Tabs
 .theme--dark.v-tabs > .v-tabs-bar {
-    background-color: #193340 !important;
+    background-color: $bg-dark !important;
+}
+
+// Custom Tabs Accueil
+.v-application a.v-tab {
+    color: $text-color-primary-light !important;
+}
+
+.v-application a.v-tab:hover {
+    color: $text-color-secondary !important;
+}
+
+.v-application a.v-tab--active {
+    color: $text-color-secondary !important;
+}
+
+// Custome tableau
+.theme--light.v-data-table.v-data-table--fixed-header thead th{
+    background-color: $bg-dark !important;
+    color: #f8fafc !important;
+    height: 35px !important;
+}
+
+.v-data-table th, .v-data-table td{
+    height: 40px !important;
 }
 
 // Custom Formulaire
+.form-control::placeholder {
+    color: rgba(0,0,0,.6) !important;
+}
 .error--text {
     color: #e3342f !important;
 }
 
+.text-champs-obligatoires {
+    font-weight: lighter;
+    font-style: italic;
+}
+
 .theme--light.v-icon {
-    color: #317283;
+    color: $text-color-primary-light;
+}
+
+.input-group-prepend > .input-group-text {
+    color: $text-color-primary-dark;
+    font-weight: bold;
+}
+
+.input-group-append > .input-group-text {
+    border-top-right-radius: .25rem !important;
+    border-bottom-right-radius: .25rem !important;
+}
+
+.invalid-feedback {
+    text-align: center;
+}
+
+#dates_recrutement > .v-input > .v-input__control > .v-input__slot > .v-select__slot > .v-label  {
+    top: 2px !important;
 }
 
 // Custom Formulaire Login
-.myFormEmail, .myFormPassword {
+.v-form {
     border-radius: 20px !important;
 }
 
-.myFormEmail > .v-input__control > .v-input__slot > .v-input__prepend-inner,
-.myFormPassword > .v-input__control > .v-input__slot > .v-input__prepend-inner{
+.v-form > .v-input__control > .v-input__slot > .v-input__prepend-inner{
     margin-right: 10px !important;
     padding-left: 3px;
 }
 
-.myFormEmail > .v-input__control > .v-input__slot > fieldset > legend {
+.v-form-email > .v-input__control > .v-input__slot > fieldset > legend {
     margin-left: 20px !important;
 }
 
-.myFormPassword > .v-input__control > .v-input__slot > fieldset > legend {
+.v-form-password > .v-input__control > .v-input__slot > fieldset > legend {
     margin-left: 24px !important;
 }
 
-.myFormEmail > .v-input__control > .v-input__slot > .v-text-field__slot > .v-label--active {
+.v-form-email > .v-input__control > .v-input__slot > .v-text-field__slot > .v-label--active {
     transform: translateX(-2px) translateY(-28px) scale(0.75) !important;
 }
 
-.myFormPassword > .v-input__control > .v-input__slot > .v-text-field__slot > .v-label--active {
+.v-form-password > .v-input__control > .v-input__slot > .v-text-field__slot > .v-label--active {
     transform: translateX(-5px) translateY(-28px) scale(0.75) !important;
 }
 
-.myFormPassword > .v-input__control > .v-input__slot > .v-input__append-inner {
+.v-form-password > .v-input__control > .v-input__slot > .v-input__append-inner {
     padding-right: 5px;
 }
 
@@ -215,17 +309,33 @@ a:link {
     margin-bottom: 0 !important;
 }
 
+#form__login {
+    -webkit-animation: formanim 1s; /* Chrome, Safari, Opera */
+    animation: formanim 1s;
+}
+
+/* Chrome, Safari, Opera */
+@-webkit-keyframes formanim {
+    0%   { bottom: -70vh; }
+    100% { bottom: 0; }
+}
+
+@keyframes formanim {
+    0%   { bottom: -70vh; }
+    100% { bottom: 0; }
+}
+
 // Custom Formulaires
-.myLabel> .v-input__control > .v-input__slot > .v-label {
+.myLabel > .v-input__control > .v-input__slot > .v-label {
     margin-bottom: 0 !important;
 }
 
-.myLabel{
+.myLabel {
     margin-top: 4px !important;
 }
 
 ::placeholder {
-    color: #bdc5cf !important;
+    color: $text-light !important;
 }
 
 // Custom Search
@@ -238,6 +348,10 @@ a:link {
 }
 
 // Custom Stepper
+.v-stepper {
+
+}
+
 .v-stepper,
 .v-stepper__items,
 .theme--light.v-stepper .v-stepper__items .v-stepper__content .v-stepper__wrapper {
@@ -245,7 +359,7 @@ a:link {
 }
 
 .v-stepper__header {
-    background-color: #317283;
+    background-color: $bg-dark;
 }
 
 .theme--light.v-stepper .v-stepper__label {
@@ -253,24 +367,32 @@ a:link {
 }
 
 .theme--light.v-stepper .v-stepper__step--active .v-stepper__label {
-    color: rgba(255, 255, 255, 1);
+    color: $text-light;
 }
 
 .theme--light.v-stepper .v-stepper__step--active .v-stepper__step__step,
 .theme--light.v-stepper .v-stepper__step--complete .v-stepper__step__step, {
-    background-color: #5cdffd !important;
-    border-color: #5cdffd !important;
-    color: #193340 !important;
+    background-color: $bg-color !important;
+    border-color: $color-primary-light !important;
+    color: $text-color-primary-dark !important;
     font-weight: bolder;
+}
+
+.theme--light.v-stepper .v-stepper__step--complete .v-stepper__label {
+    color: $text-color-primary-light !important;
 }
 
 .theme--light.v-stepper .v-stepper__header .v-divider {
     border-color: rgba(255, 255, 255, 0.38);
 }
 
+.v-stepper__label {
+    margin-left: 10px;
+}
+
 // Custom Pagination
-.page-link {
-    color: #193340;
+.pagination > li > button {
+    color: $text-color-primary-dark;
 }
 
 // Custom Date Input Without Date Picker
@@ -278,10 +400,21 @@ a:link {
     display: none;
 }
 
-// Custom Tabs Accueil
-.v-application a.v-tab--active {
-    color: #389fad !important;
+.v-btn--active::before {
+    background-color: $bg-color !important;
+    opacity: 1 !important;
 }
+
+// Custom v-speed-dial
+.v-speed-dial__list  > a > .green {
+    background-color: $green !important;
+}
+
+.v-speed-dial__list  > div > .red {
+    background-color: $red !important;
+}
+
+
 
 // Custome tableau
 .no-information {

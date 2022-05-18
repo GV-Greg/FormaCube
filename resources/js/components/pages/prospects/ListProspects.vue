@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <h1>Liste des Prospects</h1>
+    <div class="container">
+        <h1 class="d-flex align-content-center">Liste des Prospects</h1>
         <v-row v-if="loadingPage === true" class="ml-1">
             <v-row class="justify-center mt-2">
                 <v-col cols="2">
@@ -40,11 +40,7 @@
                     <v-btn @click="searchData()">Rechercher</v-btn>
                 </v-col>
                 <v-col cols="3">
-                    <a class="mailtoui btn interface text-light" :href="'mailto:?bcc=' + emails" :class="recherche === false || prospects === null ? 'disabled' : ''">MAILTO</a>
-                    <v-btn color="interface text-light" :disabled="recherche === false || prospects === null">
-                        <download-excel :data="json_data" :fields="json_fields" worksheet="Prospects"
-                                        name="prospects.xlsx">Excel</download-excel>
-                    </v-btn>
+                    <a class="mailtoui btn btn-primary" :href="'mailto:?bcc=' + emails" :class="recherche === false || prospects === null ? 'disabled' : ''">MAILTO</a>
                 </v-col>
             </v-row>
             <v-row class="justify-center mt-1">

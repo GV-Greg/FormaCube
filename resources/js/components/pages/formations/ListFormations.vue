@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <h1>Liste des Formations</h1>
-        <div class="row align-items-center mt-2">
+    <div class="container">
+        <h1 class="d-flex align-content-center">Liste des Formations</h1>
+        <div class="row align-items-center mt-n2">
             <div class="col-lg-4" >
                 <div class="btn-wrapper" v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
                     <router-link to="/formations/create" class="btn btn-success px-3">
@@ -21,13 +21,12 @@
             </div>
         </div>
         <v-simple-table fixed-header>
-            <thead class>
+            <thead>
             <tr>
                 <th>N°</th>
                 <th class="text-center">NOM</th>
                 <th style="width:95px;">SESSION</th>
                 <th>TUTEUR·RICE</th>
-                <th style="width:80px;">P. SUBS.</th>
                 <th>DÉBUT</th>
                 <th>FIN</th>
                 <th style="width:115px;">SALLE</th>
@@ -47,9 +46,6 @@
                 </td>
                 <td>
                     {{ formation.tuteur_prenom }}
-                </td>
-                <td>
-                    {{ formation.pouvsub }}
                 </td>
                 <td>
                     {{ formation.date_debut | newDate }}
@@ -98,12 +94,9 @@
             </tr>
             </tbody>
         </v-simple-table>
-        <PaginationComponent class="mt-3"
-                             v-if="pagination.last_page > 1"
-                             :pagination="pagination"
-                             :offset="5"
-                             @paginate="search === '' ? getData() : searchData()"
-        ></PaginationComponent>
+        <PaginationComponent class="mt-3" v-if="pagination.last_page > 1"
+                             :pagination="pagination" :offset="5"
+                             @paginate="search === '' ? getData() : searchData()" />
     </div>
 </template>
 

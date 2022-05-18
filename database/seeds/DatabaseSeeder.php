@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             RecrutementsTableSeeder::class,
             RecrutementInscritTableSeeder::class,
             FormationInscritTableSeeder::class,
+            TagSeeder::class,
         ]);
     }
 }

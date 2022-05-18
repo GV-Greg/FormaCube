@@ -20,7 +20,7 @@ class RecrutementResource extends JsonResource
             'formation' => $this->formation->nom,
             'abreviation' => $this->formation->abreviation,
             'session' => $this->formation->session,
-            'date' => $this->date,
+            'date' => $this->date->format('Y-m-d'),
             'tuteur_prenom' => $this->formation->user['firstname'],
             'tuteur_genre' => $this->formation->user['avatar'],
             'nombreCandidats' => $this->inscrits->count(),

@@ -1,247 +1,231 @@
 <template>
-    <div>
-        <h1 class="ml-5 mb-n2">
-            <a @click="goBack">
-                <button class="btn btn-light mt-n2">
-                    <i class="fas fa-reply fa-lg text-interface"></i>
-                </button>
-            </a>
+    <div class="container">
+        <h1 class="d-flex align-content-center">
+            <button class="btn btn-light pb-2 mr-2" @click="goBack">
+                <i class="fas fa-reply fa-lg text-primary-dark"></i>
+            </button>
             Fiche de Recrutement
         </h1>
-        <v-row justify="center" class="mb-n3" v-if="loading === true">
-            <v-col cols="12">
-                <v-card class="mx-auto" shaped>
-                    <v-card-text class="p-3 ml-2">
-                        <v-row class="mt-n2">
-                            <div class="col-11 d-flex pb-0">
-                                <h4 class="font-weight-bolder">Pour la <router-link :to="{ name: 'showFormation', params: { id: recrutement.formation_id }}" class="myLink">formation {{ recrutement.formation | upperCase }}</router-link></h4><br/>
-                                <span class="mt-2 ml-5">{{ recrutement.session | upperCase }}</span>
-                            </div>
-                            <v-speed-dial class="ml-3 mt-2"
-                                v-model="fab"
-                                :top="top"
-                                :bottom="bottom"
-                                :right="right"
-                                :left="left"
-                                :direction="direction"
-                                :open-on-hover="hover"
-                                :transition="transition"
-                            >
-                                <template v-slot:activator>
-                                    <v-btn v-model="fab" color="darken-2" class="bg-interface" dark fab>
-                                        <v-icon v-if="fab">
-                                            mdi-close
-                                        </v-icon>
-                                        <v-icon v-else>
-                                            mdi-settings
-                                        </v-icon>
-                                    </v-btn>
-                                </template>
-                                <v-btn fab dark small color="green" @click.prevent="editRecrutement()" class="mt-n1">
-                                    <v-icon>mdi-pencil</v-icon>
+        <div class="row mt-2" v-if="loading === true">
+            <v-card class="mx-auto w-100" shaped>
+                <v-card-text class="p-3 ml-2">
+                    <v-row class="mt-n2">
+                        <div class="col-11 d-flex pb-0">
+                            <h3 class="font-weight-bolder">Pour la <router-link :to="{ name: 'showFormation', params: { id: recrutement.formation_id }}" class="myLink">formation {{ recrutement.formation | upperCase }}</router-link></h3><br/>
+                            <span class="mt-2 ml-5">{{ recrutement.session | upperCase }}</span>
+                        </div>
+                        <v-speed-dial class="ml-3 mt-2"
+                            v-model="fab"
+                            :top="top"
+                            :bottom="bottom"
+                            :right="right"
+                            :left="left"
+                            :direction="direction"
+                            :open-on-hover="hover"
+                            :transition="transition"
+                        >
+                            <template v-slot:activator>
+                                <v-btn v-model="fab" color="darken-2" dark fab>
+                                    <v-icon v-if="fab">
+                                        mdi-close
+                                    </v-icon>
+                                    <v-icon v-else>
+                                        mdi-settings
+                                    </v-icon>
                                 </v-btn>
-                                <v-btn fab dark small color="red" @click.prevent="verifRecrutement(recrutement.id)">
-                                    <v-icon>mdi-delete</v-icon>
-                                </v-btn>
-                            </v-speed-dial>
+                            </template>
+                            <v-btn fab dark small color="green" @click.prevent="editRecrutement()" class="mt-n1">
+                                <v-icon>mdi-pencil</v-icon>
+                            </v-btn>
+                            <v-btn fab dark small color="red" @click.prevent="verifRecrutement(recrutement.id)">
+                                <v-icon>mdi-delete</v-icon>
+                            </v-btn>
+                        </v-speed-dial>
+                    </v-row>
+                    <v-row class="mt-n5">
+                        <v-col class="col-11 pt-0">
+                            <span class="mr-5"><i>Création : le {{ recrutement.created_at | newDate }}</i></span>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col class="text-start align-baseline">
+                            <h5>
+                                <i class="fas fa-calendar-day fa-lg text-primary-light mr-2"></i>Date : <span class="font-weight-bolder text-primary-dark">{{ recrutement.date | newDate }}</span>
+                            </h5>
+                        </v-col>
+                        <v-col class="text-start">
+                            <i class="fas fa-user fa-lg text-primary-light ml-1 mr-2"></i>
+                            <span v-if="recrutement.tuteur_genre === 'man.png'">Tuteur : </span>
+                            <span v-show="recrutement.tuteur_genre === 'woman.png'">Tutrice : </span>
+                            <span v-show="recrutement.tuteur_genre === 'user.png'">Tuteur·rice : </span>
+                            <span class="font-weight-bolder text-primary-dark">{{ recrutement.tuteur_prenom }}</span>
+                        </v-col>
+                        <v-col>
+                            <router-link :to="{ name: 'selectionToFormation', params: { id: recrutement.id }}" class="btn btn-primary mt-n2" v-show="date_today >= date_recrutement">
+                                    Sélection des candidats
+                            </router-link>
+                        </v-col>
+                    </v-row>
+                    <div v-if="others_recrutements.length !== 0">
+                        <v-row>
+                            <v-col >
+                                <i>Autres dates de recrutement :</i>
+                            </v-col>
                         </v-row>
                         <v-row class="mt-n5">
-                            <div class="col-11 pt-0">
-                                <span class="mr-5"><i>Création : le {{ recrutement.created_at | newDate }}</i></span>
-                            </div>
-                        </v-row>
-                        <v-row>
-                            <v-col class="text-start align-baseline">
-                                <h5>
-                                    <i class="fas fa-calendar-day fa-lg text-interface mr-2"></i>Date : <span class="font-weight-bolder text-interface">{{ recrutement.date | newDate }}</span>
-                                </h5>
-                            </v-col>
-                            <v-col class="text-start">
-                                <i class="fas fa-user fa-lg text-interface ml-1 mr-2"></i>
-                                <span v-if="recrutement.tuteur_genre === 'man.png'">Tuteur : </span>
-                                <span v-show="recrutement.tuteur_genre === 'woman.png'">Tutrice : </span>
-                                <span v-show="recrutement.tuteur_genre === 'user.png'">Tuteur·rice : </span>
-                                <span class="font-weight-bolder text-interface">{{ recrutement.tuteur_prenom }}</span>
-                            </v-col>
-                            <v-col>
-                                <router-link :to="{ name: 'selectionToFormation', params: { id: recrutement.id }}" class="myLink" v-show="date_today >= date_recrutement">
-                                    <button class="btn btn-interface button-link mt-n2">
-                                        Sélection des candidats
-                                    </button>
+                            <v-col cols="2" v-for="other in others_recrutements" :key="other.id" class="text-start align-baseline">
+                                <router-link :to="{ name: 'showRecrutement', params: { id: other.id }}" class="btn btn-primary">
+                                    <i class="fas fa-calendar-day fa-lg mr-2"></i>Date : <span class="font-weight-bolder">{{ other.date | newDate }}</span>
                                 </router-link>
                             </v-col>
                         </v-row>
-                        <div v-if="others_recrutements.length !== 0">
-                            <v-row>
-                                <v-col >
-                                    <i>Autres dates de recrutement :</i>
-                                </v-col>
-                            </v-row>
-                            <v-row class="mt-n5">
-                                <v-col cols="2" v-for="other in others_recrutements" :key="other.id" class="text-start align-baseline">
-                                    <router-link :to="{ name: 'showRecrutement', params: { id: other.id }}" class="myLink">
-                                        <i class="fas fa-calendar-day fa-lg mr-2"></i>Date : <span class="font-weight-bolder">{{ other.date | newDate }}</span>
-                                    </router-link>
-                                </v-col>
-                            </v-row>
-                        </div>
-                        <div v-else>
-                            <v-row>
-                                <v-col >
-                                    <i>Aucune autre date de recrutement.</i>
-                                </v-col>
-                            </v-row>
-                        </div>
-                        <v-row v-if="candidats.length > 0">
-                            <v-col>
-                                <a class="mailtoui btn btn-interface button-link mt-1" :href="'mailto:?bcc=' + candidatsEmails">Envoyer un mail aux candidats</a>
+                    </div>
+                    <div v-else>
+                        <v-row>
+                            <v-col >
+                                <i>Aucune autre date de recrutement.</i>
                             </v-col>
                         </v-row>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-        <v-row v-else class="text-center text-light mt-10">
-            <v-col class="d-flex flex-column justify-center align-center">
-                <v-progress-circular :size="70" :width="10" color="white" indeterminate></v-progress-circular>
-                <span class="mt-5">Chargement...</span>
-            </v-col>
-        </v-row>
-        <v-row class="mb-n5" v-show="loading === true">
-            <v-col>
-                <v-tabs class="elevation-2" dark>
-                    <v-tabs-slider></v-tabs-slider>
-                    <v-tab href="#listCandidats">Liste des candidat·e·s</v-tab>
-                    <v-tab href="#ajoutCandidats">Ajout de candidat·e·s</v-tab>
-                    <v-tab href="#uploadPdf">Documents</v-tab>
-                    <v-tab-item value="listCandidats">
-                        <v-card flat tile>
-                            <v-card-text>
-                                <div class="row d-flex justify-content-center mt-2" v-if="loadingDatas === true && candidats.length > 0">
-                                    <v-simple-table fixed-header>
-                                        <template v-slot:default>
-                                            <thead class>
-                                            <tr>
-                                                <th class="text-left">N°</th>
-                                                <th class="text-center">Pr&eacute;nom</th>
-                                                <th class="text-center">Nom</th>
-                                                <th class="text-center">T&eacute;l/GSM</th>
-                                                <th class="text-center">Email</th>
-                                                <th class="text-left">Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr class="myTr" v-for="(candidat, index) in candidats" :key="candidat.id">
-                                                <td class="text-left"><strong>{{ index + 1 }}</strong></td>
-                                                <td class="text-center"><strong>{{ candidat.prenom }}</strong></td>
-                                                <td class="text-center"><strong>{{ candidat.nom | upperCase }}</strong></td>
-                                                <td class="text-center">
-                                                    <span v-show="candidat.tel !== null">{{ candidat.tel }}</span><br v-show="candidat.tel !== null"/>
-                                                    <span v-show="candidat.gsm !== null">{{ candidat.gsm }}</span>
-                                                    <span v-show="candidat.tel === null && candidat.gsm === null" class="no-information">Non renseigné</span>
-                                                </td>
-                                                <td class="text-center">
-                                                    <span v-if="candidat.email !== null"><a class="mailtoui link-interface" :href="'mailto:' + candidat.email">{{ candidat.email }}</a></span>
-                                                    <span v-else class="no-information">Non renseigné</span>
-                                                </td>
-                                                <td>
-                                                    <router-link :to="{ name: 'showInscrit', params: { id: candidat.id }}">
-                                                        <i class="fas fa-eye fa-lg text-blue mr-1"></i>
-                                                    </router-link>
-                                                    <span>|</span>
-                                                    <button type="button" @click="verifReportCandidat(candidat.id)">
-                                                        <i class="fas fa-paper-plane fa-lg text-orange mx-1"></i>
-                                                    </button>
-                                                    <span>|</span>
-                                                    <button type="button" class="ml-1" @click="deleteCandidat(candidat.id)">
-                                                        <i class="fas fa-trash-alt fa-lg text-red"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </template>
-                                    </v-simple-table>
+                    </div>
+                    <v-row v-if="candidats.length > 0">
+                        <v-col>
+                            <a class="mailtoui btn btn-primary mt-1" :href="'mailto:?bcc=' + candidatsEmails">Envoyer un mail aux candidats</a>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+            <v-tabs class="w-100 elevation-2 mt-2 mb-5" dark>
+                <v-tabs-slider></v-tabs-slider>
+                <v-tab href="#listCandidats">Liste des candidat·e·s</v-tab>
+                <v-tab href="#ajoutCandidats">Ajout de candidat·e·s</v-tab>
+                <v-tab href="#uploadPdf">Documents</v-tab>
+                <v-tab-item value="listCandidats">
+                    <v-card flat tile>
+                        <v-card-text>
+                            <div class="row d-flex justify-content-center mt-2" v-if="loadingDatas === true && candidats.length > 0">
+                                <v-simple-table fixed-header>
+                                    <template v-slot:default>
+                                        <thead class>
+                                        <tr>
+                                            <th class="text-left">N°</th>
+                                            <th class="text-center">Pr&eacute;nom</th>
+                                            <th class="text-center">Nom</th>
+                                            <th class="text-center">T&eacute;l/GSM</th>
+                                            <th class="text-center">Email</th>
+                                            <th class="text-left">Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr class="myTr" v-for="(candidat, index) in candidats" :key="candidat.id">
+                                            <td class="text-left"><strong>{{ index + 1 }}</strong></td>
+                                            <td class="text-center"><strong>{{ candidat.prenom }}</strong></td>
+                                            <td class="text-center"><strong>{{ candidat.nom | upperCase }}</strong></td>
+                                            <td class="text-center">
+                                                <span v-show="candidat.tel !== null">{{ candidat.tel }}</span><br v-show="candidat.tel !== null"/>
+                                                <span v-show="candidat.gsm !== null">{{ candidat.gsm }}</span>
+                                                <span v-show="candidat.tel === null && candidat.gsm === null" class="no-information">Non renseigné</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span v-if="candidat.email !== null"><a class="mailtoui link-color" :href="'mailto:' + candidat.email">{{ candidat.email }}</a></span>
+                                                <span v-else class="no-information">Non renseigné</span>
+                                            </td>
+                                            <td>
+                                                <router-link :to="{ name: 'showInscrit', params: { id: candidat.id }}">
+                                                    <i class="fas fa-eye fa-lg text-blue mr-1"></i>
+                                                </router-link>
+                                                <span>|</span>
+                                                <button type="button" @click="verifReportCandidat(candidat.id)">
+                                                    <i class="fas fa-paper-plane fa-lg text-orange mx-1"></i>
+                                                </button>
+                                                <span>|</span>
+                                                <button type="button" class="ml-1" @click="deleteCandidat(candidat.id)">
+                                                    <i class="fas fa-trash-alt fa-lg text-red"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </template>
+                                </v-simple-table>
+                            </div>
+                            <div v-show="loadingDatas === false">
+                                <v-row class="text-center text-interface mt-1">
+                                    <v-col class="d-flex flex-column justify-center align-center">
+                                        <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
+                                        <span class="mt-5">Chargement...</span>
+                                    </v-col>
+                                </v-row>
+                            </div>
+                            <div class="row" v-if="loadingDatas === true && candidats.length === 0">
+                                <div class="col">
+                                    Aucun·e candidat·e inscrit·e au recrutement
                                 </div>
-                                <div v-show="loadingDatas === false">
-                                    <v-row class="text-center text-interface mt-1">
-                                        <v-col class="d-flex flex-column justify-center align-center">
-                                            <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
-                                            <span class="mt-5">Chargement...</span>
-                                        </v-col>
-                                    </v-row>
-                                </div>
-                                <div class="row" v-if="loadingDatas === true && candidats.length === 0">
-                                    <div class="col">
-                                        Aucun·e candidat·e inscrit·e au recrutement
-                                    </div>
-                                </div>
-                            </v-card-text>
-                        </v-card>
-                    </v-tab-item>
-                    <v-tab-item value="ajoutCandidats">
-                        <v-card flat tile>
-                            <v-card-text>
-                                <div class="row row-cols-4">
-                                    <div class="col col-3 mb-5">
-                                        <b-form-input type="text" placeholder="Rechercher un·e inscrit·e" v-model="query"></b-form-input>
-                                        <div v-if="results.length > 0 && query" class="list_inscrits elevation-4">
-                                            <ul>
-                                                <li v-for="result in results.slice(0,10)" :key="result.id">
-                                                    <div class="d-inline-flex">
-                                                        <span class="inscrit" v-on:click="ajoutCandidat(result.searchable.id, result.searchable.nom, result.searchable.prenom)">
-                                                            <i class="fas fa-user-plus fa-lg myIcon"></i>
-                                                            <span v-text="result.title" class="span_inscrit"></span>
-                                                        </span>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="col col-3">
-                                        <h6>Liste des candidat·e·s à ajouter:</h6>
-                                        <div v-if="listCandidats.length > 0" class="list_candidats">
-                                            <ul>
-                                                <li v-for="(personne, index) in listCandidats" :key="personne.id">
-                                                    <div class="d-inline-flex candidat">
-                                                        <i class="fas fa-user fa-lg myIconCandidat"></i>
-                                                        {{ personne.nom | upperCase }} {{ personne.prenom }}
-                                                        <i class="fas fa-times fa-lg myIconDelete" v-on:click="deleteListCandidats(index)"></i>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div v-else>
-                                            Aucun
-                                        </div>
-                                    </div>
-                                    <div class="col col-3 text-right">
-                                        <button class="btn btn-success text-light" @click="startStoreInscriptionCandidats()">Inscrire les candidat·e·s</button>
-                                    </div>
-                                    <div class="col col-3 text-left">
-                                        <router-link :to="{ name: 'createInscritWithRecrutement', params: { recrutement_id: recrutement.id }}"
-                                                     class="link default">
-                                            <button class="btn btn-interface text-light">
-                                                <b-img v-bind="images" center src="../images/BoutonAjoutPerso.png" alt="Center image"></b-img>
-                                                Faire une inscription
-                                            </button>
-                                        </router-link>
+                            </div>
+                        </v-card-text>
+                    </v-card>
+                </v-tab-item>
+                <v-tab-item value="ajoutCandidats">
+                    <v-card flat tile>
+                        <v-card-text>
+                            <div class="row row-cols-4">
+                                <div class="col col-3 mb-5">
+                                    <b-form-input type="text" placeholder="Rechercher un·e inscrit·e" v-model="query"></b-form-input>
+                                    <div v-if="results.length > 0 && query" class="list_inscrits elevation-4">
+                                        <ul>
+                                            <li v-for="result in results.slice(0,10)" :key="result.id">
+                                                <div class="d-inline-flex">
+                                                    <span class="inscrit" v-on:click="ajoutCandidat(result.searchable.id, result.searchable.nom, result.searchable.prenom)">
+                                                        <i class="fas fa-user-plus fa-lg myIcon"></i>
+                                                        <span v-text="result.title" class="span_inscrit"></span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                            </v-card-text>
-                        </v-card>
-                    </v-tab-item>
-                    <v-tab-item value="uploadPdf">
-                        <v-card flat tile>
-                            <v-card-text>
-                                <button class="btn btn-interface button-link" @click="uploadListePresence()">Liste des présences</button>
-                                <button class="btn btn-interface button-link" @click="openModalAttestation()">Attestation de participation</button>
-                                <button class="btn btn-interface button-link" @click="uploadFicheSignaletique()">Fiche signal&eacute;tique</button>
-                            </v-card-text>
-                        </v-card>
-                    </v-tab-item>
-                </v-tabs>
-            </v-col>
-        </v-row>
+                                <div class="col col-3">
+                                    <h6>Liste des candidat·e·s à ajouter:</h6>
+                                    <div v-if="listCandidats.length > 0" class="list_candidats">
+                                        <ul>
+                                            <li v-for="(personne, index) in listCandidats" :key="personne.id">
+                                                <div class="d-inline-flex candidat">
+                                                    <i class="fas fa-user fa-lg myIconCandidat"></i>
+                                                    {{ personne.nom | upperCase }} {{ personne.prenom }}
+                                                    <i class="fas fa-times fa-lg myIconDelete" v-on:click="deleteListCandidats(index)"></i>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div v-else>
+                                        Aucun
+                                    </div>
+                                </div>
+                                <div class="col col-3 text-right">
+                                    <button class="btn btn-success" @click="startStoreInscriptionCandidats()">Inscrire les candidat·e·s</button>
+                                </div>
+                                <div class="col col-3 text-left">
+                                    <router-link :to="{ name: 'createInscritWithRecrutement', params: { recrutement_id: recrutement.id }}"
+                                                 class="link default">
+                                        <button class="btn btn-primary">
+                                            <b-img v-bind="images" center src="../storage/images/BoutonAjoutPerso.png" alt="Center image"></b-img>
+                                            Faire une inscription
+                                        </button>
+                                    </router-link>
+                                </div>
+                            </div>
+                        </v-card-text>
+                    </v-card>
+                </v-tab-item>
+                <v-tab-item value="uploadPdf">
+                    <v-card flat tile>
+                        <v-card-text>
+                            <button class="btn btn-primary" @click="uploadListePresence()">Liste des présences</button>
+                            <button class="btn btn-primary" @click="openModalAttestation()">Attestation de participation</button>
+                        </v-card-text>
+                    </v-card>
+                </v-tab-item>
+            </v-tabs>
+        </div>
+        <Spinner v-else />
         <!-- Modal d'édition -->
         <v-dialog v-model="dialog_edition" persistent max-width="600px">
             <v-card>
@@ -454,10 +438,13 @@
 
 <script>
     import {Form} from "vform";
-    import MailtoUI from 'mailtoui/dist/mailtoui-min.js';
+    import Spinner from "../../elements/Spinner";
 
     export default {
         name: "ShowRecrutement",
+        components: {
+            Spinner,
+        },
         data() {
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -741,21 +728,6 @@
                     .catch(error => {
                         console.log(error.response);
                         Snackbar.fire("Problème avec l'attestation à télécharger !");
-                    })
-            },
-
-            uploadFicheSignaletique() {
-                axios({
-                    url: '/PDF/recrutement/fiche/' + this.recrutement.id,
-                    method: 'GET',
-                    responseType: 'blob',
-                })
-                    .then(response => {
-                        this.forceFileDownload(response, `${this.recrutement.date}_fiche-signaletique.pdf`);
-                    })
-                    .catch(error => {
-                        console.log(error.response);
-                        Snackbar.fire('Problème avec la a fiche signalétique à télécharger !');
                     })
             },
 

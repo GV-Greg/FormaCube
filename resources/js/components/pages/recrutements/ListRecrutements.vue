@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <h1>Liste des Recrutements</h1>
+    <div class="container">
+        <h1 class="d-flex align-content-center">Liste des Recrutements</h1>
         <div class="row align-items-center mt-2">
             <div class="col-lg-2 text-right text-light">
                 <span>Recherche par :</span>
@@ -12,8 +12,10 @@
                 <v-text-field v-model="search" label="Recherche" color="blue-grey darken-4" class="mySearch bg-light" outlined dense hide-details="auto" append-icon="fas fa-search"></v-text-field>
             </div>
         </div>
-        <div v-show="colonne === 'date'" class="text-red text-center -mt-5 mb-1">
-            Le format de date doit &ecirc;tre : YYYY-MM-JJ
+        <div v-if="colonne === 'date'" class="d-flex justify-content-center mt-1 mb-0 ml-16">
+            <div class="font-weight-bold bg-danger text-light text-center px-5 rounded-xl">
+                Le format de date doit &ecirc;tre : YYYY-MM-JJ
+            </div>
         </div>
         <v-simple-table fixed-header class="mt-3">
             <thead class>

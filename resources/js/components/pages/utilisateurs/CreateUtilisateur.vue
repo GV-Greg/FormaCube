@@ -1,14 +1,12 @@
 <template>
-    <div>
-        <h1 class="ml-5 mb-n2">
-            <router-link to="/users">
-                <button class="btn btn-light mt-n2">
-                    <i class="fas fa-reply fa-lg text-interface"></i>
-                </button>
-            </router-link>
+    <div class="container">
+        <h1 class="d-flex align-content-center">
+            <button class="btn btn-light pb-2 mr-2" @click="retour">
+                <i class="fas fa-reply fa-lg text-primary-dark"></i>
+            </button>
             Création d'un nouvel utilisateur
         </h1>
-        <div class="row justify-content-center mb-n3 mt-5">
+        <div class="row justify-content-center mb-n3 mt-5" v-if="loading === true">
             <div class="col-lg-7 bg-white rounded-lg p-3">
                 <form class="p-2">
                     <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
@@ -115,9 +113,7 @@
                                                name="role" id="role">
                                     <b-form-select-option :value="null">S&eacute;lectionner un r&ocirc;le</b-form-select-option>
                                     <b-form-select-option value="formateur">Formateur</b-form-select-option>
-                                    <b-form-select-option value="commu">Commu</b-form-select-option>
                                     <b-form-select-option value="admin">Admin</b-form-select-option>
-                                    <b-form-select-option value="superAdmin">SuperAdmin</b-form-select-option>
                                     <b-form-select-option value="master">Master</b-form-select-option>
                                 </b-form-select>
                                 <b-form-invalid-feedback id="password-max-feedback" class="pl-5" v-show="checkRole === false">
@@ -143,22 +139,28 @@
                         </div>
                     </div>
                 </form>
-                <span class="font-weight-light font-italic text-light-interface mt-3 ml-2"><small>Tous les champs avec * sont obligatoires</small></span>
-                <div class="mt-4 text-right">
-                    <v-btn class="btn-success text-light mt-n5" @click="storeUser()">Cr&eacute;er</v-btn>
+                <div class="mt-1 d-flex justify-content-between">
+                    <span class="text-left font-weight-light font-italic text-primary-dark mt-2"><small>Tous les champs avec * sont obligatoires</small></span>
+                    <v-btn class="btn-success" @click="storeUser()">Cr&eacute;er</v-btn>
                 </div>
             </div>
         </div>
+        <Spinner v-else />
     </div>
 </template>
 
 <script>
     import {Form} from "vform";
+    import Spinner from "../../elements/SpinnerStepper";
 
     export default {
-        name: "new",
+        name: "NewUtilisateur",
+        components: {
+            Spinner,
+        },
         data() {
             return {
+                loading: false,
                 form: new Form({
                     firstname: '',
                     lastname: '',
@@ -172,7 +174,9 @@
             }
         },
         mounted() {
+            this.loading = false;
             console.log('New component mounted');
+            this.loading = true;
         },
         computed: {
             currentUser() {
@@ -234,6 +238,21 @@
             }
         },
         methods: {
+            retour() {
+                Swal.fire({
+                    title: 'Êtes-vous sûr?',
+                    text: "Si vous continuez, vous retournez à la liste des utilisateurs !",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3CB521',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '<strong>RETOUR</strong>'
+                }).then((result) => {
+                    if (result.value) {
+                        return this.$router.go(-1);
+                    }
+                });
+            },
             validEmail: function (email) {
                 let re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 return re.test(email);

@@ -1,14 +1,11 @@
 <?php
 
-namespace Database\Factories;
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Model\FormationInscrit;
 use App\Model\Formation;
 use App\Model\Inscrit;
-use App\Model\PouvsubInfos;
 use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factories\Factory;
-
 
 $factory->define(FormationInscrit::class, function (Faker $faker) {
     $formations = Formation::all()->pluck('id')->toArray();

@@ -21,11 +21,4 @@ class ExportsExcelController extends Controller
 
         return (new ParticipantsExport($formation))->download($formation->abreviation . '-participants', Excel::XLSX);
     }
-
-    public function formationSuiviStagiaires(int $id)
-    {
-        $formation = Formation::where('id', $id)->get()->first();
-
-        return (new SuiviExport($formation))->download('DOC_336 DE Cefora - Suivi données stagiaires - ' . $formation->nom, Excel::XLSX);
-    }
 }

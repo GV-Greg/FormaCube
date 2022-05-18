@@ -16,19 +16,22 @@ class SalleSeeder extends Seeder
     {
         $salles = [
             [
-                'nom'=>'salle blue',
+                'nom'=>'salle n°1',
             ],
             [
-                'nom'=>'grande salle',
+                'nom'=>'salle n°2',
             ],
             [
-                'nom'=>'salle rose',
+                'nom'=>'salle n°3',
             ],
             [
-                'nom'=>'salle PC',
+                'nom'=>'salle n°4',
             ],
             [
-                'nom'=>'salle externe',
+                'nom'=>'salle n°5',
+            ],
+            [
+                'nom'=>'externe',
             ],
             [
                 'nom'=>'en ligne',

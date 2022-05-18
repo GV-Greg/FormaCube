@@ -6,14 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Model\Formation;
 use App\Model\FormationInscrit;
 use App\Model\Inscrit;
-use App\Model\Pouvsub;
 use Barryvdh\DomPDF\Facade as PDF;
 
 class FormationListePresenceController extends Controller
 {
     public function index(int $id) {
         $formation = Formation::find($id);
-        $pouvsub = Pouvsub::where('id', $formation->pouvsub_id)->get()->first();
         $listStagiaires = FormationInscrit::where('formation_id', $formation->id)->get()->all();
         $stagiaires = [];
 
@@ -31,7 +29,7 @@ class FormationListePresenceController extends Controller
 
         usort($stagiaires, build_sorter('nom'));
 
-        $pdf = PDF::loadView('documents.formation.presences', compact('formation', 'pouvsub', 'stagiaires'));
+        $pdf = PDF::loadView('documents.formation.presences', compact('formation', 'stagiaires'));
         $name = 'formation-liste-presence.pdf';
 
         return $pdf->download($name);

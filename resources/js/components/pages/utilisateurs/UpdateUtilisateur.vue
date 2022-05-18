@@ -1,11 +1,9 @@
 <template>
-    <div>
-        <h1 class="ml-5 mb-n2">
-            <router-link to="/users">
-                <button class="btn btn-light mt-n2">
-                    <i class="fas fa-reply fa-lg text-interface"></i>
-                </button>
-            </router-link>
+    <div class="container">
+        <h1 class="d-flex align-content-center">
+            <button class="btn btn-light pb-2 mr-2" @click="retour">
+                <i class="fas fa-reply fa-lg text-primary-dark"></i>
+            </button>
             Modification de la fiche de {{ user.firstname }} {{ user.lastname | upperCase }}
         </h1>
         <div class="row justify-content-center mb-n3 mt-5" v-if="loading === true">
@@ -140,24 +138,25 @@
                         </div>
                     </div>
                 </form>
-                <span class="font-weight-light font-italic text-light-interface mt-3 ml-2"><small>Tous les champs avec * sont obligatoires</small></span>
-                <div class="mt-4 text-right">
-                    <v-btn class="btn-success text-light mt-n5" @click="updateUser()">Modifier</v-btn>
+                <div class="mt-1 d-flex justify-content-between">
+                    <span class="text-left font-weight-light font-italic text-primary-dark mt-2"><small>Tous les champs avec * sont obligatoires</small></span>
+                    <v-btn class="btn-success" @click="updateUser()">Modifier</v-btn>
                 </div>
             </div>
         </div>
-        <div v-else class="d-flex flex-column justify-center align-center mt-5">
-            <v-progress-circular :size="70" :width="10" color="blue-grey" indeterminate></v-progress-circular>
-            <span class="mt-5 text-interface">Chargement...</span>
-        </div>
+        <Spinner v-else />
     </div>
 </template>
 
 <script>
 import {Form} from "vform";
+import Spinner from "../../elements/SpinnerStepper";
 
 export default {
     name: "UpdateUtilisateur",
+    components: {
+        Spinner,
+    },
     data() {
         return {
             loading: false,
@@ -236,6 +235,21 @@ export default {
         }
     },
     methods: {
+        retour() {
+            Swal.fire({
+                title: 'Êtes-vous sûr?',
+                text: "Si vous continuez, vous retournez à la liste des utilisateurs !",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3CB521',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '<strong>RETOUR</strong>'
+            }).then((result) => {
+                if (result.value) {
+                    return this.$router.go(-1);
+                }
+            });
+        },
         validEmail: function (email) {
             let re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test(email);

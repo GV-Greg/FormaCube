@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <h1>Liste des Salles</h1>
+    <div class="container">
+        <h1 class="d-flex align-content-center">Liste des Salles</h1>
         <div v-if="loading === true">
             <div class="row align-items-center mt-2">
                 <div class="col-lg-2"></div>
@@ -17,7 +17,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8 mt-n1 pt-0">
                     <v-simple-table fixed-header>
-                        <thead class>
+                        <thead>
                         <tr>
                             <th>N°</th>
                             <th>NOM</th>
@@ -64,59 +64,51 @@
                     </v-simple-table>
                 </div>
             </div>
-            <PaginationComponent class="mt-3"
-                                 v-if="pagination.last_page > 1"
-                                 :pagination="pagination"
-                                 :offset="5"
-                                 @paginate="search === '' ? getData() : searchData()"
-            ></PaginationComponent>
-            <!-- Create & Edit Modal -->
-            <div class="modal fade" id="salleModal" tabindex="-1" role="dialog" aria-labelledby="salleModalTitle" aria-hidden="true" data-backdrop="static">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="salleModalTitle">{{ editMode ? "Modification d'une" : "Cr&eacute;ation d'une nouvelle" }} Salle</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form @submit.prevent="editMode ? update() : store()" @keydown="form.onKeydown($event)">
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                            <b-input-group-prepend is-text>
-                                                <span class="text-light-interface"><i class="fas fa-tag"></i></span>
-                                            </b-input-group-prepend>
-                                            <b-form-input v-model="form.nom" type="text"
-                                                          :state="validationMinSalle && validationMaxSalle"
-                                                          class="form-control rounded-r-lg" :class="{ 'is-invalid': form.errors.has('nom') }"
-                                                          name="nom" id="nom" placeholder="Nom de la salle">
-                                            </b-form-input>
-                                            <b-form-invalid-feedback id="salle-min-feedback" class="pl-5" v-show="validationMinSalle === false">
-                                                Le nom de la salle doit &ecirc;tre compos&eacute; d'au moins 3 caract&egrave;res
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="salle-max-feedback" class="pl-5" v-show="validationMaxSalle === false">
-                                                Le nom de la salle doit &ecirc;tre compos&eacute; de moins 200 caract&egrave;res
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="form" field="nom" class="pl-5"></has-error>
-                                        </b-input-group>
-                                    </div>
+            <PaginationComponent class="mt-3" v-if="pagination.last_page > 1"
+                                 :pagination="pagination" :offset="5"
+                                 @paginate="search === '' ? getData() : searchData()" />
+        </div>
+        <Spinner v-else />
+        <!-- Create & Edit Modal -->
+        <div class="modal fade" id="salleModal" tabindex="-1" role="dialog" aria-labelledby="salleModalTitle" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="salleModalTitle">{{ editMode ? "Modification d'une" : "Cr&eacute;ation d'une nouvelle" }} Salle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form @submit.prevent="editMode ? update() : store()" @keydown="form.onKeydown($event)">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
+                                        <b-input-group-prepend is-text>
+                                            <span class="text-light-interface"><i class="fas fa-tag"></i></span>
+                                        </b-input-group-prepend>
+                                        <b-form-input v-model="form.nom" type="text"
+                                                      :state="validationMinSalle && validationMaxSalle"
+                                                      class="form-control rounded-r-lg" :class="{ 'is-invalid': form.errors.has('nom') }"
+                                                      name="nom" id="nom" placeholder="Nom de la salle">
+                                        </b-form-input>
+                                        <b-form-invalid-feedback id="salle-min-feedback" class="pl-5" v-show="validationMinSalle === false">
+                                            Le nom de la salle doit &ecirc;tre compos&eacute; d'au moins 3 caract&egrave;res
+                                        </b-form-invalid-feedback>
+                                        <b-form-invalid-feedback id="salle-max-feedback" class="pl-5" v-show="validationMaxSalle === false">
+                                            Le nom de la salle doit &ecirc;tre compos&eacute; de moins 200 caract&egrave;res
+                                        </b-form-invalid-feedback>
+                                        <has-error :form="form" field="nom" class="pl-5"></has-error>
+                                    </b-input-group>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
-                                <button :disabled="form.busy" type="submit" class="btn btn-success">{{ editMode ? "&Eacute;diter" : "Cr&eacute;er" }}</button>
-                            </div>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-between">
+                            <v-btn class="btn-danger" data-dismiss="modal">Fermer</v-btn>
+                            <v-btn :disabled="form.busy" type="submit" class="btn-success">{{ editMode ? "&Eacute;diter" : "Cr&eacute;er" }}</v-btn>
+                        </div>
+                    </form>
                 </div>
-            </div>
-        </div>
-        <div v-else class="row text-center text-light mt-10">
-            <div class="col-lg-12 d-flex flex-column justify-center align-center">
-                <v-progress-circular :size="70" :width="10" color="white" indeterminate></v-progress-circular>
-                <span class="mt-5">Chargement...</span>
             </div>
         </div>
     </div>
@@ -125,11 +117,13 @@
 <script>
     import PaginationComponent from "../../elements/PaginationComponent";
     import { Form } from "vform";
+    import Spinner from "../../elements/SpinnerStepper";
 
     export default {
         name: "ListSalles",
         components: {
             PaginationComponent,
+            Spinner,
         },
         data() {
             return {
@@ -299,7 +293,7 @@
                             })
                             .catch(error => {
                                 this.$Progress.fail();
-                                console.log(error.response);
+                                console.error(error.response);
                                 Snackbar.fire('Problème avec la suppression de la salle !');
                             })
                     }

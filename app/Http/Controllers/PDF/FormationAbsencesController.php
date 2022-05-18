@@ -13,9 +13,8 @@ class FormationAbsencesController extends Controller
     public function index(int $id)
     {
         $formation = Formation::findOrFail($id);
-        $pouvsub = Pouvsub::where('id', $formation->pouvsub_id)->get()->first();
 
-        $pdf = PDF::loadView('documents.formation.absences', compact('formation', 'pouvsub'));
+        $pdf = PDF::loadView('documents.formation.absences', compact('formation'));
         $name = 'formation-absences.pdf';
 
         return $pdf->download($name);

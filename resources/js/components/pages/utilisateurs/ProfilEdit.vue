@@ -102,9 +102,11 @@
                         <has-error :form="form" field="fonction" class="pl-5"></has-error>
                     </b-input-group>
                 </form>
-                <span class="font-weight-light font-italic text-light-interface mt-3 ml-2"><small>Tous les champs avec * sont obligatoires</small></span>
-                <div class="mt-4 text-right">
-                    <v-btn class="btn-success text-light mt-n5" @click="updateProfile()">&Eacute;diter</v-btn>
+                <span class="font-weight-light font-italic text-primary-dark mt-3 ml-2"><small>Tous les champs avec * sont obligatoires.</small></span>
+                <div class="mt-4 d-flex justify-content-between">
+                    <div class="ml-2 d-flex align-items-center font-weight-bold bg-danger rounded-lg px-3 text-light"><small>Ce compte ne peut &ecirc;tre modifi&eacute;</small></div>
+                    <v-btn class="btn-success" @click="updateProfile()" v-if="currentUser.id !== 2">&Eacute;diter</v-btn>
+                    <v-btn class="btn-success" disabled v-else>&Eacute;diter</v-btn>
                 </div>
             </div>
         </div>

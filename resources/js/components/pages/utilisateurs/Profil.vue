@@ -30,18 +30,19 @@
             </v-col>
         </v-row>
         <v-row justify="center" class="ml-5">
-            <v-col cols="2" >
+            <v-col cols="2" v-if="currentUser.id !== 2">
                 <router-link :to="{ name: 'editProfil', params: { id: currentUser.id }}">
                     <button class="btn btn-success">Modifier</button>
                 </router-link>
+            </v-col>
+            <v-col class="d-flex justify-content-center">
+                <span class="bg-danger text-light px-4 py-2 rounded-xl">Ce compte ne peut &ecirc;tre modifi&eacute;</span>
             </v-col>
         </v-row>
     </v-container>
 </template>
 
 <script>
-    import Form from "vform";
-
     export default {
         data() {
             return {
@@ -63,7 +64,7 @@
         },
         methods: {
             getAvatar() {
-                this.userAvatar = "images/avatars/" + this.$store.getters.currentUser.avatar;
+                this.userAvatar = "storage/images/avatars/" + this.$store.getters.currentUser.avatar;
 
                 return this.userAvatar;
             },

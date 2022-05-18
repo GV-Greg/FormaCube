@@ -9,30 +9,20 @@
     }
 
     #entete {
-        height: 125px;
+        height: 100px;
     }
 
-    .logo {
+    #logo {
         width: 30%;
-    }
-
-    #logo-interface {
         position: relative;
         float: left;
         margin-top: -25px;
     }
 
-    #logo-pouvsub {
-        position: relative;
-        float: right;
-        margin-top: -25px;
-        margin-right: -50px;
-    }
-
     h3 {
         width: 100vw;
         height: 50px;
-        margin: 5px 0 -40px 0;
+        margin: 0;
         padding: 0;
         font-family: 'blogger', sans-serif !important;
         font-weight: bold;
@@ -112,30 +102,13 @@
     .normal {
         height: 43px;
     }
-
-    #footer {
-        margin: 5px 0 -40px 0;
-        font-size: 11pt;
-        line-height: 9pt;
-        text-align: center;
-    }
-
-    .bull {
-        font-weight: bold;
-        font-size: 16pt;
-    }
 </style>
 
 <body>
     <div id="entete">
-        <div id="logo-interface">
-            <img src="./images/Interface3-logo.png" alt="logo-interface3namur" class="logo" >
+        <div id="logo">
+            <img src="./storage/images/logos/Logo_FormaCube-Noir-500x100.png" alt="logo-FormaCube">
         </div>
-        @if($pouvsub->nom !== 'Interface' && $pouvsub->nom !== 'Interface3' && $pouvsub->nom !== 'Interface3Namur' && $pouvsub->nom !== 'Interface3.Namur' )
-            <div id="logo-pouvsub">
-                <img src="{{ './images/logos/' . $pouvsub->logo }}" alt="logo-pouvoir-subsidiant" class="logo">
-            </div>
-        @endif
     </div>
     <h3>Formation : "{{ $formation->nom }}"</h3>
     <span id="infos-formation">Du {{ \Carbon\Carbon::parse($formation->date_debut)->translatedFormat('l j F Y') }} au {{ \Carbon\Carbon::parse($formation->date_fin)->translatedFormat('l j F Y') }}</span><br>
@@ -166,8 +139,4 @@
             @endfor
         </tbody>
     </table>
-    <div id="footer">
-        <strong>Interface3.Namur</strong> <span class="bull">&bull;</span> Avenue Sergent Vrithoff, 2 – 5000 Namur <span class="bull">&bull;</span> N° d’entreprise BE0870 417226<br/>
-        Tél / Fax : 081/63 34 90 <span class="bull">&bull;</span> contact@interface3namur.be <span class="bull">&bull;</span> www.interface3namur.be
-    </div>
 </body>

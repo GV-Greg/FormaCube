@@ -11,7 +11,45 @@ class UsersController extends Controller
 {
     public function all()
     {
-        $users = User::all();
+        $users = User::orderBy('id', 'DESC')->paginate(10);
+
+        return response()->json([
+            'users' => $users
+        ], 200);
+    }
+
+    /**
+     * @param $field
+     * @param $search
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search($field, $search)
+    {
+        if($field==='nom') {
+            $field = 'lastname';
+        } else if($field==='prenom') {
+            $field = 'firstname';
+        }
+
+        $users = User::where($field,'LIKE',"%$search%")->orderBy('id', 'DESC')->paginate(10);
+
+        return response()->json([
+            'users' => $users
+        ], 200);
+    }
+
+    public function tuteurs()
+    {
+        $users = User::where('role', 'formateur')->get();
+
+        return response()->json([
+            'users' => $users
+        ], 200);
+    }
+
+    public function admins()
+    {
+        $users = User::where('role', 'admin')->get();
 
         return response()->json([
             'users' => $users
@@ -109,7 +147,22 @@ class UsersController extends Controller
 
     public function archives()
     {
-        $archives = User::onlyTrashed()->get();
+        $archives = User::onlyTrashed()->orderBy('id', 'DESC')->paginate(10);
+
+        return response()->json([
+            'archives' => $archives
+        ], 200);
+    }
+
+    public function searchArchives($field, $search)
+    {
+        if($field==='nom') {
+            $field = 'lastname';
+        } else if($field==='prenom') {
+            $field = 'firstname';
+        }
+
+        $archives = User::onlyTrashed()->where($field,'LIKE',"%$search%")->orderBy('id', 'DESC')->paginate(10);
 
         return response()->json([
             'archives' => $archives

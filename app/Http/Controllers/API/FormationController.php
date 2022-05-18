@@ -56,136 +56,42 @@ class FormationController extends Controller
      */
     public function all()
     {
-        $formations = Formation::all();
+        $formations = Formation::orderBy('date_debut', 'ASC')->get()->all();
 
         $listFormations = FormationResource::collection($formations);
 
         $stagiaires = [];
         $nbreStagiaires = [];
 
-        for($x=0; $x < count($formations); $x++) {
-            $tempStagiaire = [];
-            $maxStagiaires = null;
-            $temp = [];
-            $etat = '';
-            $inscrits= 0;
-            $min = $formations[$x]->min_stagiaires;
-            $max = $formations[$x]->max_stagiaires;
-            $inscritsFormation = FormationInscrit::where('formation_id', $formations[$x]->id)->get()->all();
-            $nbreStagiaire = FormationInscrit::where('formation_id', $formations[$x]->id)->count();
-            array_push($tempStagiaire, $nbreStagiaire);
-            $maxStagiaires = $formations[$x]->max_stagiaires;
-            array_push($tempStagiaire, $maxStagiaires);
-            array_push($nbreStagiaires, $tempStagiaire);
-            for($y=0; $y < count($inscritsFormation); $y++) {
-                $inscrits++;
+        if($formations != null) {
+            for($x=0; $x < count($formations); $x++) {
+                $tempStagiaire = [];
+                $maxStagiaires = null;
+                $temp = [];
+                $etat = '';
+                $inscrits= 0;
+                $min = $formations[$x]->min_stagiaires;
+                $max = $formations[$x]->max_stagiaires;
+                $inscritsFormation = FormationInscrit::where('formation_id', $formations[$x]->id)->get()->all();
+                $nbreStagiaire = FormationInscrit::where('formation_id', $formations[$x]->id)->count();
+                array_push($tempStagiaire, $nbreStagiaire);
+                $maxStagiaires = $formations[$x]->max_stagiaires;
+                array_push($tempStagiaire, $maxStagiaires);
+                array_push($nbreStagiaires, $tempStagiaire);
+                for($y=0; $y < count($inscritsFormation); $y++) {
+                    $inscrits++;
+                }
+                array_push($temp, $inscrits);
+                if($inscrits < $min) {
+                    $etat = 'Insuffisant';
+                } else if ($inscrits >= $min && $inscrits < $max) {
+                    $etat = 'Incomplet';
+                } else if ($inscrits === $max) {
+                    $etat = 'Complet';
+                }
+                array_push($temp, $etat);
+                array_push($stagiaires, $temp);
             }
-            array_push($temp, $inscrits);
-            if($inscrits < $min) {
-                $etat = 'Insuffisant';
-            } else if ($inscrits >= $min && $inscrits < $max) {
-                $etat = 'Incomplet';
-            } else if ($inscrits === $max) {
-                $etat = 'Complet';
-            }
-            array_push($temp, $etat);
-            array_push($stagiaires, $temp);
-        }
-
-        return response()->json([
-            'formations' => $listFormations,
-            'stagiaires' => $stagiaires,
-            'nbreStagiaires' => $nbreStagiaires,
-        ]);
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function all_not_pmtic()
-    {
-        $formations = Formation::whereNotIn('nom', ['PMTIC'])->get()->all();
-
-        $listFormations = FormationResource::collection($formations);
-
-        $stagiaires = [];
-        $nbreStagiaires = [];
-
-        for($x=0; $x < count($formations); $x++) {
-            $tempStagiaire = [];
-            $maxStagiaires = null;
-            $temp = [];
-            $etat = '';
-            $inscrits= 0;
-            $min = $formations[$x]->min_stagiaires;
-            $max = $formations[$x]->max_stagiaires;
-            $inscritsFormation = FormationInscrit::where('formation_id', $formations[$x]->id)->get()->all();
-            $nbreStagiaire = FormationInscrit::where('formation_id', $formations[$x]->id)->count();
-            array_push($tempStagiaire, $nbreStagiaire);
-            $maxStagiaires = $formations[$x]->max_stagiaires;
-            array_push($tempStagiaire, $maxStagiaires);
-            array_push($nbreStagiaires, $tempStagiaire);
-            for($y=0; $y < count($inscritsFormation); $y++) {
-                $inscrits++;
-            }
-            array_push($temp, $inscrits);
-            if($inscrits < $min) {
-                $etat = 'Insuffisant';
-            } else if ($inscrits >= $min && $inscrits < $max) {
-                $etat = 'Incomplet';
-            } else if ($inscrits === $max) {
-                $etat = 'Complet';
-            }
-            array_push($temp, $etat);
-            array_push($stagiaires, $temp);
-        }
-
-        return response()->json([
-            'formations' => $listFormations,
-            'stagiaires' => $stagiaires,
-            'nbreStagiaires' => $nbreStagiaires,
-        ]);
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function all_pmtic()
-    {
-        $formations = Formation::where('nom', 'PMTIC')->get()->all();
-
-        $listFormations = FormationResource::collection($formations);
-
-        $stagiaires = [];
-        $nbreStagiaires = [];
-
-        for($x=0; $x < count($formations); $x++) {
-            $tempStagiaire = [];
-            $maxStagiaires = null;
-            $temp = [];
-            $etat = '';
-            $inscrits= 0;
-            $min = $formations[$x]->min_stagiaires;
-            $max = $formations[$x]->max_stagiaires;
-            $inscritsFormation = FormationInscrit::where('formation_id', $formations[$x]->id)->get()->all();
-            $nbreStagiaire = FormationInscrit::where('formation_id', $formations[$x]->id)->count();
-            array_push($tempStagiaire, $nbreStagiaire);
-            $maxStagiaires = $formations[$x]->max_stagiaires;
-            array_push($tempStagiaire, $maxStagiaires);
-            array_push($nbreStagiaires, $tempStagiaire);
-            for($y=0; $y < count($inscritsFormation); $y++) {
-                $inscrits++;
-            }
-            array_push($temp, $inscrits);
-            if($inscrits < $min) {
-                $etat = 'Insuffisant';
-            } else if ($inscrits >= $min && $inscrits < $max) {
-                $etat = 'Incomplet';
-            } else if ($inscrits === $max) {
-                $etat = 'Complet';
-            }
-            array_push($temp, $etat);
-            array_push($stagiaires, $temp);
         }
 
         return response()->json([
@@ -239,7 +145,6 @@ class FormationController extends Controller
             'prix' => 'required',
             'statut' => 'required',
             'user_id' => 'required',
-            'pouvsub_id' => 'required',
             'abreviation' => 'required',
             'duree_rgpd' => 'required'
         ]);
@@ -258,7 +163,6 @@ class FormationController extends Controller
         $formation->commentaire_formation = $request->commentaire_formation;
         $formation->statut = $request->statut;
         $formation->user_id = $request->user_id;
-        $formation->pouvsub_id = $request->pouvsub_id;
         $formation->abreviation = $request->abreviation;
         $formation->duree_rgpd = $request->duree_rgpd;
         $formation->save();
@@ -275,9 +179,6 @@ class FormationController extends Controller
     public function show($id)
     {
         $formation = new FormationResource(Formation::findOrFail($id));
-        $infosPouvSub = PouvsubInfos::where('formation_id', $id)->get()->first();
-        $idPouvSub = $formation->pouvsub_id;
-        $pouvsub = Pouvsub::where('id', $idPouvSub)->get()->first();
         $recrutements = Recrutement::where('formation_id', $id)->get()->all();
 
         $stagiaires = DB::table('inscrits')
@@ -285,14 +186,12 @@ class FormationController extends Controller
             ->join('inscrit_formation', 'inscrits.id', '=', 'inscrit_formation.inscrit_id')
             ->leftjoin('users as users_rappel', 'users_rappel.id', '=', 'inscrit_formation.rappel_user_id')
             ->leftjoin( 'users as users_rdv', 'users_rdv.id', '=', 'inscrit_formation.rdv_user_id')
-            ->select('inscrits.id', 'inscrits.prenom', 'inscrits.nom', 'inscrits.tel', 'inscrits.gsm', 'inscrits.email', 'inscrit_formation.pmtic_module_1', 'inscrit_formation.pmtic_module_2', 'inscrit_formation.pmtic_module_3', 'inscrit_formation.date_rappel', 'inscrit_formation.rappel_user_id', 'users_rappel.firstname as rappel_user_prenom', 'inscrit_formation.rappel_resultat', 'users_rappel.lastname as rappel_user_nom', 'inscrit_formation.date_rdv', 'inscrit_formation.rdv_user_id', 'users_rdv.firstname as rdv_user_prenom', 'users_rdv.lastname as rdv_user_nom', 'inscrit_formation.validation_rdv')
+            ->select('inscrits.id', 'inscrits.prenom', 'inscrits.nom', 'inscrits.tel', 'inscrits.gsm', 'inscrits.email', 'inscrit_formation.date_rappel', 'inscrit_formation.rappel_user_id', 'users_rappel.firstname as rappel_user_prenom', 'inscrit_formation.rappel_resultat', 'users_rappel.lastname as rappel_user_nom', 'inscrit_formation.date_rdv', 'inscrit_formation.rdv_user_id', 'users_rdv.firstname as rdv_user_prenom', 'users_rdv.lastname as rdv_user_nom', 'inscrit_formation.validation_rdv')
             ->orderBy('inscrits.nom', 'ASC')
             ->get();
 
         return response()->json([
             'formation' => $formation,
-            'infospouvsub' => $infosPouvSub,
-            'pouvsub' => $pouvsub,
             'recrutements' => $recrutements,
             'stagiaires' => $stagiaires,
         ]);
@@ -318,7 +217,6 @@ class FormationController extends Controller
             'prix' => 'required',
             'statut' => 'required',
             'user_id' => 'required',
-            'pouvsub_id' => 'required',
             'abreviation' => 'required',
             'duree_rgpd' => 'required'
         ]);
@@ -337,17 +235,9 @@ class FormationController extends Controller
         $formation->commentaire_formation = $request->commentaire_formation;
         $formation->statut = $request->statut;
         $formation->user_id = $request->user_id;
-        $formation->pouvsub_id = $request->pouvsub_id;
         $formation->abreviation = $request->abreviation;
         $formation->duree_rgpd = $request->duree_rgpd;
         $formation->save();
-
-        $searchInfosPouvSub = PouvsubInfos::where('formation_id', $id)->exists();
-        if($searchInfosPouvSub === true) {
-            $infosPouvSub = PouvsubInfos::where('formation_id', $id)->get()->first();
-            $infosPouvSub->pouvsub_id = $request->pouvsub_id;
-            $infosPouvSub->save();
-        }
 
         return new FormationResource($formation);
     }
@@ -379,9 +269,6 @@ class FormationController extends Controller
         $message = null;
         $error= null;
         $test = false;
-        $test_pmtic = false;
-        $pmtic = 'PMTIC';
-        $pmtic = strtolower($pmtic);
 
         $date_ajout = date('Y-m-d');
 
@@ -392,15 +279,8 @@ class FormationController extends Controller
                 $test = true;
             }
         }
-        if(strtolower($formation->nom) === $pmtic) {
-            $test_pmtic = true;
-        }
         if($test == false) {
-            if($test_pmtic === true) {
-                $formation->inscrits()->attach($inscrit, ['date_ajout' => $date_ajout, 'pmtic_module_1' => 1, 'pmtic_module_2' => 1, 'pmtic_module_3' => 1]);
-            } else {
-                $formation->inscrits()->attach($inscrit, ['date_ajout' => $date_ajout, 'pmtic_module_1' => 0, 'pmtic_module_2' => 0, 'pmtic_module_3' => 0]);
-            }
+            $formation->inscrits()->attach($inscrit, ['date_ajout' => $date_ajout]);
             $message = 'Inscription effectuée';
         } else {
             $error = 'Déjà inscrit à cette formation';
@@ -420,10 +300,6 @@ class FormationController extends Controller
     public function updateInscrit(Request $request, $id, $idInscrit)
     {
         $formationInscrit = FormationInscrit::where('formation_id', $id)->where('inscrit_id', $idInscrit)->get()->first();
-
-        $formationInscrit->pmtic_module_1 = $request->pmtic_module_1;
-        $formationInscrit->pmtic_module_2 = $request->pmtic_module_2;
-        $formationInscrit->pmtic_module_3 = $request->pmtic_module_3;
         $formationInscrit->save();
 
         return response()->json([
@@ -475,7 +351,7 @@ class FormationController extends Controller
             RecrutementInscrit::where($match)->update([
                 'selection' => true
             ]);
-            $formation->inscrits()->attach($inscrit, ['date_ajout' => $date_ajout, 'pmtic_module_1' => 0, 'pmtic_module_2' => 0, 'pmtic_module_3' => 0]);
+            $formation->inscrits()->attach($inscrit, ['date_ajout' => $date_ajout]);
             $message = "$inscrit->prenom $inscrit->nom inscrit à $formation->abreviation";
         } else {
             $error = "ERROR : $inscrit->prenom $inscrit->nom déjà inscrit à $formation->abreviation";

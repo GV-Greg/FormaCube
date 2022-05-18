@@ -1,7 +1,7 @@
 <template>
     <div class="mx-5 d-flex flex-column justify-content-center">
         <div v-if="loading === true" class="mx-5">
-            <div class="row justify-content-end mt-3">
+            <div class="row justify-content-center mt-3">
                 <div class="col col-lg-11">
                     <div class="row justify-content-center">
                         <div class="d-flex flex-column mb-4">
@@ -21,7 +21,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row justify-content-end mb-3">
+            <div class="row justify-content-center mb-3">
                 <div class="col col-lg-11">
                     <div class="row justify-content-center">
                         <router-link to="/inscrits/create">
@@ -39,7 +39,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row justify-content-end">
+            <div class="row justify-content-center">
                 <div class="col col-lg-11">
                     <v-tabs v-model="tabIndex" background-color="indigo accent-4"
                             class="elevation-2" dark centered grow icons-and-text>

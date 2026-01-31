@@ -1,15 +1,11 @@
 <template>
-    <div class="mx-5 d-flex flex-column justify-content-center">
-        <div class="mx-5">
-            <div class="row justify-content-center mt-3">
-                <div class="col col-lg-11">
-                    <div class="row justify-content-center">
-                        <router-view></router-view>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <v-container fluid class="px-5">
+        <v-row justify="center" class="mt-3">
+            <v-col cols="12" lg="11">
+                <router-view></router-view>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>

@@ -8,14 +8,20 @@ use App\Model\Recrutement;
 use App\Model\PouvsubInfos;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Formation extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'nom', 'session', 'date_debut', 'date_fin', 'min_stagiaires', 'max_stagiaires', 'nbre_heures', 'salle', 'prix', 'commentaire_formation', 'statut', 'abreviation', "duree_rgpd",
     ];
 
-    protected $dates = ['date_debut', 'date_fin'];
+    protected $casts = [
+        'date_debut' => 'datetime',
+        'date_fin' => 'datetime',
+    ];
 
 
     public function user()

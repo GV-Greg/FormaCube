@@ -9,20 +9,19 @@
 
         <title>{{ config('app.name', 'ERP-Interface3.Namur') }}</title>
 
-        <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}" defer></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9i-ybQJWaDh9vimVAwaXcDT1kCzweEhM&libraries=places"></script>
+        <!-- Google Maps API -->
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9i-ybQJWaDh9vimVAwaXcDT1kCzweEhM&libraries=places&loading=async"></script>
 
         <!-- Fonts -->
         <link rel="dns-prefetch" href="//fonts.gstatic.com">
 
-        <!-- Styles -->
-        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+        <!-- Vite Assets -->
+        @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     </head>
     <body>
         <v-app id="app">
-            <vue-progress-bar></vue-progress-bar>
             <app-container></app-container>
         </v-app>
     </body>
 </html>
+

@@ -1,0 +1,62 @@
+# Configuration pour le développement avec hot reload
+services:
+  # Application Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: formacube_app_dev
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "5173:5173"  # Vite dev server
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=mysql
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_DATABASE=${DB_DATABASE:-formacube}
+      - DB_USERNAME=${DB_USERNAME:-formacube}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=mailpit
+      - MAIL_PORT=1025
+    volumes:
+      - .:/var/www
+      - /var/www/vendor
+      - /var/www/node_modules
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - formacube_network
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: formacube_redis_dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - formacube_network
+
+  # Mailpit
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: formacube_mailpit_dev
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - formacube_network
+
+networks:
+  formacube_network:
+    driver: bridge

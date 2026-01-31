@@ -1,19 +1,25 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
 use App\Model\RecrutementInscrit;
 use App\Model\Recrutement;
 use App\Model\Inscrit;
-use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(RecrutementInscrit::class, function (Faker $faker) {
-    $recrutement = Recrutement::all()->pluck('id')->toArray();
-    $candidat = Inscrit::all()->pluck('id')->toArray();
+class RecrutementInscritFactory extends Factory
+{
+    protected $model = RecrutementInscrit::class;
 
-    return [
-        'recrutement_id' => $faker->randomElement($recrutement),
-        'inscrit_id' => $faker->unique()->randomElement($candidat),
-        'date_ajout' => $faker->dateTimeBetween($startDate = 'now', $endDate = '2 month', $timezone = 'Europe/Paris'),
-    ];
-});
+    public function definition(): array
+    {
+        $recrutement = Recrutement::all()->pluck('id')->toArray();
+        $candidat = Inscrit::all()->pluck('id')->toArray();
+
+        return [
+            'recrutement_id' => $this->faker->randomElement($recrutement),
+            'inscrit_id' => $this->faker->unique()->randomElement($candidat),
+            'date_ajout' => $this->faker->dateTimeBetween($startDate = 'now', $endDate = '2 month', $timezone = 'Europe/Paris'),
+        ];
+    }
+}

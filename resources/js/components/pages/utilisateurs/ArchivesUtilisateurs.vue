@@ -2,25 +2,25 @@
     <div class="container">
         <h1 class="d-flex align-content-center">
             <router-link to="/users">
-                <button class="btn btn-light pb-2 mr-2">
-                    <i class="fas fa-reply fa-lg text-primary-dark"></i>
-                </button>
+                <v-btn variant="flat" color="grey-lighten-3" class="pb-2 mr-2">
+                    <v-icon color="primary" size="large">mdi-reply</v-icon>
+                </v-btn>
             </router-link>
             Liste des Utilisateurs archivés
         </h1>
-        <div class="row align-items-center mt-n2">
-            <div class="col-lg-4" ></div>
-            <div class="col-lg-2 text-right text-light">
+        <v-row align="center" class="mt-n2">
+            <v-col cols="12" lg="4"></v-col>
+            <v-col cols="12" lg="2" class="text-right text-light">
                 <span>Recherche par :</span>
-            </div>
-            <div class="col-lg-2">
-                <v-select :items="searchColonnes" v-model="colonne" color="blue-grey darken-4" class="mySelect bg-light text-dark" outlined dense hide-details="auto"></v-select>
-            </div>
-            <div class="col-lg-4">
-                <v-text-field v-model="search" label="Recherche" color="blue-grey darken-4" class="mySearch bg-light" outlined dense hide-details="auto" append-icon="fas fa-search"></v-text-field>
-            </div>
-        </div>
-        <v-simple-table fixed-header class="mt-2">
+            </v-col>
+            <v-col cols="12" lg="2">
+                <v-select :items="searchColonnes" v-model="colonne" color="blue-grey-darken-4" class="mySelect bg-light text-dark" variant="outlined" density="compact" hide-details="auto"></v-select>
+            </v-col>
+            <v-col cols="12" lg="4">
+                <v-text-field v-model="search" label="Recherche" color="blue-grey-darken-4" class="mySearch bg-light" variant="outlined" density="compact" hide-details="auto" append-inner-icon="mdi-magnify"></v-text-field>
+            </v-col>
+        </v-row>
+        <v-table fixed-header class="mt-2">
             <thead>
             <tr>
                 <th scope="col" class="th">N°</th>
@@ -41,21 +41,21 @@
                     {{ user.firstname }}
                 </td>
                 <td>
-                    {{ user.lastname | UpperCase }}
+                    {{ upperCase(user.lastname) }}
                 </td>
                 <td>
                     {{ user.email }}
                 </td>
                 <td>
-                    {{ user.role | Capitalize }}
+                    {{ capitalize(user.role) }}
                 </td>
                 <td>
-                    {{ user.deleted_at  | newDate }}
+                    {{ formatDate(user.deleted_at) }}
                 </td>
                 <td>
-                    <button type="button" class="ml-3" @click="restore(user)">
-                        <i class="fas fa-user-check fa-lg text-green"></i>
-                    </button>
+                    <v-btn variant="text" size="small" class="ml-3" @click="restore(user)">
+                        <v-icon color="green" size="large">mdi-account-check</v-icon>
+                    </v-btn>
                 </td>
             </tr>
             <tr v-show="!archives.length && loading === false">
@@ -70,13 +70,13 @@
             </tr>
             <tr v-show="!archives.length && loading === true" class="justify-content-center">
                 <td colspan="12" class="pt-4">
-                    <div class="alert alert-danger" role="alert">
-                        Oups ! Rien ne correspond à votre recherche.
-                    </div>
+                    <v-alert type="warning" variant="tonal" icon="mdi-database-search">
+                        {{ search ? 'Aucune donnée ne correspond à votre recherche.' : 'Aucune donnée correspondante.' }}
+                    </v-alert>
                 </td>
             </tr>
             </tbody>
-        </v-simple-table>
+        </v-table>
         <PaginationComponent class="mt-3" v-if="pagination.last_page > 1"
                              :pagination="pagination" :offset="5"
                              @paginate="search === '' ? getData() : searchData()" />
@@ -84,7 +84,8 @@
 </template>
 
 <script>
-import PaginationComponent from "../../elements/PaginationComponent";
+import PaginationComponent from "../../elements/PaginationComponent.vue";
+import moment from 'moment';
 
 export default {
     name: "utilisateurs-archives",
@@ -122,6 +123,16 @@ export default {
         }
     },
     methods: {
+        formatDate(date) {
+            return moment(date).format('DD/MM/YYYY');
+        },
+        upperCase(value) {
+            return value ? value.toUpperCase() : '';
+        },
+        capitalize(value) {
+            if (!value) return '';
+            return value.charAt(0).toUpperCase() + value.slice(1);
+        },
         getData(){
             this.$Progress.start();
             this.loading = false;

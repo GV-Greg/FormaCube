@@ -1,203 +1,243 @@
 <template>
-    <div class="container">
-        <h1 class="d-flex align-content-center">Liste des Formations</h1>
-        <div class="row align-items-center mt-n2">
-            <div class="col-lg-4" >
-                <div class="btn-wrapper" v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
-                    <router-link to="/formations/create" class="btn btn-success px-3">
-                        <i class="fas fa-plus"></i>
-                        <span class="ml-1">Nouveau</span>
-                    </router-link>
-                </div>
-            </div>
-            <div class="col-lg-2 text-right text-light">
-                <span>Recherche par :</span>
-            </div>
-            <div class="col-lg-2">
-                <v-select :items="searchColonnes" v-model="colonne" color="blue-grey darken-4" class="mySelect bg-light text-dark" outlined dense hide-details="auto"></v-select>
-            </div>
-            <div class="col-lg-4">
-                <v-text-field v-model="search" label="Recherche" color="blue-grey darken-4" class="mySearch bg-light" outlined dense hide-details="auto" append-icon="fas fa-search"></v-text-field>
-            </div>
+    <v-container fluid>
+        <v-row align="center" class="mb-4">
+            <v-col cols="12" md="4">
+                <h1 class="text-h4">Liste des Formations</h1>
+            </v-col>
+            <v-col cols="12" md="8">
+                <v-row align="center" justify="end">
+                    <v-col cols="auto" v-if="currentUser.role === 'admin' || currentUser.role === 'master'">
+                        <v-btn color="success" :to="'/formations/create'" prepend-icon="mdi-plus">
+                            Nouveau
+                        </v-btn>
+                    </v-col>
+                    <v-col cols="12" md="3">
+                        <v-select
+                            v-model="colonne"
+                            :items="searchColonnes"
+                            label="Recherche par"
+                            variant="outlined"
+                            density="compact"
+                            hide-details
+                        ></v-select>
+                    </v-col>
+                    <v-col cols="12" md="4">
+                        <v-text-field
+                            v-model="search"
+                            label="Recherche"
+                            variant="outlined"
+                            density="compact"
+                            hide-details
+                            prepend-inner-icon="mdi-magnify"
+                            clearable
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+            </v-col>
+        </v-row>
+
+        <v-card>
+            <v-table fixed-header>
+                <thead>
+                    <tr>
+                        <th>N°</th>
+                        <th class="text-center">NOM</th>
+                        <th style="width:95px;">SESSION</th>
+                        <th>TUTEUR·RICE</th>
+                        <th>DÉBUT</th>
+                        <th>FIN</th>
+                        <th style="width:115px;">SALLE</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-if="formations.length" v-for="formation in formations" :key="formation.id">
+                        <th scope="row">{{ formation.id }}</th>
+                        <td>{{ formation.nom }}</td>
+                        <td>{{ formation.session }}</td>
+                        <td>{{ formation.tuteur_prenom }}</td>
+                        <td>{{ formatDate(formation.date_debut) }}</td>
+                        <td>{{ formatDate(formation.date_fin) }}</td>
+                        <td>
+                            <span v-if="formation.salle != null">{{ formation.salle }}</span>
+                            <span v-else class="font-italic text-grey">Pas de salle</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-center">
+                                <v-btn
+                                    icon
+                                    variant="text"
+                                    size="small"
+                                    color="primary"
+                                    :to="{ name: 'showFormation', params: { id: formation.id }}"
+                                >
+                                    <v-icon>mdi-eye</v-icon>
+                                    <v-tooltip activator="parent" location="top">Voir</v-tooltip>
+                                </v-btn>
+                                <template v-if="currentUser.role === 'admin' || currentUser.role === 'master'">
+                                    <v-btn
+                                        icon
+                                        variant="text"
+                                        size="small"
+                                        color="success"
+                                        :to="{ name: 'editFormation', params: { id: formation.id }}"
+                                    >
+                                        <v-icon>mdi-pencil</v-icon>
+                                        <v-tooltip activator="parent" location="top">Modifier</v-tooltip>
+                                    </v-btn>
+                                    <v-btn
+                                        icon
+                                        variant="text"
+                                        size="small"
+                                        color="error"
+                                        @click="destroy(formation)"
+                                    >
+                                        <v-icon>mdi-delete</v-icon>
+                                        <v-tooltip activator="parent" location="top">Supprimer</v-tooltip>
+                                    </v-btn>
+                                </template>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr v-if="!formations.length && !loading">
+                        <td colspan="8" class="text-center py-8">
+                            <v-progress-circular
+                                :size="70"
+                                :width="7"
+                                color="primary"
+                                indeterminate
+                            ></v-progress-circular>
+                            <div class="mt-4 text-grey">Chargement...</div>
+                        </td>
+                    </tr>
+                    <tr v-if="!formations.length && loading">
+                        <td colspan="8">
+                            <v-alert type="warning" variant="tonal" class="ma-4" icon="mdi-database-search">
+                                {{ search ? 'Aucune donnée ne correspond à votre recherche.' : 'Aucune donnée correspondante.' }}
+                            </v-alert>
+                        </td>
+                    </tr>
+                </tbody>
+            </v-table>
+        </v-card>
+
+        <div class="d-flex justify-center mt-4" v-if="pagination.last_page > 1">
+            <v-pagination
+                v-model="pagination.current_page"
+                :length="pagination.last_page"
+                :total-visible="5"
+                @update:model-value="search === '' ? getData() : searchData()"
+                rounded
+            ></v-pagination>
         </div>
-        <v-simple-table fixed-header>
-            <thead>
-            <tr>
-                <th>N°</th>
-                <th class="text-center">NOM</th>
-                <th style="width:95px;">SESSION</th>
-                <th>TUTEUR·RICE</th>
-                <th>DÉBUT</th>
-                <th>FIN</th>
-                <th style="width:115px;">SALLE</th>
-                <th>ACTIONS</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-show="formations.length" v-for="formation in formations" :key="formation.id">
-                <th scope="row">
-                    {{ formation.id }}
-                </th>
-                <td>
-                    {{ formation.nom }}
-                </td>
-                <td>
-                    {{ formation.session }}
-                </td>
-                <td>
-                    {{ formation.tuteur_prenom }}
-                </td>
-                <td>
-                    {{ formation.date_debut | newDate }}
-                </td>
-                <td>
-                    {{ formation.date_fin | newDate }}
-                </td>
-                <td>
-                    <span v-if="formation.salle != null">{{ formation.salle }}</span>
-                    <span v-else class="font-italic">Pas de salle</span>
-                </td>
-                <td>
-                    <div class="d-flex flex-row">
-                        <router-link :to="{ name: 'showFormation', params: { id: formation.id }}">
-                            <i class="fas fa-eye fa-lg text-blue mr-1"></i>
-                        </router-link>
-                        <span v-show="currentUser.role === 'admin' || currentUser.role === 'master'">|</span>
-                        <router-link :to="{ name: 'editFormation', params: { id: formation.id }}"
-                            v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
-                            <i class="fas fa-edit fa-lg text-green mx-1"></i>
-                        </router-link>
-                        <span v-show="currentUser.role === 'admin' || currentUser.role === 'master'">|</span>
-                        <button type="button" class="ml-1" @click="destroy(formation)"
-                            v-show="currentUser.role === 'admin' || currentUser.role === 'master'">
-                            <i class="fas fa-trash fa-lg text-red"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            <tr v-show="!formations.length && loading === false">
-                <td colspan="12" class="pt-4">
-                    <v-row class="text-center text-interface mt-10">
-                        <v-col class="d-flex flex-column justify-center align-center">
-                            <v-progress-circular :size="70" :width="10" color="interface" indeterminate></v-progress-circular>
-                            <span class="mt-5">Chargement...</span>
-                        </v-col>
-                    </v-row>
-                </td>
-            </tr>
-            <tr v-show="!formations.length && loading === true" class="justify-content-center">
-                <td colspan="12" class="pt-4">
-                    <div class="alert alert-danger" role="alert">
-                        Oups ! Rien ne correspond à votre recherche.
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </v-simple-table>
-        <PaginationComponent class="mt-3" v-if="pagination.last_page > 1"
-                             :pagination="pagination" :offset="5"
-                             @paginate="search === '' ? getData() : searchData()" />
-    </div>
+    </v-container>
 </template>
 
 <script>
-    import PaginationComponent from "../../elements/PaginationComponent";
-    import {Form} from "vform";
+import moment from 'moment';
 
-    export default {
-        name: "ListFormations",
-        components: {
-            PaginationComponent,
-        },
-        data() {
-            return {
-                loading: false,
-                searchColonnes: ['nom', 'salle'],
-                colonne: 'nom',
-                search: '',
-                formations: [],
-                pagination: {
-                    current_page: 1,
-                },
+export default {
+    name: "ListFormations",
+    data() {
+        return {
+            loading: false,
+            searchColonnes: ['nom', 'salle'],
+            colonne: 'nom',
+            search: '',
+            formations: [],
+            pagination: {
+                current_page: 1,
+                last_page: 1,
+            },
+        }
+    },
+    watch: {
+        search(newSearch) {
+            if (newSearch === '' || newSearch === null) {
+                this.getData();
+            } else {
+                this.searchData();
             }
+        }
+    },
+    mounted() {
+        console.log('List Formations component mounted');
+        this.getData();
+    },
+    computed: {
+        currentUser() {
+            return this.$store.getters.currentUser;
+        }
+    },
+    methods: {
+        formatDate(date) {
+            if (!date) return '';
+            return moment(date).format('DD/MM/YYYY');
         },
-        watch: {
-            search: function(newSearch) {
-                if (newSearch === '') {
-                    this.getData();
-                } else {
-                    this.searchData();
-                }
-            }
-        },
-        mounted() {
-            console.log('List Formations component mounted');
-            this.getData();
-        },
-        computed: {
-            currentUser() {
-                return this.$store.getters.currentUser;
-            }
-        },
-        methods: {
-            getData(){
-                this.$Progress.start();
-                this.loading = false;
-                axios.get('api/formations?page=' + this.pagination.current_page)
-                    .then(response => {
-                        this.formations = response.data.data;
-                        this.pagination = response.data.meta;
-                        this.$Progress.finish();
-                        this.loading= true;
+        getData() {
+            this.$Progress.start();
+            this.loading = false;
+            axios.get('api/formations?page=' + this.pagination.current_page)
+                .then(response => {
+                    this.formations = response.data.data;
+                    this.pagination = response.data.meta;
+                    this.$Progress.finish();
+                    this.loading = true;
+                })
+                .catch(error => {
+                    this.$Progress.fail();
+                    console.log(error.response);
+                    Snackbar.fire({
+                        title: 'Problème avec la récupération de la liste des formations !',
+                        timer: undefined,
                     })
-                    .catch(error => {
-                        this.$Progress.fail();
-                        console.log(error.response);
-                        Snackbar.fire({
-                            title: 'Problème avec la récupération de la liste des formations !',
-                            timer: undefined,
+                })
+        },
+        searchData() {
+            this.$Progress.start();
+            axios.get('api/search/formations/' + this.colonne + '/' + this.search + '?page=' + this.pagination.current_page)
+                .then(response => {
+                    this.formations = response.data.data;
+                    this.pagination = response.data.meta;
+                    this.$Progress.finish();
+                })
+                .catch(error => {
+                    this.$Progress.fail();
+                    console.log(error.response);
+                    Snackbar.fire('Problème avec la recherche de formations !');
+                })
+        },
+        destroy(formation) {
+            this.$Progress.start();
+            Suppression.fire().then((result) => {
+                if (result.value) {
+                    axios.delete('api/formations/' + formation.id)
+                        .then(response => {
+                            this.getData();
+                            this.$Progress.finish();
+                            Confirm.fire('Formation supprimée!');
+                            Fire.$emit('RefreshPage');
                         })
-                    })
-            },
-            searchData() {
-                this.$Progress.start();
-                axios.get('api/search/formations/' + this.colonne +'/'+ this.search +'?page=' + this.pagination.current_page)
-                    .then(response => {
-                        this.formations = response.data.data
-                        this.pagination = response.data.meta
-                        this.$Progress.finish();
-                    })
-                    .catch(error => {
-                        this.$Progress.fail();
-                        console.log(error.response);
-                        Snackbar.fire('Problème avec la recherche de formations !');
-                    })
-            },
-            destroy(formation) {
-                this.$Progress.start();
-                Suppression.fire().then((result) => {
-                    if (result.value) {
-                        axios.delete('api/formations/' + formation.id)
-                            .then(response => {
-                                this.getData();
-                                this.$Progress.finish();
-                                Confirm.fire('Formation supprimée!');
-                                Fire.$emit('RefreshPage'); // Rafraichit la page
-                            })
-                            .catch(error => {
-                                this.$Progress.fail();
-                                console.log(error.response);
-                                Snackbar.fire('Problème avec la suppression de la formation !');
-                            })
-                    }
-                });
-            }
-        },
-    }
+                        .catch(error => {
+                            this.$Progress.fail();
+                            console.log(error.response);
+                            Snackbar.fire('Problème avec la suppression de la formation !');
+                        })
+                }
+            });
+        }
+    },
+}
 </script>
 
 <style scoped>
-    .v-list-item {
-        color: #0a0a17 !important;
-    }
+.v-table {
+    background: transparent;
+}
+
+.v-table th {
+    background-color: rgb(var(--v-theme-primary)) !important;
+    color: white !important;
+    font-weight: bold !important;
+}
 </style>

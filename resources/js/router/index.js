@@ -1,7 +1,4 @@
-import Vue from 'vue';
-import VueRouter from "vue-router";
-
-Vue.use(VueRouter);
+import { createRouter, createWebHashHistory } from 'vue-router';
 
 import LoginForm from "../components/pages/auth/LoginForm.vue";
 
@@ -48,27 +45,29 @@ import ListTags from "../components/pages/tags/ListTags.vue";
 import MainProspects from "../components/pages/prospects/MainProspects.vue";
 import ListProspects from "../components/pages/prospects/ListProspects.vue";
 
-import PageNotFound from "../components/elements/PageNotFound";
+import PageNotFound from "../components/elements/PageNotFound.vue";
 
 const routes = [
     {
         path: "/",
         name: "dashboard",
         component: Dashboard,
+        redirect: '/home',
         meta: {
             requiresAuth: true
         },
         children: [
             {
-                path: "/home",
+                path: "home",
+                name: "home",
                 component: Home,
             },
             {
-                path: "/users",
+                path: "users",
                 component: UtilisateursMain,
                 children: [
                     {
-                        path: '/',
+                        path: '',
                         component: UtilisateursList,
                     },
                     {
@@ -94,15 +93,15 @@ const routes = [
                 ]
             },
             {
-                path: "/profil",
+                path: "profil",
                 component: MainProfil,
                 children: [
                     {
-                        path: '/',
+                        path: '',
                         component: Profil,
                     },
                     {
-                        path: '/profil/edit/:id',
+                        path: 'edit/:id',
                         name: 'editProfil',
                         component: EditProfil,
                         props: true,
@@ -110,15 +109,15 @@ const routes = [
                 ]
             },
             {
-                path: "/formations",
+                path: "formations",
                 component: MainFormations,
                 children: [
                     {
-                        path: '/',
+                        path: '',
                         component: ListFormations,
                     },
                     {
-                        path: '/formations/show/:id',
+                        path: 'show/:id',
                         name: 'showFormation',
                         component: ShowFormation,
                         props: true,
@@ -129,7 +128,7 @@ const routes = [
                         component: CreateFormation,
                     },
                     {
-                        path: '/formations/edit/:id',
+                        path: 'edit/:id',
                         name: 'editFormation',
                         component: EditFormation,
                         props: true,
@@ -137,15 +136,15 @@ const routes = [
                 ]
             },
             {
-                path: "/recrutements",
+                path: "recrutements",
                 component: MainRecrutements,
                 children: [
                     {
-                        path: '/',
+                        path: '',
                         component: ListRecrutements,
                     },
                     {
-                        path: '/recrutements/show/:id',
+                        path: 'show/:id',
                         name: 'showRecrutement',
                         component: ShowRecrutement,
                         props: true,
@@ -158,15 +157,15 @@ const routes = [
                 ]
             },
             {
-                path: "/inscrits",
+                path: "inscrits",
                 component: MainInscrits,
                 children: [
                     {
-                        path: '/',
+                        path: '',
                         component: ListInscrits,
                     },
                     {
-                        path: '/inscrits/show/:id',
+                        path: 'show/:id',
                         name: 'showInscrit',
                         component: ShowInscrit,
                         props: true,
@@ -192,7 +191,7 @@ const routes = [
                         component: CreateInscritWithProspect,
                     },
                     {
-                        path: '/inscrits/edit/:id',
+                        path: 'edit/:id',
                         name: 'editInscrit',
                         component: EditInscrit,
                         props: true,
@@ -200,31 +199,31 @@ const routes = [
                 ]
             },
             {
-                path: "/salles",
+                path: "salles",
                 component: MainSalles,
                 children: [
                     {
-                        path: '/',
+                        path: '',
                         component: ListSalles,
                     },
                 ]
             },
             {
-                path: "/tags",
+                path: "tags",
                 component: MainTags,
                 children: [
                     {
-                        path: '/',
+                        path: '',
                         component: ListTags,
                     },
                 ]
             },
             {
-                path: "/prospects",
+                path: "prospects",
                 component: MainProspects,
                 children: [
                     {
-                        path: '/',
+                        path: '',
                         component: ListProspects,
                     },
                 ]
@@ -237,13 +236,14 @@ const routes = [
         path: "/login",
         component: LoginForm,
     },
-    { path: '*', redirect: '/404' },
+    { path: '/:pathMatch(.*)*', redirect: '/404' },
     { path: '/404', component: PageNotFound, },
 ];
 
-const router = new VueRouter({
+const router = createRouter({
+    history: createWebHashHistory(),
     routes: routes,
-    // mode: 'history',
 });
 
 export default router;
+

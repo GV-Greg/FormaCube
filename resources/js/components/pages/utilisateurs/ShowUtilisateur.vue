@@ -2,9 +2,9 @@
     <div>
         <h1 class="ml-5">
             <router-link to="/users">
-                <button class="btn btn-light mt-n2">
-                    <i class="fas fa-reply fa-lg text-interface"></i>
-                </button>
+                <v-btn variant="flat" color="grey-lighten-3" class="mt-n2">
+                    <v-icon color="primary" size="large">mdi-reply</v-icon>
+                </v-btn>
             </router-link>
             Fiche d'utilisateur
         </h1>
@@ -17,10 +17,10 @@
                                 <img :src="'storage/images/avatars/'+user.avatar" class="img-circle elevation-2" alt="User Image">
                             </v-avatar>
                             <div>
-                        <span class="display-1 text--primary font-weight-bold">
-                            {{ user.firstname }} {{ user.lastname | UpperCase }}<br>
+                        <span class="text-h4 text-primary font-weight-bold">
+                            {{ user.firstname }} {{ upperCase(user.lastname) }}<br>
                         </span>
-                                <p><i>Fiche créée depuis le {{ user.created_at | newDate }}.</i></p>
+                                <p><i>Fiche créée depuis le {{ formatDate(user.created_at) }}.</i></p>
                             </div>
                         </div>
                         <v-row>
@@ -45,6 +45,8 @@
 </template>
 
 <script>
+    import moment from 'moment';
+
     export default {
         name: "show",
         data() {
@@ -77,6 +79,14 @@
             users() {
                 return this.$store.getters.users;
             }
+        },
+        methods: {
+            formatDate(date) {
+                return moment(date).format('DD/MM/YYYY');
+            },
+            upperCase(value) {
+                return value ? value.toUpperCase() : '';
+            },
         }
     }
 </script>

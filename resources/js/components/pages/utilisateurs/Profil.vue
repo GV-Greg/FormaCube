@@ -9,10 +9,10 @@
                                 <img :src="getAvatar()" class="img-circle elevation-2" alt="User Image">
                             </v-avatar>
                             <div>
-                                <span class="display-1 text--primary font-weight-bold">
-                                    {{ currentUser.firstname }} {{ currentUser.lastname | UpperCase }}<br>
+                                <span class="text-h4 text-primary font-weight-bold">
+                                    {{ currentUser.firstname }} {{ upperCase(currentUser.lastname) }}<br>
                                 </span>
-                                <p><i>Fiche créée depuis le {{ currentUser.created_at | newDate }}.</i></p>
+                                <p><i>Fiche créée depuis le {{ formatDate(currentUser.created_at) }}.</i></p>
                             </div>
                         </div>
                         <v-row>
@@ -32,10 +32,10 @@
         <v-row justify="center" class="ml-5">
             <v-col cols="2" v-if="currentUser.id !== 2">
                 <router-link :to="{ name: 'editProfil', params: { id: currentUser.id }}">
-                    <button class="btn btn-success">Modifier</button>
+                    <v-btn color="success">Modifier</v-btn>
                 </router-link>
             </v-col>
-            <v-col class="d-flex justify-content-center">
+            <v-col class="d-flex justify-center">
                 <span class="bg-danger text-light px-4 py-2 rounded-xl">Ce compte ne peut &ecirc;tre modifi&eacute;</span>
             </v-col>
         </v-row>
@@ -43,6 +43,8 @@
 </template>
 
 <script>
+    import moment from 'moment';
+
     export default {
         data() {
             return {
@@ -63,6 +65,12 @@
             this.getAvatar();
         },
         methods: {
+            formatDate(date) {
+                return moment(date).format('DD/MM/YYYY');
+            },
+            upperCase(value) {
+                return value ? value.toUpperCase() : '';
+            },
             getAvatar() {
                 this.userAvatar = "storage/images/avatars/" + this.$store.getters.currentUser.avatar;
 

@@ -1,308 +1,304 @@
 <template>
-    <div class="container">
-        <h1 class="d-flex align-content-center">Liste des Salles</h1>
-        <div v-if="loading === true">
-            <div class="row align-items-center mt-2">
-                <div class="col-lg-2"></div>
-                <div class="col-lg-4">
-                    <button type="button" class="btn btn-success" @click="create">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span class="ml-1">Nouveau</span>
-                    </button>
-                </div>
-                <div class="col-lg-4">
-                    <v-text-field v-model="search" label="Recherche" color="blue-grey darken-4" class="mySearch bg-light" outlined dense hide-details="auto" append-icon="fas fa-search"></v-text-field>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-8 mt-n1 pt-0">
-                    <v-simple-table fixed-header>
-                        <thead>
+    <v-container fluid>
+        <h1 class="text-h4 mb-4">Liste des Salles</h1>
+
+        <div v-if="loading">
+            <v-row align="center" class="mb-4">
+                <v-col cols="12" sm="6" md="4">
+                    <v-btn color="success" @click="create">
+                        <v-icon start>mdi-plus</v-icon>
+                        Nouvelle salle
+                    </v-btn>
+                </v-col>
+                <v-col cols="12" sm="6" md="4" class="ml-auto">
+                    <v-text-field
+                        v-model="search"
+                        label="Recherche"
+                        variant="outlined"
+                        density="compact"
+                        hide-details
+                        clearable
+                        prepend-inner-icon="mdi-magnify"
+                    ></v-text-field>
+                </v-col>
+            </v-row>
+
+            <v-card>
+                <v-table hover>
+                    <thead>
                         <tr>
-                            <th>N°</th>
-                            <th>NOM</th>
-                            <th class="text-uppercase">création</th>
-                            <th class="text-uppercase">dernière modification</th>
-                            <th>ACTIONS</th>
+                            <th class="text-left">N°</th>
+                            <th class="text-left">NOM</th>
+                            <th class="text-left">CRÉATION</th>
+                            <th class="text-left">DERNIÈRE MODIFICATION</th>
+                            <th class="text-center">ACTIONS</th>
                         </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-show="salles.length" v-for="salle in salles" :key="salle.id">
-                            <th scope="row">
-                                {{ salle.id }}
-                            </th>
-                            <td>
-                                {{ salle.nom | UpperCase }}
-                            </td>
-                            <td>
-                                {{ salle.created_at | newDate }}
-                            </td>
-                            <td>
-                                {{ salle.updated_at | newDate }}
-                            </td>
-                            <td>
-                                <div class="d-flex flex-row">
-                                    <button type="button" class="mx-1" @click="edit(salle)">
-                                        <i class="fas fa-edit fa-lg text-green "></i>
-                                    </button>
-                                    |
-                                    <button type="button" class="ml-1" @click="destroy(salle)">
-                                        <i class="fas fa-trash fa-lg text-red"></i>
-                                    </button>
-                                </div>
+                    </thead>
+                    <tbody>
+                        <tr v-for="salle in salles" :key="salle.id">
+                            <td>{{ salle.id }}</td>
+                            <td>{{ salle.nom?.toUpperCase() }}</td>
+                            <td>{{ formatDate(salle.created_at) }}</td>
+                            <td>{{ formatDate(salle.updated_at) }}</td>
+                            <td class="text-center">
+                                <v-btn icon size="small" variant="text" color="success" @click="edit(salle)">
+                                    <v-icon>mdi-pencil</v-icon>
+                                </v-btn>
+                                <v-btn icon size="small" variant="text" color="error" @click="destroy(salle)">
+                                    <v-icon>mdi-delete</v-icon>
+                                </v-btn>
                             </td>
                         </tr>
-                        <!-- Si le tableau est chargé mais qu'il n'y a pas de données -->
-                        <tr v-show="!salles.length" class="justify-content-center">
-                            <td colspan="12" class="pt-4">
-                                <div class="alert alert-danger" role="alert">
-                                    Oups ! Il n'y a aucune correspondance dans la base de données.
-                                </div>
+                        <tr v-if="!salles.length">
+                            <td colspan="5">
+                                <v-alert type="warning" variant="tonal" class="ma-4" icon="mdi-database-search">
+                                    {{ search ? 'Aucune donnée ne correspond à votre recherche.' : 'Aucune donnée correspondante.' }}
+                                </v-alert>
                             </td>
                         </tr>
-                        </tbody>
-                    </v-simple-table>
-                </div>
-            </div>
-            <PaginationComponent class="mt-3" v-if="pagination.last_page > 1"
-                                 :pagination="pagination" :offset="5"
-                                 @paginate="search === '' ? getData() : searchData()" />
+                    </tbody>
+                </v-table>
+            </v-card>
+
+            <v-pagination
+                v-if="pagination.last_page > 1"
+                v-model="pagination.current_page"
+                :length="pagination.last_page"
+                class="mt-4"
+                @update:model-value="search === '' ? getData() : searchData()"
+            ></v-pagination>
         </div>
-        <Spinner v-else />
-        <!-- Create & Edit Modal -->
-        <div class="modal fade" id="salleModal" tabindex="-1" role="dialog" aria-labelledby="salleModalTitle" aria-hidden="true" data-backdrop="static">
-            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="salleModalTitle">{{ editMode ? "Modification d'une" : "Cr&eacute;ation d'une nouvelle" }} Salle</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form @submit.prevent="editMode ? update() : store()" @keydown="form.onKeydown($event)">
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col">
-                                    <b-input-group class="mb-2 mr-sm-2 mb-sm-0">
-                                        <b-input-group-prepend is-text>
-                                            <span class="text-light-interface"><i class="fas fa-tag"></i></span>
-                                        </b-input-group-prepend>
-                                        <b-form-input v-model="form.nom" type="text"
-                                                      :state="validationMinSalle && validationMaxSalle"
-                                                      class="form-control rounded-r-lg" :class="{ 'is-invalid': form.errors.has('nom') }"
-                                                      name="nom" id="nom" placeholder="Nom de la salle">
-                                        </b-form-input>
-                                        <b-form-invalid-feedback id="salle-min-feedback" class="pl-5" v-show="validationMinSalle === false">
-                                            Le nom de la salle doit &ecirc;tre compos&eacute; d'au moins 3 caract&egrave;res
-                                        </b-form-invalid-feedback>
-                                        <b-form-invalid-feedback id="salle-max-feedback" class="pl-5" v-show="validationMaxSalle === false">
-                                            Le nom de la salle doit &ecirc;tre compos&eacute; de moins 200 caract&egrave;res
-                                        </b-form-invalid-feedback>
-                                        <has-error :form="form" field="nom" class="pl-5"></has-error>
-                                    </b-input-group>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer d-flex justify-content-between">
-                            <v-btn class="btn-danger" data-dismiss="modal">Fermer</v-btn>
-                            <v-btn :disabled="form.busy" type="submit" class="btn-success">{{ editMode ? "&Eacute;diter" : "Cr&eacute;er" }}</v-btn>
-                        </div>
-                    </form>
-                </div>
-            </div>
+
+        <!-- Loading -->
+        <div v-else class="text-center py-16">
+            <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+            <div class="mt-4">Chargement...</div>
         </div>
-    </div>
+
+        <!-- Create & Edit Dialog -->
+        <v-dialog v-model="dialog" max-width="600" persistent>
+            <v-card>
+                <v-card-title>
+                    {{ editMode ? "Modification d'une" : "Création d'une nouvelle" }} Salle
+                </v-card-title>
+                <v-card-text>
+                    <v-text-field
+                        v-model="form.nom"
+                        label="Nom de la salle"
+                        variant="outlined"
+                        prepend-inner-icon="mdi-tag"
+                        :error="!validationMinSalle || !validationMaxSalle"
+                        :error-messages="getSalleErrors()"
+                    ></v-text-field>
+                </v-card-text>
+                <v-card-actions class="justify-space-between pa-4">
+                    <v-btn color="error" @click="dialog = false">Fermer</v-btn>
+                    <v-btn color="success" :disabled="form.busy" @click="editMode ? update() : store()">
+                        {{ editMode ? "Éditer" : "Créer" }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    </v-container>
 </template>
 
 <script>
-    import PaginationComponent from "../../elements/PaginationComponent";
-    import { Form } from "vform";
-    import Spinner from "../../elements/SpinnerStepper";
+import { Form } from "vform";
+import moment from 'moment';
 
-    export default {
-        name: "ListSalles",
-        components: {
-            PaginationComponent,
-            Spinner,
-        },
-        data() {
-            return {
-                loading: false,
-                editMode: false,
-                colonne: 'nom',
-                search: '',
-                salles: [],
-                pagination: {
-                    current_page: 1,
-                },
-                error: '',
-                form : new Form({
-                    id: '',
-                    nom: '',
-                }),
+export default {
+    name: "ListSalles",
+    data() {
+        return {
+            loading: false,
+            editMode: false,
+            dialog: false,
+            colonne: 'nom',
+            search: '',
+            salles: [],
+            pagination: {
+                current_page: 1,
+            },
+            error: '',
+            form: new Form({
+                id: '',
+                nom: '',
+            }),
+        }
+    },
+    watch: {
+        search(newSearch) {
+            if (newSearch === '') {
+                this.getData();
+            } else {
+                this.searchData();
             }
+        }
+    },
+    mounted() {
+        console.log('List Salles component mounted');
+        this.getData();
+    },
+    computed: {
+        currentUser() {
+            return this.$store.getters.currentUser;
         },
-        watch: {
-            search: function(newSearch) {
-                if (newSearch === '') {
-                    this.getData();
-                } else {
-                    this.searchData();
-                }
+        validationMinSalle() {
+            return this.form.nom.length > 2;
+        },
+        validationMaxSalle() {
+            return this.form.nom.length < 200;
+        },
+    },
+    methods: {
+        formatDate(date) {
+            if (!date) return '';
+            return moment(date).format('DD/MM/YYYY');
+        },
+        getSalleErrors() {
+            if (!this.validationMinSalle) return "Le nom de la salle doit être composé d'au moins 3 caractères.";
+            if (!this.validationMaxSalle) return "Le nom de la salle doit être composé de moins de 200 caractères.";
+            return '';
+        },
+        validation(test, message) {
+            if (test) {
+                Snackbar.fire(message);
+                return true;
             }
+            return false;
         },
-        mounted() {
-            console.log('List Salles component mounted');
-            this.getData();
-        },
-        computed: {
-            currentUser() {
-                return this.$store.getters.currentUser;
-            },
-            validationMinSalle() {
-                return this.form.nom.length > 2;
-            },
-            validationMaxSalle() {
-                return this.form.nom.length < 200;
-            },
-        },
-        methods: {
-            validation(test, message){
-                if(test) {
-                    Snackbar.fire(message);
-                    return true;
-                }
-                return false;
-            },
-            getData(){
-                this.$Progress.start();
-                this.loading = false;
-                axios.get('api/salles?page=' + this.pagination.current_page)
-                    .then(response => {
-                        this.salles = response.data.data;
-                        this.pagination = response.data.meta;
-                        this.$Progress.finish();
-                        this.loading= true;
-                    })
-                    .catch(error => {
-                        this.$Progress.fail();
-                        console.log(error);
-                        Snackbar.fire({
-                            title: 'Problème avec la récupération de la liste des salles !',
-                            timer: undefined,
-                        })
-                    })
-            },
-            searchData() {
-                this.$Progress.start();
-                axios.get('api/search/salles/' + this.colonne +'/'+ this.search +'?page=' + this.pagination.current_page)
-                    .then(response => {
-                        this.salles = response.data.data
-                        this.pagination = response.data.meta
-                        this.$Progress.finish();
-                    })
-                    .catch(error => {
-                        this.$Progress.fail();
-                        console.log(error);
-                        Snackbar.fire('Problème avec la recherche de salle !');
-                    })
-            },
-            create() {
-                this.editMode = false;
-                this.form.reset();
-                this.form.clear();
-                $('#salleModal').modal('show');
-            },
-            store() {
-                this.$Progress.start();
-                if(this.validation(!this.validationMinSalle, 'Le nom de la salle doit être composé d\'au moins 3 caractères')) {
-                } else if(this.validation(!this.validationMaxSalle, 'Le nom de la salle doit être composé de moins de 200 caractères')) {
-                } else {
-                    this.form.nom = this.form.nom.toLowerCase();
-                    this.form.busy = true;
-                    this.form
-                        .post('api/salles/create')
-                        .then(response => {
-                            this.getData()
-                            if(this.form.successful) {
-                                this.$Progress.finish();
-                                Toast.fire('Salle créée'); // affiche la notification de réussite
-                                $('#salleModal').modal('hide');
-                                Fire.$emit('RefreshPage'); // Rafraichit la page
-                            }
-                        })
-                        .catch(error => {
-                            this.$Progress.fail();
-                            console.log(error.response);
-                            if (error.response.status === 422) {
-                                this.error = error.response.data.errors.nom[0];
-                                Snackbar.fire('Salle déjà existante');
-                            } else {
-                                Snackbar.fire('Problème avec la création de la salle !');
-                            }
-                        })
-                }
-            },
-            edit(salle) {
-                this.editMode = true;
-                this.form.reset();
-                this.form.clear();
-                this.form.fill(salle);
-                $('#salleModal').modal('show');
-            },
-            update() {
-                this.$Progress.start();
-                if(this.validation(!this.validationMinSalle, 'Le nom de la salle doit être composé d\'au moins 3 caractères')) {
-                } else if(this.validation(!this.validationMaxSalle, 'Le nom de la salle doit être composé de moins de 200 caractères')) {
-                } else {
-                    this.form.nom = this.form.nom.toLowerCase();
-                    this.form.busy = true;
-                    this.form
-                        .put('api/salles/edit/' + this.form.id)
-                        .then(response => {
-                            this.getData()
-                            if(this.form.successful) {
-                                this.$Progress.finish();
-                                Toast.fire('Salle éditée');
-                                $('#salleModal').modal('hide');
-                                Fire.$emit('RefreshPage');
-                            }
-                        })
-                        .catch(error => {
-                            this.$Progress.fail();
-                            console.log(error.response);
-                            if (error.response.status === 422) {
-                                this.error = error.response.data.errors.nom[0];
-                                Snackbar.fire('Salle déjà existante !');
-                            } else {
-                                Snackbar.fire('Problème avec la modification de salle !');
-                            }
-                        })
-                }
-            },
-            destroy(salle) {
-                this.$Progress.start();
-                Suppression.fire().then((result) => {
-                    if (result.value) {
-                        axios.delete('api/salles/' + salle.id)
-                            .then(response => {
-                                this.getData();
-                                this.$Progress.finish();
-                                Confirm.fire('Salle supprimée!');
-                                Fire.$emit('RefreshPage');
-                            })
-                            .catch(error => {
-                                this.$Progress.fail();
-                                console.error(error.response);
-                                Snackbar.fire('Problème avec la suppression de la salle !');
-                            })
-                    }
+        getData() {
+            this.$Progress.start();
+            this.loading = false;
+            axios.get('api/salles?page=' + this.pagination.current_page)
+                .then(response => {
+                    this.salles = response.data.data;
+                    this.pagination = response.data.meta;
+                    this.$Progress.finish();
+                    this.loading = true;
+                })
+                .catch(error => {
+                    this.$Progress.fail();
+                    console.log(error);
+                    Snackbar.fire({
+                        title: 'Problème avec la récupération de la liste des salles !',
+                        timer: undefined,
+                    });
                 });
+        },
+        searchData() {
+            this.$Progress.start();
+            axios.get('api/search/salles/' + this.colonne + '/' + this.search + '?page=' + this.pagination.current_page)
+                .then(response => {
+                    this.salles = response.data.data;
+                    this.pagination = response.data.meta;
+                    this.$Progress.finish();
+                })
+                .catch(error => {
+                    this.$Progress.fail();
+                    console.log(error);
+                    Snackbar.fire('Problème avec la recherche de salle !');
+                });
+        },
+        create() {
+            this.editMode = false;
+            this.form.reset();
+            this.form.clear();
+            this.dialog = true;
+        },
+        store() {
+            this.$Progress.start();
+            if (this.validation(!this.validationMinSalle, "Le nom de la salle doit être composé d'au moins 3 caractères")) {
+            } else if (this.validation(!this.validationMaxSalle, "Le nom de la salle doit être composé de moins de 200 caractères")) {
+            } else {
+                this.form.nom = this.form.nom.toLowerCase();
+                this.form.busy = true;
+                this.form
+                    .post('api/salles/create')
+                    .then(response => {
+                        this.getData();
+                        if (this.form.successful) {
+                            this.$Progress.finish();
+                            Toast.fire('Salle créée');
+                            this.dialog = false;
+                            Fire.$emit('RefreshPage');
+                        }
+                    })
+                    .catch(error => {
+                        this.$Progress.fail();
+                        console.log(error.response);
+                        if (error.response.status === 422) {
+                            this.error = error.response.data.errors.nom[0];
+                            Snackbar.fire('Salle déjà existante');
+                        } else {
+                            Snackbar.fire('Problème avec la création de la salle !');
+                        }
+                    });
             }
         },
+        edit(salle) {
+            this.editMode = true;
+            this.form.reset();
+            this.form.clear();
+            this.form.fill(salle);
+            this.dialog = true;
+        },
+        update() {
+            this.$Progress.start();
+            if (this.validation(!this.validationMinSalle, "Le nom de la salle doit être composé d'au moins 3 caractères")) {
+            } else if (this.validation(!this.validationMaxSalle, "Le nom de la salle doit être composé de moins de 200 caractères")) {
+            } else {
+                this.form.nom = this.form.nom.toLowerCase();
+                this.form.busy = true;
+                this.form
+                    .put('api/salles/edit/' + this.form.id)
+                    .then(response => {
+                        this.getData();
+                        if (this.form.successful) {
+                            this.$Progress.finish();
+                            Toast.fire('Salle éditée');
+                            this.dialog = false;
+                            Fire.$emit('RefreshPage');
+                        }
+                    })
+                    .catch(error => {
+                        this.$Progress.fail();
+                        console.log(error.response);
+                        if (error.response.status === 422) {
+                            this.error = error.response.data.errors.nom[0];
+                            Snackbar.fire('Salle déjà existante !');
+                        } else {
+                            Snackbar.fire('Problème avec la modification de salle !');
+                        }
+                    });
+            }
+        },
+        destroy(salle) {
+            this.$Progress.start();
+            Suppression.fire().then((result) => {
+                if (result.value) {
+                    axios.delete('api/salles/' + salle.id)
+                        .then(response => {
+                            this.getData();
+                            this.$Progress.finish();
+                            Confirm.fire('Salle supprimée!');
+                            Fire.$emit('RefreshPage');
+                        })
+                        .catch(error => {
+                            this.$Progress.fail();
+                            console.error(error.response);
+                            Snackbar.fire('Problème avec la suppression de la salle !');
+                        });
+                }
+            });
+        }
     }
+}
 </script>
 
 <style scoped>
-
+.v-table th {
+    background-color: rgb(var(--v-theme-primary)) !important;
+    color: white !important;
+}
 </style>

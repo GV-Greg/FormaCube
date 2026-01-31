@@ -1,28 +1,34 @@
 export function initialize(store, router) {
     router.beforeEach((to, from, next) => {
         const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-        const currentUser = store.state.currentUser;
+        const currentUser = store.currentUser;
 
-        if(requiresAuth && !currentUser) {
-            next('/login');
-        } else if(to.path === '/login' && currentUser) {
-            next('/home');
+        // Éviter les boucles de redirection
+        if (to.path === from.path) {
+            next();
+            return;
+        }
+
+        if (requiresAuth && !currentUser) {
+            next({ path: '/login', replace: true });
+        } else if (to.path === '/login' && currentUser) {
+            next({ path: '/home', replace: true });
         } else {
             next();
         }
     });
 
     axios.interceptors.response.use(null, (error) => {
-        if (error.response.status === 401) {
-            store.commit('logout');
+        if (error.response && error.response.status === 401) {
+            store.logout();
             router.push('/login');
         }
 
         return Promise.reject(error);
     });
 
-    if(store.getters.currentUser) {
-        setAuthorization(store.getters.currentUser.token);
+    if (store.currentUser) {
+        setAuthorization(store.currentUser.token);
     }
 }
 

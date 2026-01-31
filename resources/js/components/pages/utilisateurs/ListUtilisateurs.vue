@@ -2,34 +2,38 @@
     <div class="container">
         <h1 class="d-flex align-content-center">Liste des Utilisateurs</h1>
         <div v-if="loading === true">
-            <div class="row align-items-center mt-n2">
-                <div class="col-lg-2" >
+            <v-row align="center" class="mt-n2">
+                <v-col cols="12" lg="2">
                     <div class="btn-wrapper">
-                        <router-link to="/users/create" class="btn btn-success px-3">
-                            <i class="fas fa-users-cog"></i>
-                            Nouveau
+                        <router-link to="/users/create">
+                            <v-btn color="success" class="px-3">
+                                <v-icon start>mdi-account-cog</v-icon>
+                                Nouveau
+                            </v-btn>
                         </router-link>
                     </div>
-                </div>
-                <div class="col-lg-2 text-right text-light">
+                </v-col>
+                <v-col cols="12" lg="2" class="text-right text-light">
                     <span>Recherche par :</span>
-                </div>
-                <div class="col-lg-2">
-                    <v-select :items="searchColonnes" v-model="colonne" color="blue-grey darken-4" class="mySelect bg-light text-dark" outlined dense hide-details="auto"></v-select>
-                </div>
-                <div class="col-lg-4">
-                    <v-text-field v-model="search" label="Recherche" color="blue-grey darken-4" class="mySearch bg-light" outlined dense hide-details="auto" append-icon="fas fa-search"></v-text-field>
-                </div>
-                <div class="col-lg-2 d-flex align-items-end flex-column">
+                </v-col>
+                <v-col cols="12" lg="2">
+                    <v-select :items="searchColonnes" v-model="colonne" color="blue-grey-darken-4" class="mySelect bg-light text-dark" variant="outlined" density="compact" hide-details="auto"></v-select>
+                </v-col>
+                <v-col cols="12" lg="4">
+                    <v-text-field v-model="search" label="Recherche" color="blue-grey-darken-4" class="mySearch bg-light" variant="outlined" density="compact" hide-details="auto" append-inner-icon="mdi-magnify"></v-text-field>
+                </v-col>
+                <v-col cols="12" lg="2" class="d-flex align-items-end flex-column">
                     <div class="btn-wrapper">
-                        <router-link to="/users/archives" class="btn btn-primary px-3">
-                            <i class="fas fa-archive"></i>
-                            Archives
+                        <router-link to="/users/archives">
+                            <v-btn color="primary" class="px-3">
+                                <v-icon start>mdi-archive</v-icon>
+                                Archives
+                            </v-btn>
                         </router-link>
                     </div>
-                </div>
-            </div>
-            <v-simple-table fixed-header>
+                </v-col>
+            </v-row>
+            <v-table fixed-header>
                 <thead>
                 <tr>
                     <th scope="col" class="th">N°</th>
@@ -50,41 +54,41 @@
                         {{ user.firstname }}
                     </td>
                     <td>
-                        {{ user.lastname | UpperCase }}
+                        {{ upperCase(user.lastname) }}
                     </td>
                     <td>
                         {{ user.email }}
                     </td>
                     <td>
-                        {{ user.role | Capitalize }}
+                        {{ capitalize(user.role) }}
                     </td>
                     <td>
-                        {{ user.created_at  | newDate }}
+                        {{ formatDate(user.created_at) }}
                     </td>
                     <td>
                         <router-link :to="`/users/${user.id}`">
-                            <i class="fas fa-eye fa-lg text-blue "></i>
+                            <v-icon color="blue" size="large">mdi-eye</v-icon>
                         </router-link>
                         |
                         <router-link :to="`/users/edit/${user.id}`">
-                            <i class="fas fa-edit fa-lg text-green"></i>
+                            <v-icon color="green" size="large">mdi-pencil</v-icon>
                         </router-link>
                         |
-                        <button type="button" class="ml-1" @click="destroy(user)">
-                            <i class="fas fa-trash fa-lg text-red"></i>
-                        </button>
+                        <v-btn variant="text" size="small" class="ml-1" @click="destroy(user)">
+                            <v-icon color="red" size="large">mdi-delete</v-icon>
+                        </v-btn>
                     </td>
                 </tr>
                 <!-- Si le tableau est chargé mais qu'il n'y a pas de données -->
-                <tr v-show="!users.length" class="justify-content-center">
+                <tr v-show="!users.length && loading" class="justify-content-center">
                     <td colspan="12" class="pt-4">
-                        <div class="alert alert-danger" role="alert">
-                            Oups ! Il n'y a aucune correspondance dans la base de données.
-                        </div>
+                        <v-alert type="warning" variant="tonal" icon="mdi-database-search">
+                            {{ search ? 'Aucune donnée ne correspond à votre recherche.' : 'Aucune donnée correspondante.' }}
+                        </v-alert>
                     </td>
                 </tr>
                 </tbody>
-            </v-simple-table>
+            </v-table>
             <PaginationComponent class="mt-3" v-if="pagination.last_page > 1"
                                  :pagination="pagination" :offset="5"
                                  @paginate="search === '' ? getData() : searchData()" />
@@ -94,9 +98,10 @@
 </template>
 
 <script>
-    import PaginationComponent from "../../elements/PaginationComponent";
-    import Spinner from "../../elements/SpinnerStepper";
+    import PaginationComponent from "../../elements/PaginationComponent.vue";
+    import Spinner from "../../elements/SpinnerStepper.vue";
     import {Form} from "vform";
+    import moment from 'moment';
 
     export default {
         name: "ListUtilisateurs",
@@ -140,6 +145,16 @@
             },
         },
         methods: {
+            formatDate(date) {
+                return moment(date).format('DD/MM/YYYY');
+            },
+            upperCase(value) {
+                return value ? value.toUpperCase() : '';
+            },
+            capitalize(value) {
+                if (!value) return '';
+                return value.charAt(0).toUpperCase() + value.slice(1);
+            },
             getData(){
                 this.$Progress.start();
                 this.loading = false;

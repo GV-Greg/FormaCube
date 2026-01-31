@@ -1,33 +1,39 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
 use App\User;
-use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(User::class, function (Faker $faker) {
-    $random = $faker->randomElement([0, 1]);
-    switch ($random) {
-        case 0:
-            $firstname = $faker->firstNameMale;
-            $lastname = $faker->lastName;
-            $avatar = 'man.png';
-            break;
-        case 1:
-            $firstname = $faker->firstNameFemale;
-            $lastname = $faker->lastName;
-            $avatar = 'woman.png';
-            break;
+class UserFactory extends Factory
+{
+    protected $model = User::class;
+
+    public function definition(): array
+    {
+        $random = $this->faker->randomElement([0, 1]);
+        switch ($random) {
+            case 0:
+                $firstname = $this->faker->firstNameMale;
+                $lastname = $this->faker->lastName;
+                $avatar = 'man.png';
+                break;
+            case 1:
+                $firstname = $this->faker->firstNameFemale;
+                $lastname = $this->faker->lastName;
+                $avatar = 'woman.png';
+                break;
+        }
+        $role = $this->faker->randomElement(['formateur', 'formateur', 'formateur', 'formateur', 'admin']);
+
+        return [
+            'firstname' => $firstname,
+            'lastname' => $lastname,
+            'email' => strtolower($firstname) . '.' . strtolower($lastname) . '@' . $this->faker->safeEmailDomain,
+            'password' => bcrypt($this->faker->unique()->password),
+            'fonction' => 'formateur',
+            'role' => $role,
+            'avatar' => $avatar,
+        ];
     }
-    $role = $faker->randomElement(['formateur', 'formateur', 'formateur', 'formateur', 'admin']);
-
-    return [
-        'firstname' => $firstname,
-        'lastname' => $lastname,
-        'email' => strtolower($firstname) . '.' . strtolower($lastname) . '@' . $faker->safeEmailDomain,
-        'password' => bcrypt($faker->unique()->password),
-        'fonction' => 'formateur',
-        'role' => $role,
-        'avatar' => $avatar,
-    ];
-});
+}

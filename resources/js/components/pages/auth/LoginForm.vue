@@ -1,35 +1,36 @@
 <template>
     <div class="container vh-100 d-flex flex-row align-items-center justify-content-center text-center">
         <div class="flex-col col-lg-6 bg-light p-5 rounded-xl" id="form__login">
-            <div class="d-flex justify-content-center">
-                <v-img :src="'./storage/images/logos/Logo_FormaCube-Noir-1000x200.png'" id="logo" alt="app logo"></v-img>
+            <div class="d-flex justify-content-center mb-4">
+                <img src="/storage/images/logos/Logo_FormaCube-1000x200.png" id="logo" alt="FormaCube logo" style="max-width: 400px; height: auto;" />
             </div>
             <v-container class="field my-3">
                 <v-text-field
                     label="Email"
-                    type="Email"
-                    prepend-inner-icon="fas fa-house-user"
-                    :min="0"
+                    type="email"
+                    prepend-inner-icon="mdi-account"
                     v-model="user.email"
                     :rules="emailRules"
-                    outlined
-                    color="green accent-4"
-                    class="v-form v-form-email mb-3"
+                    variant="outlined"
+                    color="primary"
+                    base-color="secondary"
+                    bg-color="white"
+                    class="mb-3"
                 >
                 </v-text-field>
                 <v-text-field
                     label="Mot de passe"
-                    type="Submit"
-                    :append-icon="TogglePass ? 'fas fa-eye' : 'fas fa-eye-slash'"
+                    :append-inner-icon="TogglePass ? 'mdi-eye' : 'mdi-eye-off'"
                     :type="TogglePass ? 'text' : 'password'"
-                    :min="0"
-                    prepend-inner-icon="fas fa-lock"
+                    prepend-inner-icon="mdi-lock"
                     v-model="user.password"
                     :rules="passwordRules"
-                    @click:append="TogglePass = !TogglePass"
-                    outlined
-                    color="green accent-4"
-                    class="v-form v-form-password mb-3"
+                    @click:append-inner="TogglePass = !TogglePass"
+                    variant="outlined"
+                    color="primary"
+                    base-color="secondary"
+                    bg-color="white"
+                    class="mb-3"
                 >
                 </v-text-field>
                 <div v-if="authError">
@@ -37,10 +38,10 @@
                         <strong>{{ authError }}</strong>
                     </p>
                 </div>
-                <button type="submit" class="btn btn-primary text-light px-3" @click="authenticate">Se loguer</button>
-                <div class="mt-4 mb-n10 text-primary-dark font-weight-bold">
-                    Compte de démo : <span class="text-primary-light">demo@creacube.be</span><br/>
-                    Mot de passe : <span class="text-primary-light">demo.2022</span>
+                <v-btn color="primary" size="large" @click="authenticate" class="mt-2">Se connecter</v-btn>
+                <div class="mt-4 text-secondary">
+                    Compte de démo : <strong class="text-primary">demo@creacube.be</strong><br/>
+                    Mot de passe : <strong class="text-primary">demo.2022</strong>
                 </div>
             </v-container>
         </div>
@@ -49,6 +50,7 @@
 
 <script>
     import { login } from '../../../helpers/auth';
+    import { useMainStore } from '../../../store';
 
     export default {
         name: 'login',
@@ -68,23 +70,27 @@
             TogglePass: false,
             error: null,
         }),
+        setup() {
+            const store = useMainStore();
+            return { store };
+        },
         methods: {
             authenticate() {
-                this.$store.dispatch('login');
+                this.store.login();
 
                 login(this.$data.user)
                     .then((response) => {
-                        this.$store.commit('loginSuccess', response);
+                        this.store.loginSuccess(response);
                         this.$router.push({ path: '/home'});
                     })
                     .catch((error) => {
-                        this.$store.commit('loginFailed', {error});
+                        this.store.loginFailed({error});
                     });
             }
         },
         computed: {
             authError() {
-                return this.$store.getters.authError;
+                return this.store.auth_error;
             }
         }
     }

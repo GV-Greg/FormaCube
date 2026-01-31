@@ -4,9 +4,12 @@ namespace App\Model;
 
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class FormationInscrit extends Model
 {
+    use HasFactory;
+
     protected $table = 'inscrit_formation';
 
     protected $fillable = [

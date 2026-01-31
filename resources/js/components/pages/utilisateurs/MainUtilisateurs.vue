@@ -1,22 +1,22 @@
 <template>
-    <div class="mx-5 d-flex flex-column justify-content-center">
-        <div class="mx-5">
-            <div class="row justify-content-end mt-3">
-                <div class="col col-lg-11">
-                    <div class="row justify-content-center" v-if="currentUser.role === 'superAdmin' || currentUser.role === 'master'">
+    <v-container fluid class="px-5">
+        <v-row justify="end" class="mt-3">
+            <v-col cols="12" lg="11">
+                <v-row justify="center" v-if="currentUser.role === 'superAdmin' || currentUser.role === 'master'">
+                    <v-col cols="12">
                         <router-view></router-view>
-                    </div>
-                    <div v-else>
-                        <page-not-found></page-not-found>
-                    </div>
+                    </v-col>
+                </v-row>
+                <div v-else>
+                    <page-not-found></page-not-found>
                 </div>
-            </div>
-        </div>
-    </div>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script>
-    import PageNotFound from "../../elements/PageNotFound";
+    import PageNotFound from "../../elements/PageNotFound.vue";
 
     export default {
         name: "utilisateurs-main",

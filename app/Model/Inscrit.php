@@ -2,20 +2,24 @@
 
 namespace App\Model;
 
-
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Searchable\Searchable;
 use Spatie\Searchable\SearchResult;
 
 class Inscrit extends Model implements Searchable
 {
+    use HasFactory;
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
         'nom', 'prenom', 'genre', 'date_naissance', 'rue', 'numero', 'boite', 'email', 'tel', 'gsm', 'commentaire_inscrit', 'prospect', 'newsletter'
     ];
 
-    protected $dates = ['date_naissance'];
+    protected $casts = [
+        'date_naissance' => 'datetime',
+    ];
 
     public function ville()
     {

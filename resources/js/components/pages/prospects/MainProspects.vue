@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import MainPage from "../../elements/MainPage"
+import MainPage from "../../elements/MainPage.vue"
 
 export default {
     name: "prospects-main",

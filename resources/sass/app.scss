@@ -6,26 +6,19 @@
 @import 'variables';
 
 // Bootstrap
-@import '~bootswatch/dist/spacelab/variables';
-@import '~bootstrap/scss/bootstrap';
-@import '~bootstrap-vue/src/index.scss';
-@import '~bootswatch/dist/spacelab/bootswatch';
-@import '~bootswatch/dist/spacelab/bootstrap';
-
-// Vuetify
-@import '~vuetify/dist/vuetify.min.css';
+@import 'bootswatch/dist/spacelab/variables';
+@import 'bootstrap/scss/bootstrap';
+@import 'bootswatch/dist/spacelab/bootswatch';
 
 // Material Design Icons pour Vuetify
-@import '~@mdi/font/css/materialdesignicons.min.css';
-@import '~@mdi/font/scss/materialdesignicons.scss';
+@import '@mdi/font/css/materialdesignicons.min.css';
 @import url('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css');
-@import '~material-design-icons-iconfont/dist/material-design-icons.css';
 
 // Font Awesome Icons
 $fa-font-path: "../webfonts";
-@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
-@import "~@fortawesome/fontawesome-free/scss/solid.scss";
-@import "~@fortawesome/fontawesome-free/scss/brands.scss";
+@import "@fortawesome/fontawesome-free/scss/fontawesome.scss";
+@import "@fortawesome/fontawesome-free/scss/solid.scss";
+@import "@fortawesome/fontawesome-free/scss/brands.scss";
 
 body {
     margin: 0;

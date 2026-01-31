@@ -1,698 +1,663 @@
 <template>
-    <div class="container">
-        <h1 class="d-flex align-content-center">
-            <button class="btn btn-light pb-2 mr-2" @click="retour">
-                <i class="fas fa-reply fa-lg text-primary-dark"></i>
-            </button>
-            Création d'une nouvelle formation
-        </h1>
-        <div class="row mt-2">
-            <v-stepper v-model="step" class="w-100">
-                <v-stepper-header>
-                    <v-stepper-step :complete="step > 1" step="1">Généralités</v-stepper-step>
+    <v-container fluid>
+        <v-row align="center" class="mb-4">
+            <v-col cols="auto">
+                <v-btn icon variant="text" @click="retour">
+                    <v-icon>mdi-arrow-left</v-icon>
+                </v-btn>
+            </v-col>
+            <v-col>
+                <h1 class="text-h4">Création d'une nouvelle formation</h1>
+            </v-col>
+        </v-row>
 
-                    <v-divider class="light"></v-divider>
+        <v-stepper v-model="step" :items="stepItems" alt-labels>
+            <template v-slot:item.1>
+                <v-card flat>
+                    <v-card-text v-if="loading">
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="formFormation.nom"
+                                    label="Nom *"
+                                    variant="outlined"
+                                    :error="!checkNom || !validationMinNom || !validationMaxNom"
+                                    :error-messages="getNomErrors()"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="formFormation.abreviation"
+                                    label="Abréviation *"
+                                    variant="outlined"
+                                    :error="!checkAbreviation || !validationMinAbreviation || !validationMaxAbreviation"
+                                    :error-messages="getAbreviationErrors()"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="formFormation.session"
+                                    label="Session"
+                                    variant="outlined"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    v-model="formFormation.salle_id"
+                                    :items="salles"
+                                    item-title="nom"
+                                    item-value="id"
+                                    label="Salle *"
+                                    variant="outlined"
+                                    :error="!checkSalle"
+                                    :error-messages="!checkSalle ? 'La salle est requise.' : ''"
+                                ></v-select>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="formFormation.date_debut"
+                                    label="Date de début *"
+                                    type="date"
+                                    variant="outlined"
+                                    :error="!checkDateDebut || !validationDatesDebutFin"
+                                    :error-messages="getDateDebutErrors()"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model="formFormation.date_fin"
+                                    label="Date de fin *"
+                                    type="date"
+                                    variant="outlined"
+                                    :error="!checkDateFin || !validationDatesDebutFin"
+                                    :error-messages="getDateFinErrors()"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model.number="formFormation.min_stagiaires"
+                                    label="Min. stagiaires *"
+                                    type="number"
+                                    min="0"
+                                    variant="outlined"
+                                    :error="!checkMinStagiaires || !validationMinStagiaires || !validationMinMaxStagiaires"
+                                    :error-messages="getMinStagiairesErrors()"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model.number="formFormation.max_stagiaires"
+                                    label="Max. stagiaires *"
+                                    type="number"
+                                    min="0"
+                                    variant="outlined"
+                                    :error="!checkMaxStagiaires || !validationMaxStagiaires || !validationMinMaxStagiaires"
+                                    :error-messages="getMaxStagiairesErrors()"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model.number="formFormation.nbre_heures"
+                                    label="Nombre d'heures *"
+                                    type="number"
+                                    min="0"
+                                    variant="outlined"
+                                    :error="!checkNbreHeures || !validationNbreHeures"
+                                    :error-messages="getNbreHeuresErrors()"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model.number="formFormation.prix"
+                                    label="Prix *"
+                                    type="number"
+                                    min="0"
+                                    variant="outlined"
+                                    suffix="€"
+                                    :error="!checkPrix || !validationPrix"
+                                    :error-messages="getPrixErrors()"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row class="mt-4">
+                            <v-col class="d-flex justify-space-between align-center">
+                                <span class="text-caption text-grey">* Champs obligatoires</span>
+                                <v-btn color="primary" @click="validationStepOne()">
+                                    Continuer
+                                    <v-icon end>mdi-arrow-right</v-icon>
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                    <v-card-text v-else class="text-center py-8">
+                        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+                        <div class="mt-4">Chargement...</div>
+                    </v-card-text>
+                </v-card>
+            </template>
 
-                    <v-stepper-step :complete="step > 2" step="2">Généralités (suite)</v-stepper-step>
+            <template v-slot:item.2>
+                <v-card flat>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="6">
+                                <v-select
+                                    v-model="formFormation.user_id"
+                                    :items="users.users || []"
+                                    :item-title="item => item.firstname + ' ' + item.lastname"
+                                    item-value="id"
+                                    label="Tuteur·rice *"
+                                    variant="outlined"
+                                    :error="!checkTuteur"
+                                    :error-messages="!checkTuteur ? 'Le tuteur·trice est requis·e.' : ''"
+                                ></v-select>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-text-field
+                                    v-model.number="formFormation.duree_rgpd"
+                                    label="Durée RGPD (années) *"
+                                    type="number"
+                                    min="0"
+                                    variant="outlined"
+                                    :error="!checkDureeRgpd || !validationDureeRgpd"
+                                    :error-messages="getDureeRgpdErrors()"
+                                ></v-text-field>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col cols="12">
+                                <v-textarea
+                                    v-model="formFormation.commentaire_formation"
+                                    label="Commentaire(s)"
+                                    variant="outlined"
+                                    rows="4"
+                                ></v-textarea>
+                            </v-col>
+                        </v-row>
+                        <v-row class="mt-4">
+                            <v-col class="d-flex justify-space-between align-center">
+                                <v-btn variant="outlined" color="error" @click="step = 1">
+                                    <v-icon start>mdi-arrow-left</v-icon>
+                                    Retour
+                                </v-btn>
+                                <span class="text-caption text-grey">* Champs obligatoires</span>
+                                <v-btn color="success" @click="validationStepTwo()">
+                                    {{ checkStoreFormation ? 'Modifier la formation' : 'Créer la formation' }}
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-card>
+            </template>
 
-                    <v-divider></v-divider>
-
-                    <v-stepper-step step="3">Recrutement</v-stepper-step>
-                </v-stepper-header>
-                <v-stepper-items>
-                    <!-- Contenu partie 1 : les généralités-->
-                    <v-stepper-content step="1">
-                        <div class="step-content mb-3" v-if="loading === true">
-                            <form>
-                                <div class="row row-cols-2">
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Nom*">
-                                            <b-form-input v-model="formFormation.nom" type="text"
-                                                          :state="checkNom && validationMinNom && validationMaxNom"
-                                                          class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('nom') }"
-                                                          name="nom" id="nom" placeholder="Nom de la formation">
-                                            </b-form-input>
-                                            <b-form-invalid-feedback id="nom-feedback" v-show="checkNom === false">
-                                                Le nom de la formation est requis.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="nom-min-feedback" v-show="validationMinNom === false">
-                                                Le nom doit &ecirc;tre compos&eacute; d'au moins 3 caract&egrave;res.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="nom-max-feedback" v-show="validationMaxNom === false">
-                                                Le nom doit &ecirc;tre compos&eacute; de moins 190 caract&egrave;res.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="nom"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Abréviation*">
-                                            <b-form-input v-model="formFormation.abreviation" type="text"
-                                                          :state="checkAbreviation && validationMinAbreviation && validationMaxAbreviation"
-                                                          class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('abreviation') }"
-                                                          name="abreviation" id="abreviation" placeholder="Abréviation de la formation">
-                                            </b-form-input>
-                                            <b-form-invalid-feedback id="abreviation-feedback" v-show="checkAbreviation === false">
-                                                L'abréviation de la formation est requise.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="abreviation-min-feedback" v-show="validationMinAbreviation === false">
-                                                L'abréviation de la formation doit &ecirc;tre compos&eacute; d'au moins 3 caract&egrave;res.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="abreviation-max-feedback" v-show="validationMaxAbreviation === false">
-                                                L'abréviation de la formation doit &ecirc;tre compos&eacute; de moins 21 caract&egrave;res.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="abreviation"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                </div>
-                                <div class="row row-cols-2">
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Session">
-                                            <b-form-input v-model="formFormation.session" type="text" :state="validationMaxSession"
-                                                          class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('session') }"
-                                                          name="session" id="session" placeholder="Session de la formation">
-                                            </b-form-input>
-                                            <b-form-invalid-feedback id="abreviation-max-feedback" v-show="validationMaxSession === false">
-                                                La session de la formation doit &ecirc;tre compos&eacute; de moins 190 caract&egrave;res.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="session"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Salle*">
-                                            <b-form-select v-model="formFormation.salle_id" :state="checkSalle"
-                                                           class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('salle_id') }"
-                                                           name="salle" id="salle" placeholder="Salle de la formation">
-                                                <b-form-select-option :value="null">Choisissez</b-form-select-option>
-                                                <b-form-select-option v-for="salle in salles" :key="salle.id" :value="salle.id">{{ salle.nom }}</b-form-select-option>
-                                            </b-form-select>
-                                            <b-form-invalid-feedback id="abreviation-max-feedback" v-show="checkSalle === false">
-                                                La salle est requise.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="salle"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                </div>
-                                <div class="row row-cols-2">
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Début*">
-                                            <b-form-datepicker v-model="formFormation.date_debut" type="date" local="fr-BE" :hide-header="hideHeader"
-                                                               :start-weekday="weekday" :date-disabled-fn="dateDisabled" :min="start_min"
-                                                               :state="checkDateDebut && validationDatesDebutFin" no-flip
-                                                               :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
-                                                               class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('date_debut')}"
-                                                               name="date_debut" id="date_debut" placeholder="Début de la formation">
-                                            </b-form-datepicker>
-                                            <b-form-invalid-feedback id="date-debut-feedback" v-show="checkDateDebut === false">
-                                                La date de début de formation est requise.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="dates-debut-fin-feedback" v-show="validationDatesDebutFin === false">
-                                                La date de fin de formation ne peut &ecirc;tre avant la date de d&eacute;but de la formation.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="date_debut"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Fin*">
-                                            <b-form-datepicker v-model="formFormation.date_fin" type="date" local="fr-BE" :hide-header="hideHeader"
-                                                               :start-weekday="weekday" :date-disabled-fn="dateDisabled" :min="dateTodayOrDebut"
-                                                               :state="checkDateFin && validationDatesDebutFin" no-flip
-                                                               :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
-                                                               class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('date_fin')}"
-                                                               name="date_fin" id="date_fin" placeholder="Fin de la formation">
-                                            </b-form-datepicker>
-                                            <b-form-invalid-feedback id="date-fin-feedback" v-show="checkDateFin === false">
-                                                La date de fin de formation est requise.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="dates-fin-debut-feedback" v-show="validationDatesDebutFin === false">
-                                                La date de fin de formation ne peut &ecirc;tre avant la date de d&eacute;but de la formation.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="date_fin"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                </div>
-                                <div class="row row-cols-2">
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Min. stagiaires*">
-                                            <b-form-input v-model.number="formFormation.min_stagiaires" type="number" min="0"
-                                                          :state="checkMinStagiaires && validationMinStagiaires && validationMinMaxStagiaires"
-                                                          class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('min_stagiaires')}"
-                                                          name="min_stagiaires" id="min_stagiaires" placeholder="Minimum de stagiaires">
-                                            </b-form-input>
-                                            <b-form-invalid-feedback id="check-min-stagiaire-feedback" v-show="checkMinStagiaires === false">
-                                                Le nombre minimum de stagiaires est requis.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="min-stagiaire-feedback" v-show="validationMinStagiaires === false">
-                                                Le nombre minimum de stagiaires doit &ecirc;tre sup&eacute;rieur &agrave; 0.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="min-max-stagiaire-feedback" v-show="validationMinMaxStagiaires  === false">
-                                                Le nombre min. de stagiaires doit &ecirc;tre inf&eacute;rieur au nombre max. de stagiaires.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="min_stagiaires"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Max. stagiaires*">
-                                            <b-form-input v-model.number="formFormation.max_stagiaires" type="number" min="0"
-                                                          :state="checkMaxStagiaires && validationMaxStagiaires && validationMinMaxStagiaires"
-                                                          class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('max_stagiaires')}"
-                                                          name="max_stagiaires" id="max_stagiaires" placeholder="Maximum de stagiaires">
-                                            </b-form-input>
-                                            <b-form-invalid-feedback id="check-max-stagiaire-feedback" v-show="checkMaxStagiaires === false">
-                                                Le nombre maximum de stagiaires est requis.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="max-stagiaire-feedback" v-show="validationMaxStagiaires === false">
-                                                Le nombre maximum de stagiaires doit &ecirc;tre sup&eacute;rieur &agrave; 0.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="max-min-stagiaire-feedback" v-show="validationMinMaxStagiaires  === false">
-                                                Le nombre min. de stagiaires doit &ecirc;tre inf&eacute;rieur au nombre max. de stagiaires.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="max_stagiaires"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                </div>
-                                <div class="row row-cols-2">
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Nombre d'heures*">
-                                            <b-form-input v-model.number="formFormation.nbre_heures" type="number" min="0"
-                                                          :state="checkNbreHeures && validationNbreHeures"
-                                                          class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('nbre_heures')}"
-                                                          name="nbre_heures" id="nbre_heures" placeholder="Nombre d'heures">
-                                            </b-form-input>
-                                            <b-form-invalid-feedback id="check-nbre-heures-feedback" v-show="checkNbreHeures === false">
-                                                Le nombre d'heures de formation est requis.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="nbre-heures-feedback" v-show="validationNbreHeures === false">
-                                                Le nombre d'heures doit &ecirc;tre sup&eacute;rieur &agrave; 0.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="nbre_heures"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Prix*">
-                                            <b-form-input v-model.number="formFormation.prix" type="number" min="0"
-                                                          :state="checkPrix && validationPrix"
-                                                          :class="{ 'is-invalid': formFormation.errors.has('prix')}"
-                                                          name="prix" id="prix" placeholder="Prix">
-                                            </b-form-input>
-                                            <b-input-group-append is-text>
-                                                <span class="text-primary-dark font-weight-bold">€</span>
-                                            </b-input-group-append>
-                                            <b-form-invalid-feedback id="check-nbre-heures-feedback" v-show="checkPrix === false">
-                                                Le prix de la formation est requis.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="nbre-heures-feedback" v-show="validationPrix === false">
-                                                Le prix de la formation doit &ecirc;tre sup&eacute;rieur &agrave; 0.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="prix"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                </div>
-                            </form>
-                            <div class="mt-3 d-flex justify-content-between">
-                                <span class="text-left font-weight-light font-italic text-primary-dark mt-2"><small>Tous les champs avec * sont obligatoires</small></span>
-                                <v-btn class="btn-primary" @click="validationStepOne()">Continuer</v-btn>
-                            </div>
-                        </div>
-                        <Spinner v-else />
-                    </v-stepper-content>
-                    <!-- Contenu partie 2 : les généralités suite-->
-                    <v-stepper-content step="2">
-                        <div class="step-content mb-6">
-                            <form>
-                                <div class="row row-cols-2">
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Tuteur·rice*">
-                                            <b-form-select v-model="formFormation.user_id" :state="checkTuteur"
-                                                           class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('user_id') }"
-                                                           name="user_id" id="user_id">
-                                                <b-form-select-option :value="null">Choisissez</b-form-select-option>
-                                                <b-form-select-option v-for="user in users.users" :key="user.id" :value="user.id">{{ user.firstname + ' ' + user.lastname }}</b-form-select-option>
-                                            </b-form-select>
-                                            <b-form-invalid-feedback id="check-tuteur-feedback" v-show="checkTuteur === false">
-                                                Le tuteur·trice de la formation est requis·e.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="user_id"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Durée RGPD*">
-                                            <b-form-input v-model.number="formFormation.duree_rgpd" type="number" min="0" :state="checkDureeRgpd && validationDureeRgpd"
-                                                          class="rounded-right" :class="{ 'is-invalid': formFormation.errors.has('duree_rgpd')}"
-                                                          name="duree_rgpd" id="duree_rgpd" placeholder="Durée durant laquelle garder les infos (RGPD)">
-                                            </b-form-input>
-                                            <b-form-invalid-feedback id="check-rgpd-feedback" v-show="checkDureeRgpd === false">
-                                                Le durée pour le RGPD est requis.
-                                            </b-form-invalid-feedback>
-                                            <b-form-invalid-feedback id="min-rgpd-feedback" v-show="validationDureeRgpd === false">
-                                                La durée pour le RGPD doit &ecirc;tre sup&eacute;rieur &agrave; 0.
-                                            </b-form-invalid-feedback>
-                                            <has-error :form="formFormation" field="duree_rgpd"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <b-input-group class="mb-2 mr-sm-2 mb-sm-0" prepend="Commentaire(s)">
-                                            <b-form-textarea v-model="formFormation.commentaire_formation" rows="5" class="rounded-right"
-                                                             name="commentaire_formation" id="commentaire_formation" placeholder="Entrez  un commentaire...">
-                                            </b-form-textarea>
-                                            <has-error :form="formFormation" field="commentaire_formation"></has-error>
-                                        </b-input-group>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="mt-5 d-flex justify-content-between">
-                            <v-btn class="btn-danger" @click="step = 1">Retour</v-btn>
-                            <span class="text-champs-obligatoires text-primary-dark"><small>Tous les champs avec * sont obligatoires</small></span>
-                            <v-btn class="btn-success" @click="validationStepTwo()">
-                                <span v-show="checkStoreFormation === false">Cr&eacute;er la formation</span>
-                                <span v-show="checkStoreFormation === true">Modifier la formation</span>
-                            </v-btn>
-                        </div>
-                    </v-stepper-content>
-                    <!-- Contenu partie 3 : Le recrutement -->
-                    <v-stepper-content step="3">
-                        <div class="step-content mb-6">
-                            <v-row>
-                                <v-col cols="8">
-                                    <span class="text-orange font-weight-bold">Cocher la case s'il y a des jours de recrutement :</span>
-                                    <v-checkbox v-model="checkRecrutement" label="Formation avec recrutement ?"
-                                                class="myLabel ml-5" color="success" hide-details>
-                                    </v-checkbox>
-                                </v-col>
-                            </v-row>
-                            <v-row v-if="checkRecrutement === true">
-                                <v-col cols="12" sm="6" class="d-flex justify-content-center">
-                                    <v-date-picker
-                                        v-model="listDatesRecrutements"
-                                        multiple no-title
-                                        :min="minRecrutement"
-                                        :max="maxRecrutement"
-                                        :allowed-dates="allowedDays()"
-                                        locale="fr"
-                                        :first-day-of-week="weekday"
-                                        color="green lighten-1"
-                                    >
-                                    </v-date-picker>
-                                </v-col>
-                                <v-col cols="12" sm="6" id="dates_recrutement">
-                                    <v-menu :close-on-content-click="false"
-                                            :return-value.sync="listDatesRecrutements"
-                                            transition="scale-transition"
-                                            offset-y
-                                            min-width="290px">
-                                        <template v-slot:activator="{ on, attrs }">
-                                            <v-combobox
-                                                v-model="listDatesRecrutements"
-                                                multiple
-                                                chips
-                                                small-chips
-                                                label="Date(s) de recrutement"
-                                                prepend-icon="mdi-calendar"
-                                                v-bind="attrs" v-on="on">
-                                            </v-combobox>
-                                        </template>
-                                    </v-menu>
-                                </v-col>
-                            </v-row>
-                        </div>
-                        <div class="mt-5 d-flex justify-content-between">
-                            <v-btn class="btn-danger" @click="step = 2">Retour</v-btn>
-                            <v-btn class="btn-success" @click="validationStepThree()">Cr&eacute;er</v-btn>
-                        </div>
-                    </v-stepper-content>
-                </v-stepper-items>
-            </v-stepper>
-        </div>
-    </div>
+            <template v-slot:item.3>
+                <v-card flat>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" md="8">
+                                <v-alert type="info" variant="tonal" class="mb-4">
+                                    Cocher la case s'il y a des jours de recrutement
+                                </v-alert>
+                                <v-checkbox
+                                    v-model="checkRecrutement"
+                                    label="Formation avec recrutement ?"
+                                    color="success"
+                                ></v-checkbox>
+                            </v-col>
+                        </v-row>
+                        <v-row v-if="checkRecrutement">
+                            <v-col cols="12" md="6">
+                                <v-date-picker
+                                    v-model="listDatesRecrutements"
+                                    multiple
+                                    :min="minRecrutement"
+                                    :max="maxRecrutement"
+                                    color="success"
+                                    show-adjacent-months
+                                ></v-date-picker>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <v-card variant="outlined">
+                                    <v-card-title>Dates sélectionnées</v-card-title>
+                                    <v-card-text>
+                                        <v-chip
+                                            v-for="(date, index) in listDatesRecrutements"
+                                            :key="index"
+                                            class="ma-1"
+                                            closable
+                                            @click:close="listDatesRecrutements.splice(index, 1)"
+                                        >
+                                            {{ formatDateDisplay(date) }}
+                                        </v-chip>
+                                        <p v-if="!listDatesRecrutements.length" class="text-grey">
+                                            Aucune date sélectionnée
+                                        </p>
+                                    </v-card-text>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                        <v-row class="mt-4">
+                            <v-col class="d-flex justify-space-between">
+                                <v-btn variant="outlined" color="error" @click="step = 2">
+                                    <v-icon start>mdi-arrow-left</v-icon>
+                                    Retour
+                                </v-btn>
+                                <v-btn color="success" @click="validationStepThree()">
+                                    <v-icon start>mdi-check</v-icon>
+                                    Créer
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-card>
+            </template>
+        </v-stepper>
+    </v-container>
 </template>
 
 <script>
-    import { Form } from "vform";
-    import Spinner from "../../elements/SpinnerStepper";
+import { Form } from "vform";
+import moment from 'moment';
 
-    export default {
-        name: "CreateFormation",
-        components: {
-            Spinner,
-        },
-        data () {
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const minDate = new Date(today);
-            const minDateR = new Date(now).toISOString().substring(0, 10);
-            return {
-                loading: false,
-                step: 1,
-                hideHeader: true,
-                weekday: 1,
-                start_min: minDate,
-                end_min: minDate,
-                min: minDate,
-                minRecrutement: minDateR,
-                dayBeforeFormation: null,
-                maxRecrutement: null,
-                formFormation : new Form({
-                    id: '',
-                    nom: '',
-                    session: '',
-                    date_debut: null,
-                    date_fin: null,
-                    min_stagiaires: '',
-                    max_stagiaires: '',
-                    nbre_heures: '',
-                    salle_id: null,
-                    prix: 0,
-                    commentaire_formation: '',
-                    user_id: null,
-                    statut: 'future',
-                    abreviation: '',
-                    duree_rgpd: '',
-                }),
-                users: [],
-                salles: [],
-                checkStoreFormation: false,
-                formation: [],
-                checkRecrutement: false,
-                menuDatesRecrutement: false,
-                listDatesRecrutements: [],
-                nbreRecrutements: null,
-                formRecrutement : new Form({
-                    formation_id: null,
-                    date: null,
-                }),
-                recrutements: [],
-                event: null,
-                finStoreRecrutement: false,
+export default {
+    name: "CreateFormation",
+    data() {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const minDate = today.toISOString().substring(0, 10);
+        return {
+            loading: false,
+            step: 1,
+            stepItems: [
+                { title: 'Généralités', value: 1 },
+                { title: 'Généralités (suite)', value: 2 },
+                { title: 'Recrutement', value: 3 },
+            ],
+            formFormation: new Form({
+                id: '',
+                nom: '',
+                session: '',
+                date_debut: null,
+                date_fin: null,
+                min_stagiaires: '',
+                max_stagiaires: '',
+                nbre_heures: '',
+                salle_id: null,
+                prix: 0,
+                commentaire_formation: '',
+                user_id: null,
+                statut: 'future',
+                abreviation: '',
+                duree_rgpd: '',
+            }),
+            users: [],
+            salles: [],
+            checkStoreFormation: false,
+            formation: [],
+            checkRecrutement: false,
+            listDatesRecrutements: [],
+            minRecrutement: minDate,
+            maxRecrutement: null,
+            formRecrutement: new Form({
+                formation_id: null,
+                date: null,
+            }),
+            finStoreRecrutement: false,
+        }
+    },
+    mounted() {
+        console.log('CreateFormation component mounted');
+        this.getUsers();
+        this.getSalles();
+    },
+    watch: {
+        checkRecrutement(val) {
+            if (!val) {
+                this.listDatesRecrutements = [];
             }
         },
-        mounted() {
-            console.log('CreateFormation component mounted');
-            this.getUsers();
-            this.getSalles();
+    },
+    computed: {
+        checkNom() {
+            return this.formFormation.nom !== '';
         },
-        watch: {
-            checkRecrutement: function() {
-                if(this.checkRecrutement === false) {
-                    this.listDatesRecrutements = [];
-                }
-            },
-
+        validationMinNom() {
+            if (this.checkNom) {
+                return this.formFormation.nom.length > 2;
+            }
+            return true;
         },
-        computed: {
-            checkNom() {
-                return this.formFormation.nom !== '';
-            },
-            validationMinNom() {
-                if(this.checkNom){
-                    return this.formFormation.nom.length > 2;
-                }
-            },
-            validationMaxNom() {
-                return this.formFormation.nom.length < 190;
-            },
-            checkAbreviation() {
-                return this.formFormation.abreviation !== '';
-            },
-            validationMinAbreviation() {
-                if(this.checkAbreviation){
-                    return this.formFormation.abreviation.length > 2;
-                }
-            },
-            validationMaxAbreviation() {
-                return this.formFormation.abreviation.length < 20;
-            },
-            validationMaxSession() {
-                if(this.formFormation.session !== '') {
-                    return this.formFormation.session.length < 190;
-                }
-            },
-            checkSalle() {
-                return this.formFormation.salle_id != null;
-            },
-            checkDateDebut() {
-                return this.formFormation.date_debut != null;
-            },
-            checkDateFin() {
-                return this.formFormation.date_fin != null;
-            },
-            dateTodayOrDebut() {
-                if(this.formFormation.date_debut === null) {
-                    let now = new Date();
-                    let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    return new Date(today);
-                } else {
-                    return this.formFormation.date_debut
-                }
-            },
-            validationDatesDebutFin() {
-                if(this.formFormation.date_debut !== null && this.formFormation.date_fin !== null) {
-                    return this.formFormation.date_debut <= this.formFormation.date_fin;
-                }
-            },
-            checkMinStagiaires() {
-                return this.formFormation.min_stagiaires !== '';
-            },
-            validationMinStagiaires() {
-                if(this.formFormation.min_stagiaires !== '') {
-                    return Number(this.formFormation.min_stagiaires) > 0;
-                }
-            },
-            checkMaxStagiaires() {
-                return this.formFormation.max_stagiaires !== '';
-            },
-            validationMaxStagiaires() {
-                if(this.formFormation.max_stagiaires !== '') {
-                    return Number(this.formFormation.max_stagiaires) > 0;
-                }
-            },
-            validationMinMaxStagiaires() {
-                if(this.formFormation.min_stagiaires !== '' && this.formFormation.max_stagiaires !== '') {
-                   return Number(this.formFormation.max_stagiaires) >= Number(this.formFormation.min_stagiaires);
-                }
-            },
-            checkNbreHeures() {
-                return this.formFormation.nbre_heures !== '';
-            },
-            validationNbreHeures() {
-                if(this.formFormation.nbre_heures !== '') {
-                    return Number(this.formFormation.nbre_heures) > 0;
-                }
-            },
-            checkPrix() {
-                return this.formFormation.prix !== '';
-            },
-            validationPrix() {
-                if(this.formFormation.prix !== '') {
-                    return Number(this.formFormation.prix) >= 0;
-                }
-            },
-            checkTuteur() {
-                return this.formFormation.user_id != null;
-            },
-            checkDureeRgpd() {
-                return this.formFormation.duree_rgpd !== ''
-            },
-            validationDureeRgpd() {
-                if(this.formFormation.duree_rgpd !== '') {
-                    return Number(this.formFormation.duree_rgpd) > 0;
-                }
-            },
+        validationMaxNom() {
+            return this.formFormation.nom.length < 190;
         },
-        methods: {
-            retour() {
-                Swal.fire({
-                    title: 'Êtes-vous sûr?',
-                    text: "Si vous continuez, vous retournez à la liste des formations!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3CB521',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: '<strong>RETOUR</strong>'
-                }).then((result) => {
-                    if (result.value) {
-                        this.$router.push('/formations')
-                    }
-                });
-            },
-            twoDigit(n) {
-                return (n < 10 ? '0' : '') + n
-            },
-            dateDisabled(ymd, date) {
-                const weekday = date.getDay()
-                return weekday === 0 || weekday === 6
-            },
-            allowedDays: function(a){
-                return val => [a].indexOf(val) === -1 && ![0,6].includes(new Date(val).getDay());
-            },
-            validation(test, message){
-                if(test) {
-                    Snackbar.fire(message);
-                    return true;
-                }
-                return false;
-            },
-
-            getUsers() {
-                axios.get('api/users/tuteurs')
-                    .then(response => {
-                        this.users = response.data;
-                    })
-                    .catch(error => {
-                        console.log(error.response);
-                        Snackbar.fire({
-                            title: 'Problème avec la récupération des tuteurs !',
-                            timer: undefined,
-                        })
-                    })
-            },
-            getSalles() {
-                axios.get('api/salles/all')
-                    .then(response => {
-                        this.salles = response.data.salles;
-                        this.loading = true;
-                    })
-                    .catch(error => {
-                        console.log(error.response);
-                        Snackbar.fire({
-                            title: 'Problème avec la récupération des salles !',
-                            timer: undefined,
-                        })
-                    })
-            },
-            validationStepOne() {
-                if(this.checkNom && this.checkAbreviation && this.checkSalle && this.checkDateDebut && this.checkDateFin &&
-                    this.checkMinStagiaires && this.checkMaxStagiaires && this.checkNbreHeures && this.checkPrix) {
-                    if(this.validationMinStagiaires && this.validationMaxStagiaires && this.validationNbreHeures) {
-                        if(this.validation(!this.validationMaxNom, "Le nom doit être composé de moins de 100 caractères !")) {
-                        } else if(this.validation(!this.validationMaxAbreviation, "L'abréviation de la formation doit être composé de moins de 20 caractères !")) {
-                        } else if(this.validation(this.formFormation.session !== '' && !this.validationMaxSession, "La session de formation doit être composé de moins de 190 caractères !")) {
-                        } else {
-                            if(this.twoDigit(this.formFormation.min_stagiaires) <= this.twoDigit(this.formFormation.max_stagiaires)) {
-                                if(this.formFormation.date_fin >= this.formFormation.date_debut) {
-                                    this.dayBeforeFormation = new Date(this.formFormation.date_debut);
-                                    this.dayBeforeFormation = this.dayBeforeFormation.setDate(this.dayBeforeFormation.getDate() -1);
-                                    this.maxRecrutement = new Date(this.dayBeforeFormation).toISOString().substr(0, 10)
-                                    this.step = 2;
-                                } else {
-                                    Snackbar.fire('La fin de formation ne peut être avant le début de la formation !');
-                                }
-                            } else {
-                                Snackbar.fire('Nombre de stagiaires : Le minimum doit être plus petit que le max !');
-                            }
-                        }
-                    } else {
-                        Snackbar.fire('Vous avez rempli des champs avec un nombre négatif et/ou nul !');
-                    }
-                } else {
-                    Snackbar.fire('Vous n\'avez pas rempli tous les champs obligatoires !');
-                }
-            },
-            validationStepTwo() {
-                if(this.checkTuteur && this.checkDureeRgpd) {
-                    if(this.validationDureeRgpd) {
-                        if(this.checkStoreFormation === false) {
-                            this.storeFormation();
-                        } else if(this.checkStoreFormation === true) {
-                            this.updateFormation();
-                        }
-                    } else {
-                        Snackbar.fire('La durée RGPD doit être supérieur à 0 !');
-                    }
-                } else {
-                    Snackbar.fire('Vous n\'avez pas rempli tous les champs obligatoires !');
-                }
-            },
-            storeFormation() {
-                this.$Progress.start();
-                this.formFormation
-                    .post('api/formations/create')
-                    .then(response => {
-                        if(this.formFormation.successful) {
-                            this.$Progress.finish();
-                            Toast.fire('Formation créée');
-                            this.formation = response.data.data;
-                            this.checkStoreFormation = true;
-                            this.step = 3;
-                        }
-                    })
-                    .catch(error => {
-                        this.$Progress.fail();
-                        console.log(error.response);
-                        Snackbar.fire('Problème avec la création de la formation');
-                    })
-            },
-            updateFormation() {
-                this.$Progress.start();
-                this.formFormation
-                    .put('api/formations/edit/' + this.formation.id)
-                    .then(response => {
-                        if(this.formFormation.successful) {
-                            this.$Progress.finish();
-                            Toast.fire('Formation modifiée');
-                            this.formation = response.data.data;
-                            this.checkStoreFormation = true;
-                            this.step = 3;
-                        }
-                    })
-                    .catch(error => {
-                        this.$Progress.fail();
-                        console.log(error.response);
-                        Snackbar.fire('Problème avec la modification de la formation');
-                    })
-            },
-            validationStepThree() {
-                if(this.checkRecrutement === false) {
+        checkAbreviation() {
+            return this.formFormation.abreviation !== '';
+        },
+        validationMinAbreviation() {
+            if (this.checkAbreviation) {
+                return this.formFormation.abreviation.length > 2;
+            }
+            return true;
+        },
+        validationMaxAbreviation() {
+            return this.formFormation.abreviation.length < 20;
+        },
+        validationMaxSession() {
+            if (this.formFormation.session !== '') {
+                return this.formFormation.session.length < 190;
+            }
+            return true;
+        },
+        checkSalle() {
+            return this.formFormation.salle_id != null;
+        },
+        checkDateDebut() {
+            return this.formFormation.date_debut != null;
+        },
+        checkDateFin() {
+            return this.formFormation.date_fin != null;
+        },
+        validationDatesDebutFin() {
+            if (this.formFormation.date_debut && this.formFormation.date_fin) {
+                return this.formFormation.date_debut <= this.formFormation.date_fin;
+            }
+            return true;
+        },
+        checkMinStagiaires() {
+            return this.formFormation.min_stagiaires !== '';
+        },
+        validationMinStagiaires() {
+            if (this.formFormation.min_stagiaires !== '') {
+                return Number(this.formFormation.min_stagiaires) > 0;
+            }
+            return true;
+        },
+        checkMaxStagiaires() {
+            return this.formFormation.max_stagiaires !== '';
+        },
+        validationMaxStagiaires() {
+            if (this.formFormation.max_stagiaires !== '') {
+                return Number(this.formFormation.max_stagiaires) > 0;
+            }
+            return true;
+        },
+        validationMinMaxStagiaires() {
+            if (this.formFormation.min_stagiaires !== '' && this.formFormation.max_stagiaires !== '') {
+                return Number(this.formFormation.max_stagiaires) >= Number(this.formFormation.min_stagiaires);
+            }
+            return true;
+        },
+        checkNbreHeures() {
+            return this.formFormation.nbre_heures !== '';
+        },
+        validationNbreHeures() {
+            if (this.formFormation.nbre_heures !== '') {
+                return Number(this.formFormation.nbre_heures) > 0;
+            }
+            return true;
+        },
+        checkPrix() {
+            return this.formFormation.prix !== '';
+        },
+        validationPrix() {
+            if (this.formFormation.prix !== '') {
+                return Number(this.formFormation.prix) >= 0;
+            }
+            return true;
+        },
+        checkTuteur() {
+            return this.formFormation.user_id != null;
+        },
+        checkDureeRgpd() {
+            return this.formFormation.duree_rgpd !== '';
+        },
+        validationDureeRgpd() {
+            if (this.formFormation.duree_rgpd !== '') {
+                return Number(this.formFormation.duree_rgpd) > 0;
+            }
+            return true;
+        },
+    },
+    methods: {
+        formatDateDisplay(date) {
+            if (!date) return '';
+            return moment(date).format('DD/MM/YYYY');
+        },
+        getNomErrors() {
+            if (!this.checkNom) return 'Le nom est requis.';
+            if (!this.validationMinNom) return 'Le nom doit comporter au moins 3 caractères.';
+            if (!this.validationMaxNom) return 'Le nom doit comporter moins de 190 caractères.';
+            return '';
+        },
+        getAbreviationErrors() {
+            if (!this.checkAbreviation) return "L'abréviation est requise.";
+            if (!this.validationMinAbreviation) return "L'abréviation doit comporter au moins 3 caractères.";
+            if (!this.validationMaxAbreviation) return "L'abréviation doit comporter moins de 20 caractères.";
+            return '';
+        },
+        getDateDebutErrors() {
+            if (!this.checkDateDebut) return 'La date de début est requise.';
+            if (!this.validationDatesDebutFin) return 'La date de fin ne peut être avant la date de début.';
+            return '';
+        },
+        getDateFinErrors() {
+            if (!this.checkDateFin) return 'La date de fin est requise.';
+            if (!this.validationDatesDebutFin) return 'La date de fin ne peut être avant la date de début.';
+            return '';
+        },
+        getMinStagiairesErrors() {
+            if (!this.checkMinStagiaires) return 'Le nombre minimum est requis.';
+            if (!this.validationMinStagiaires) return 'Le nombre doit être supérieur à 0.';
+            if (!this.validationMinMaxStagiaires) return 'Le min doit être inférieur au max.';
+            return '';
+        },
+        getMaxStagiairesErrors() {
+            if (!this.checkMaxStagiaires) return 'Le nombre maximum est requis.';
+            if (!this.validationMaxStagiaires) return 'Le nombre doit être supérieur à 0.';
+            if (!this.validationMinMaxStagiaires) return 'Le min doit être inférieur au max.';
+            return '';
+        },
+        getNbreHeuresErrors() {
+            if (!this.checkNbreHeures) return "Le nombre d'heures est requis.";
+            if (!this.validationNbreHeures) return 'Le nombre doit être supérieur à 0.';
+            return '';
+        },
+        getPrixErrors() {
+            if (!this.checkPrix) return 'Le prix est requis.';
+            if (!this.validationPrix) return 'Le prix doit être supérieur ou égal à 0.';
+            return '';
+        },
+        getDureeRgpdErrors() {
+            if (!this.checkDureeRgpd) return 'La durée RGPD est requise.';
+            if (!this.validationDureeRgpd) return 'La durée doit être supérieure à 0.';
+            return '';
+        },
+        retour() {
+            Swal.fire({
+                title: 'Êtes-vous sûr?',
+                text: "Si vous continuez, vous retournez à la liste des formations!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3CB521',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '<strong>RETOUR</strong>'
+            }).then((result) => {
+                if (result.value) {
                     this.$router.push('/formations')
-                } else {
-                    if(this.checkRecrutement === true && this.listDatesRecrutements.length === 0) {
-                        Snackbar.fire('Vous n\'avez pas encodé de date(s) !');
+                }
+            });
+        },
+        getUsers() {
+            axios.get('api/users/tuteurs')
+                .then(response => {
+                    this.users = response.data;
+                })
+                .catch(error => {
+                    console.log(error.response);
+                    Snackbar.fire({
+                        title: 'Problème avec la récupération des tuteurs !',
+                        timer: undefined,
+                    })
+                })
+        },
+        getSalles() {
+            axios.get('api/salles/all')
+                .then(response => {
+                    this.salles = response.data.salles;
+                    this.loading = true;
+                })
+                .catch(error => {
+                    console.log(error.response);
+                    Snackbar.fire({
+                        title: 'Problème avec la récupération des salles !',
+                        timer: undefined,
+                    })
+                })
+        },
+        validationStepOne() {
+            if (this.checkNom && this.checkAbreviation && this.checkSalle && this.checkDateDebut && this.checkDateFin &&
+                this.checkMinStagiaires && this.checkMaxStagiaires && this.checkNbreHeures && this.checkPrix) {
+                if (this.validationMinStagiaires && this.validationMaxStagiaires && this.validationNbreHeures) {
+                    if (!this.validationMaxNom) {
+                        Snackbar.fire("Le nom doit être composé de moins de 100 caractères !");
+                    } else if (!this.validationMaxAbreviation) {
+                        Snackbar.fire("L'abréviation doit être composée de moins de 20 caractères !");
+                    } else if (this.formFormation.session !== '' && !this.validationMaxSession) {
+                        Snackbar.fire("La session doit être composée de moins de 190 caractères !");
+                    } else if (Number(this.formFormation.min_stagiaires) > Number(this.formFormation.max_stagiaires)) {
+                        Snackbar.fire('Le minimum de stagiaires doit être plus petit que le maximum !');
+                    } else if (this.formFormation.date_fin < this.formFormation.date_debut) {
+                        Snackbar.fire('La fin de formation ne peut être avant le début !');
                     } else {
-                        this.storeRecrutements();
+                        const dayBefore = new Date(this.formFormation.date_debut);
+                        dayBefore.setDate(dayBefore.getDate() - 1);
+                        this.maxRecrutement = dayBefore.toISOString().substr(0, 10);
+                        this.step = 2;
                     }
+                } else {
+                    Snackbar.fire('Vous avez rempli des champs avec un nombre négatif et/ou nul !');
                 }
-            },
-            storeRecrutements() {
-                this.finStoreRecrutement = false;
-                for(let x = 0; x < this.listDatesRecrutements.length; x++) {
-                    this.formRecrutement = new Form({
-                        formation_id: this.formation.id,
-                        date: this.listDatesRecrutements[x],
-                    });
-                    this.storeRecrutement();
-                    if(x === this.listDatesRecrutements.length-1) {
-                        this.finStoreRecrutement = true;
+            } else {
+                Snackbar.fire("Vous n'avez pas rempli tous les champs obligatoires !");
+            }
+        },
+        validationStepTwo() {
+            if (this.checkTuteur && this.checkDureeRgpd) {
+                if (this.validationDureeRgpd) {
+                    if (!this.checkStoreFormation) {
+                        this.storeFormation();
+                    } else {
+                        this.updateFormation();
                     }
+                } else {
+                    Snackbar.fire('La durée RGPD doit être supérieure à 0 !');
                 }
-            },
-            storeRecrutement() {
-                this.$Progress.start();
-                this.formRecrutement
-                    .post('api/recrutements')
-                    .then(response => {
-                        if(this.formRecrutement.successful) {
-                            this.$Progress.finish();
-                            Toast.fire('Recrutement créé');
-                            if(this.finStoreRecrutement === true) {
-                                this.$router.push('/formations')
-                            }
+            } else {
+                Snackbar.fire("Vous n'avez pas rempli tous les champs obligatoires !");
+            }
+        },
+        storeFormation() {
+            this.$Progress.start();
+            this.formFormation
+                .post('api/formations/create')
+                .then(response => {
+                    if (this.formFormation.successful) {
+                        this.$Progress.finish();
+                        Toast.fire('Formation créée');
+                        this.formation = response.data.data;
+                        this.checkStoreFormation = true;
+                        this.step = 3;
+                    }
+                })
+                .catch(error => {
+                    this.$Progress.fail();
+                    console.log(error.response);
+                    Snackbar.fire('Problème avec la création de la formation');
+                })
+        },
+        updateFormation() {
+            this.$Progress.start();
+            this.formFormation
+                .put('api/formations/edit/' + this.formation.id)
+                .then(response => {
+                    if (this.formFormation.successful) {
+                        this.$Progress.finish();
+                        Toast.fire('Formation modifiée');
+                        this.formation = response.data.data;
+                        this.checkStoreFormation = true;
+                        this.step = 3;
+                    }
+                })
+                .catch(error => {
+                    this.$Progress.fail();
+                    console.log(error.response);
+                    Snackbar.fire('Problème avec la modification de la formation');
+                })
+        },
+        validationStepThree() {
+            if (!this.checkRecrutement) {
+                this.$router.push('/formations')
+            } else {
+                if (this.listDatesRecrutements.length === 0) {
+                    Snackbar.fire("Vous n'avez pas encodé de date(s) !");
+                } else {
+                    this.storeRecrutements();
+                }
+            }
+        },
+        storeRecrutements() {
+            this.finStoreRecrutement = false;
+            for (let x = 0; x < this.listDatesRecrutements.length; x++) {
+                const dateStr = typeof this.listDatesRecrutements[x] === 'string'
+                    ? this.listDatesRecrutements[x]
+                    : this.listDatesRecrutements[x].toISOString().substring(0, 10);
+                this.formRecrutement = new Form({
+                    formation_id: this.formation.id,
+                    date: dateStr,
+                });
+                this.storeRecrutement();
+                if (x === this.listDatesRecrutements.length - 1) {
+                    this.finStoreRecrutement = true;
+                }
+            }
+        },
+        storeRecrutement() {
+            this.$Progress.start();
+            this.formRecrutement
+                .post('api/recrutements')
+                .then(response => {
+                    if (this.formRecrutement.successful) {
+                        this.$Progress.finish();
+                        Toast.fire('Recrutement créé');
+                        if (this.finStoreRecrutement) {
+                            this.$router.push('/formations')
                         }
-                    })
-                    .catch(error => {
-                        this.$Progress.fail();
-                        console.log(error.response);
-                        if (error.response.status === 422) {
-                            Snackbar.fire('Recrutement déjà existant');
-                        } else {
-                            Snackbar.fire('Problème avec la création d\'un recrutement');
-                        }
-                    })
-            },
-        }
+                    }
+                })
+                .catch(error => {
+                    this.$Progress.fail();
+                    console.log(error.response);
+                    if (error.response.status === 422) {
+                        Snackbar.fire('Recrutement déjà existant');
+                    } else {
+                        Snackbar.fire("Problème avec la création d'un recrutement");
+                    }
+                })
+        },
     }
+}
 </script>
 
 <style scoped>
-
+.v-stepper {
+    background: transparent;
+}
 </style>

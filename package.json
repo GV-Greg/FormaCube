@@ -27,7 +27,7 @@
         "pinia-plugin-persistedstate": "^3.2.3",
         "sweetalert2": "^11.15.3",
         "vform": "^2.1.2",
-        "vue": "^3.5.13",
+        "vue": "^3.5.44",
         "vue-router": "^4.5.0",
         "vuetify": "^3.8.0"
     }
